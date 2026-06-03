@@ -114,13 +114,13 @@
         .badge-review { background-color: rgba(242, 54, 69, 0.15); color: var(--color-positive); border: 1px solid var(--color-positive); }
         
         .report-text {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             line-height: 1.6;
             color: var(--text-main);
-            background-color: var(--bg-input);
-            padding: 12px;
-            border-radius: 8px;
-            border-left: 3px solid var(--border-focus);
+            background-color: transparent;
+            padding: 0;
+            border-left: none;
+            width: 100%;
         }
 
         /* --- 入力フォーム --- */
@@ -298,28 +298,31 @@
             width: auto;
         }
 
-        /* --- 履歴リスト --- */
+        /* --- 履歴リスト（全幅フラット化＆高さを1.5倍に拡張） --- */
         .history-list {
-            max-height: 280px;
+            max-height: 420px; /* 280pxから1.5倍に拡張 */
             overflow-y: auto;
+            margin: 0 -16px;   /* 親要素のパディングを相殺して全幅化 */
+            padding: 0 16px;
         }
         .history-item {
             display: flex;
             flex-direction: column;
-            padding: 12px;
+            padding: 12px 0;   /* 左右の余白を削り上下のみに */
             border-bottom: 1px solid var(--border-color);
-            background-color: var(--bg-card);
-            transition: background-color 0.2s;
+            background-color: transparent; /* 背景カード感を廃止 */
+            transition: background-color 0.15s;
             user-select: none;
             -webkit-user-select: none;
         }
         .history-item:last-child { border-bottom: none; }
         .history-item:active { background-color: var(--bg-input); }
+        
         .history-meta {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
         .history-date {
             font-family: var(--font-mono);
@@ -337,13 +340,14 @@
             font-size: 0.85rem;
             color: var(--text-main);
             white-space: pre-wrap;
-            padding-left: 2px;
+            padding-left: 0; /* 絵文字削除に伴いパディング調整 */
+            line-height: 1.5;
         }
         .hint-text {
             font-size: 0.75rem;
             color: var(--text-muted);
             text-align: right;
-            margin-top: 4px;
+            margin-top: 12px;
         }
 
         /* --- プロフィール ＆ 適正範囲 --- */
@@ -412,6 +416,30 @@
             margin-top: 4px;
         }
         .btn-profile-save:hover { background-color: var(--theme-blue); }
+
+        /* システムデータリセットボタン */
+        .system-danger-zone {
+            margin-top: 32px;
+            padding-top: 16px;
+            border-top: 1px dashed var(--border-color);
+            text-align: center;
+        }
+        .btn-danger-reset {
+            background-color: rgba(242, 54, 69, 0.1);
+            color: var(--color-positive);
+            border: 1px solid rgba(242, 54, 69, 0.4);
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-danger-reset:hover {
+            background-color: var(--color-positive);
+            color: #fff;
+            border-color: var(--color-positive);
+        }
 
         /* --- モーダル --- */
         .modal-overlay {
@@ -620,6 +648,10 @@
         </div>
     </div>
 
+    <div class="system-danger-zone">
+        <button class="btn-danger-reset" onclick="resetAllDataData()">🗑️ すべてのデータをリセット</button>
+    </div>
+
     <div id="help-modal" class="modal-overlay" onclick="toggleModal(false)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h3>MyLog マニュアル</h3>
@@ -627,9 +659,9 @@
             <ul>
                 <li><strong>高速入力対応:</strong> 体重欄に「655」のようにドットを省いて打つと、自動的に「65.5」へ補正されます。</li>
                 <li><strong>メモのみの記録:</strong> 体重欄を空欄にして、メモ（日記や行動ログ）だけを保存することも可能です。</li>
-                <li><strong>ストレスフリー設計:</strong> 画面内の必要以上の「kg」単位の連続を徹底排除。数値のみがクリアに確認できます。</li>
-                <li><strong>スマホ完全最適化:</strong> グラフのピンチ・スクロールズームを制限し、さらに邪魔なポップアップ（ツールチップ）を廃止。触れた位置の正確な情報は、すべて上部の板情報テーブルへと瞬時に同期されます。</li>
-                <li><strong>範囲連動型インジケーター:</strong> 期間プルダウンを変更すると、「期間内最高」「期間内最安」も、指定された範囲内だけで自動計算・再マッピングされます。</li>
+                <li><strong>全幅フラット仕様:</strong> ログ表示の枠線をなくし、スマートに情報を凝縮。1.5倍の拡張ウィンドウで一度に多くの履歴を見渡せます。</li>
+                <li><strong>高精度タップ連動:</strong> グラフのローソク足をタップまたはマウスでホバーすると、上部の板情報データ（始値・高値・安値・終値）が完全に同期して変化します。スマホでも確実に確認できます。</li>
+                <li><strong>一括リセット機能:</strong> ページ最下部から、プリセットのサンプルデータを含めた全てのデータを安全に完全一括消去できます。</li>
             </ul>
             <button class="btn-close" onclick="toggleModal(false)">閉じる</button>
         </div>
@@ -908,7 +940,7 @@
                 if (log.memo) {
                     const memoEl = document.createElement('div');
                     memoEl.className = 'history-memo';
-                    memoEl.innerText = `📝 ${log.memo}`;
+                    memoEl.innerText = log.memo; // 📝 絵文字を完全に撤廃
                     item.appendChild(memoEl);
                 }
 
@@ -943,6 +975,21 @@
                 renderHistory();
                 updateChart();
                 generateReport();
+            }
+        }
+
+        function resetAllDataData() {
+            if (confirm("【警告】\nすべてのサンプルデータおよび記録ログを完全に消去しますか？この操作は戻せません。")) {
+                if (confirm("本当に本当によろしいですか？（すべての履歴が空になります）")) {
+                    logs = [];
+                    localStorage.setItem('weight_logs', JSON.stringify(logs));
+                    showToast("すべてのデータをクリアしました");
+                    
+                    updateSummaryIndicator();
+                    renderHistory();
+                    updateChart();
+                    generateReport();
+                }
             }
         }
 
@@ -1072,11 +1119,12 @@
                     id: 'weight_chart',
                     background: 'transparent',
                     toolbar: { show: false },
-                    // ズーム・スクロールピンチ操作を完全に不許可
                     zoom: { enabled: false },
                     scrolling: { enabled: false },
                     events: {
                         mouseMove: function(event, chartContext, config) { updateBoardLabels(config); },
+                        dataPointMouseEnter: function(event, chartContext, config) { updateBoardLabels(config); },
+                        dataPointSelection: function(event, chartContext, config) { updateBoardLabels(config); },
                         mouseLeave: function() { resetBoardToLatest(); }
                     }
                 },
@@ -1104,7 +1152,6 @@
                         formatter: function (val) { return val ? val.toFixed(1) : ""; }
                     }
                 },
-                // ポップアップ表示(ツールチップ)を非表示にし、視認性をボードに一本化
                 tooltip: {
                     enabled: false
                 },
@@ -1150,7 +1197,6 @@
             const range = document.getElementById('range-selector').value;
             const dataObj = getDailyCandlestickData(range);
 
-            // 選択期間に基づいて期間内最高・最安を再計算(連動)
             updatePeriodExtremeValues(dataObj.candlestick);
 
             chart.updateSeries([
@@ -1165,7 +1211,6 @@
             setTimeout(() => { resetBoardToLatest(); }, 100);
         }
 
-        // 選択されたプルダウンのデータ範囲に基づいて最高・最安値を精密マッピング
         function updatePeriodExtremeValues(candlestickData) {
             if (!candlestickData || candlestickData.length === 0) {
                 document.getElementById('board-period-high').innerText = '--';
@@ -1183,8 +1228,10 @@
             if (dataPointIndex === undefined || dataPointIndex < 0) return;
 
             const w = config.w;
+            if (!w || !w.config || !w.config.series || !w.config.series[0] || !w.config.series[0].data) return;
+            
             const candleData = w.config.series[0].data[dataPointIndex];
-            if (!candleData) return;
+            if (!candleData || !candleData.y) return;
 
             const dateObj = new Date(candleData.x);
             const dateStr = `${dateObj.getFullYear()}/${String(dateObj.getMonth()+1).padStart(2,'0')}/${String(dateObj.getDate()).padStart(2,'0')}`;
