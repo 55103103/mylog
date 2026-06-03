@@ -237,7 +237,7 @@
             color: var(--theme-blue);
         }
 
-        /* --- 板情報（情報テーブルの省スペース・1行最適化） --- */
+        /* --- 板情報（3項目削除し、究極に高さを圧縮したテーブル） --- */
         .board-grid {
             display: grid;
             grid-template-columns: repeat(1, 1fr);
@@ -246,16 +246,16 @@
             border: 1px solid var(--border-color);
             border-radius: 8px;
             overflow: hidden;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
         @media(min-width: 480px) {
             .board-grid { grid-template-columns: repeat(2, 1fr); }
         }
         .board-cell {
             background-color: var(--bg-input);
-            padding: 10px 14px;
+            padding: 9px 14px;
             display: flex;
-            justify-content: space-between; /* ラベルと数値を左右に振り分け */
+            justify-content: space-between;
             align-items: center;
         }
         .board-cell.full-width {
@@ -267,7 +267,6 @@
         .board-label {
             font-size: 0.8rem;
             color: var(--text-muted);
-            margin-bottom: 0; /* 下マージンを排除 */
         }
         .board-value {
             font-family: var(--font-mono);
@@ -279,16 +278,11 @@
             font-size: 0.85rem;
         }
 
-        /* ターゲット指標用セルの固有スタイル */
-        .board-label.target-center { color: #5c85ff; }
-        .board-label.target-high { color: #ff6b76; }
-        .board-label.target-low { color: #52ec8b; }
-
         /* --- チャートコントロール --- */
         .chart-controls {
             display: flex;
             justify-content: flex-end;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
         .range-select {
             background-color: var(--bg-input);
@@ -300,17 +294,66 @@
             width: auto;
         }
 
+        /* --- 【新規】グラフ下インジケーター（ターゲット基準値の表示エリア） --- */
+        .chart-bottom-indicators {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+            padding: 10px 12px;
+            background-color: rgba(30, 34, 45, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+        @media(min-width: 540px) {
+            .chart-bottom-indicators { grid-template-columns: repeat(3, 1fr); }
+        }
+        .indicator-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+        }
+        @media(min-width: 540px) {
+            .indicator-item.full-mobile { grid-column: span 1; }
+        }
+        /* スマホ時のみ3つ目の項目（適正下限）を横いっぱいに広げてバランスを取る */
+        @style (max-width: 539px) {
+            .indicator-item.full-mobile { grid-column: span 2; }
+        }
+        .indicator-label {
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .indicator-value {
+            font-weight: 700;
+            color: var(--text-bright);
+        }
+        /* 凡例カラーインジケーター */
+        .ind-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+            display: inline-block;
+        }
+        .ind-high { background-color: #ff6b76; }
+        .ind-center { background-color: var(--theme-blue); }
+        .ind-low { background-color: #08d158; }
+
         /* --- 履歴リスト --- */
         .history-list {
             max-height: 420px;
             overflow-y: auto;
-            margin: 0 -16px;   /* 親要素のパディングを相殺して全幅化 */
+            margin: 0 -16px;
             padding: 0 16px;
         }
         .history-item {
             display: flex;
             flex-direction: column;
-            padding: 12px 0;   /* 左右の余白を削り上下のみに */
+            padding: 12px 0;
             border-bottom: 1px solid var(--border-color);
             background-color: transparent;
             transition: background-color 0.15s;
@@ -546,18 +589,6 @@
                 <span class="board-label">期間内最安</span>
                 <span id="board-period-low" class="board-value">--</span>
             </div>
-            <div class="board-cell">
-                <span class="board-label target-high">適正上限 (25)</span>
-                <span id="board-target-high" class="board-value">--</span>
-            </div>
-            <div class="board-cell">
-                <span class="board-label target-center">理想中心 (22)</span>
-                <span id="board-target-center" class="board-value">--</span>
-            </div>
-            <div class="board-cell">
-                <span class="board-label target-low">適正下限 (18.5)</span>
-                <span id="board-target-low" class="board-value">--</span>
-            </div>
         </div>
 
         <div class="chart-controls">
@@ -570,6 +601,21 @@
         </div>
 
         <div id="main-chart"></div>
+
+        <div class="chart-bottom-indicators">
+            <div class="indicator-item">
+                <span class="indicator-label"><span class="ind-dot ind-high"></span>適正上限 (BMI 25)</span>
+                <span id="board-target-high" class="indicator-value">--</span>
+            </div>
+            <div class="indicator-item">
+                <span class="indicator-label"><span class="ind-dot ind-center"></span>理想中心 (BMI 22)</span>
+                <span id="board-target-center" class="indicator-value">--</span>
+            </div>
+            <div class="indicator-item full-mobile">
+                <span class="indicator-label"><span class="ind-dot ind-low"></span>適正下限 (BMI 18.5)</span>
+                <span id="board-target-low" class="indicator-value">--</span>
+            </div>
+        </div>
     </div>
 
     <div class="card">
@@ -725,10 +771,10 @@
             document.getElementById('range-bmi-good').innerText = `${r210} - ${r230} kg`;
             document.getElementById('range-bmi-normal').innerText = `${r185} - ${r250} kg`;
 
-            // ダッシュボード板情報テーブルへの埋め込み
-            document.getElementById('board-target-high').innerText = r250;
-            document.getElementById('board-target-center').innerText = r220;
-            document.getElementById('board-target-low').innerText = r185;
+            // グラフ下インジケーターへの埋め込み
+            document.getElementById('board-target-high').innerText = `${r250}kg`;
+            document.getElementById('board-target-center').innerText = `${r220}kg`;
+            document.getElementById('board-target-low').innerText = `${r185}kg`;
 
             computedRanges.center = hSquare * 22.0;
             computedRanges.goodMin = hSquare * 21.0;
@@ -1128,12 +1174,10 @@
         }
 
         function updateChartAnnotations() {
-            // 【重要】グラフ内オブジェクトと被らないよう、ラベルテキストは最左端（left）に綺麗に揃えて配置
             chart.updateOptions({
                 annotations: {
                     yaxis: [
                         {
-                            // 1. 理想の中心値 (BMI 22): 青い実線
                             y: computedRanges.center,
                             borderColor: '#2962ff',
                             strokeDashArray: 0,
@@ -1148,7 +1192,6 @@
                             }
                         },
                         {
-                            // 2. 優良範囲 (BMI 21 - 23): 薄いグリーンの帯
                             y: computedRanges.goodMin,
                             y2: computedRanges.goodMax,
                             fillColor: '#08d158',
@@ -1164,7 +1207,6 @@
                             }
                         },
                         {
-                            // 3. 一般適正範囲 (BMI 18.5 - 25): さらにつつみ込む薄いブルーの帯
                             y: computedRanges.normalMin,
                             y2: computedRanges.normalMax,
                             fillColor: '#2962ff',
