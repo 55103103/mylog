@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyLog</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        /* --- デザインシステム & 変数 --- */
+        :root {
+            --bg-body: #0b0e14;
+            --bg-card: #131722;
+            --bg-input: #1e222d;
+            --border-color: #2a2e39;
+            --border-focus: #434651;
+            --text-main: #c5c7d0;
+            --text-bright: #ffffff;
+            --text-muted: #848e9c;
+            --theme-blue: #2962ff;
+            --theme-blue-hover: #1e4bd6;
+            --color-positive: #f23645; /* 体重増加・警告（赤系） */
+            --color-negative: #08d158; /* 体重減少・健全（緑系） */
+            --font-main: 'Noto Sans JP', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            padding: 16px;
+            max-width: 800px;
+            margin: 0 auto;
+            padding-bottom: 60px;
+        }
+
+        /* --- タイポグラフィ & 共通コンポーネント --- */
+        h2 {
+            font-size: 1.1rem;
+            color: var(--text-bright);
+            border-left: 4px solid var(--theme-blue);
+            padding-left: 8px;
+            margin-bottom: 16px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- ナビゲーション --- */
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .brand-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-bright);
+            font-family: var(--font-mono);
+            letter-spacing: -0.5px;
+        }
+        .btn-help {
+            background-color: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-help:hover {
+            border-color: var(--border-focus);
+            color: var(--text-bright);
+        }
+
+        /* --- 概況・レポート --- */
+        .status-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+        }
+        .badge-prime { background-color: rgba(8, 209, 88, 0.15); color: var(--color-negative); border: 1px solid var(--color-negative); }
+        .badge-fair { background-color: rgba(41, 98, 255, 0.15); color: var(--theme-blue); border: 1px solid var(--theme-blue); }
+        .badge-review { background-color: rgba(242, 54, 69, 0.15); color: var(--color-positive); border: 1px solid var(--color-positive); }
+        
+        .report-text {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-main);
+            background-color: var(--bg-input);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid var(--border-focus);
+        }
+
+        /* --- 入力フォーム --- */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+        label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        input, textarea, select {
+            width: 100%;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-bright);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: var(--font-main);
+            transition: border-color 0.2s;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--theme-blue);
+        }
+        input[type="datetime-local"] {
+            font-family: var(--font-mono);
+        }
+        .weight-input-container {
+            position: relative;
+        }
+        .weight-unit {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+        .btn-submit {
+            width: 100%;
+            background-color: var(--theme-blue);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 8px;
+        }
+        .btn-submit:hover {
+            background-color: var(--theme-blue-hover);
+        }
+
+        /* --- 直近の状況 サマリー表示エリア --- */
+        .latest-summary-container {
+            background: linear-gradient(135deg, var(--bg-input), #171c28);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .summary-block {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .summary-block.right-align {
+            text-align: right;
+            align-items: flex-end;
+        }
+        .summary-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .summary-values {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+        .summary-main-weight {
+            font-family: var(--font-mono);
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-bright);
+        }
+        .summary-diff {
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .diff-plus { color: var(--color-positive); background-color: rgba(242, 54, 69, 0.1); }
+        .diff-minus { color: var(--color-negative); background-color: rgba(8, 209, 88, 0.1); }
+        .diff-zero { color: var(--text-muted); background-color: rgba(132, 142, 156, 0.1); }
+
+        .summary-bmi-val {
+            font-family: var(--font-mono);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--theme-blue);
+        }
+
+        /* --- 板情報（情報テーブル） --- */
+        .board-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1px;
+            background-color: var(--border-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        @media(min-width: 480px) {
+            .board-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+        .board-cell {
+            background-color: var(--bg-input);
+            padding: 10px;
+            text-align: center;
+        }
+        .board-cell.full-width {
+            grid-column: span 2;
+        }
+        @media(min-width: 480px) {
+            .board-cell.full-width { grid-column: span 4; }
+        }
+        .board-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        .board-value {
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            color: var(--text-bright);
+            font-weight: 700;
+        }
+        .board-value.date {
+            font-size: 0.85rem;
+        }
+
+        /* ターゲット指標用セルの固有スタイル */
+        .board-label.target-center { color: #5c85ff; }
+        .board-label.target-high { color: #ff6b76; }
+        .board-label.target-low { color: #52ec8b; }
+
+        /* --- チャートコントロール --- */
+        .chart-controls {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 12px;
+        }
+        .range-select {
+            background-color: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            width: auto;
+        }
+
+        /* --- 履歴リスト --- */
+        .history-list {
+            max-height: 280px;
+            overflow-y: auto;
+        }
+        .history-item {
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--bg-card);
+            transition: background-color 0.2s;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .history-item:last-child { border-bottom: none; }
+        .history-item:active { background-color: var(--bg-input); }
+        .history-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .history-date {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+        .history-date:hover { color: var(--color-positive); }
+        .history-weight {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            color: var(--text-bright);
+        }
+        .history-memo {
+            font-size: 0.85rem;
+            color: var(--text-main);
+            white-space: pre-wrap;
+            padding-left: 2px;
+        }
+        .hint-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 4px;
+        }
+
+        /* --- プロフィール ＆ 適正範囲 --- */
+        .profile-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .bmi-display-box {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .bmi-value {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--theme-blue);
+        }
+        .range-box {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .range-title {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            font-weight: bold;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 6px;
+        }
+        .range-label {
+            font-size: 0.85rem;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            display: block;
+        }
+        .range-val {
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            color: var(--text-bright);
+            font-weight: 700;
+            display: block;
+            padding-left: 4px;
+        }
+        .range-block { margin-bottom: 14px; }
+        .range-block:last-child { margin-bottom: 0; }
+
+        .btn-profile-save {
+            background-color: var(--bg-input);
+            color: var(--text-bright);
+            border: 1px solid var(--theme-blue);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+            margin-top: 4px;
+        }
+        .btn-profile-save:hover { background-color: var(--theme-blue); }
+
+        /* --- モーダル --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000; opacity: 0; pointer-events: none;
+            transition: opacity 0.2s;
+            padding: 16px;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px; max-width: 500px; width: 100%;
+            max-height: 80vh; overflow-y: auto;
+        }
+        .modal-content h3 { margin-bottom: 12px; color: var(--text-bright); }
+        .modal-content p, .modal-content li { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+        .modal-content ul { padding-left: 20px; margin-bottom: 12px; }
+        .btn-close {
+            background-color: var(--theme-blue); color: #fff; border: none;
+            padding: 8px 16px; border-radius: 6px; cursor: pointer; float: right; margin-top: 12px;
+        }
+
+        /* --- トースト通知 --- */
+        #toast-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .toast {
+            background-color: rgba(41, 98, 255, 0.95);
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            letter-spacing: 0.5px;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: auto;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .toast.show { opacity: 1; transform: scale(1); }
+    </style>
+</head>
+<body>
+
+    <div class="nav-container">
+        <div class="brand-title">MyLog</div>
+        <button class="btn-help" onclick="toggleModal(true)">📖 HOW TO</button>
+    </div>
+
+    <div class="card">
+        <h2>Report</h2>
+        <div class="status-header">
+            <span id="status-badge" class="badge badge-fair">Analyzing...</span>
+        </div>
+        <div id="report-box" class="report-text">
+            データを入力すると、現在の状況に合わせたアドバイスがここに表示されます。
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Log recording</h2>
+        <form id="log-form" onsubmit="saveLog(event)">
+            <div class="form-group">
+                <label for="input-date">Date and time</label>
+                <input type="datetime-local" id="input-date" required>
+            </div>
+            <div class="form-group">
+                <label for="input-weight">Weight ※空白可</label>
+                <div class="weight-input-container">
+                    <input type="number" id="input-weight" step="0.1" placeholder="例: 65.3 または 653">
+                    <span class="weight-unit">kg</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="input-memo">Memo ※空白可</label>
+                <textarea id="input-memo" rows="2" placeholder="行動ログ・日記などを入力"></textarea>
+            </div>
+            <button type="submit" class="btn-submit">Save Log</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Dashboard & Chart <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal; margin-left: auto;">(kg / BMI)</span></h2>
+        
+        <div class="latest-summary-container">
+            <div class="summary-block">
+                <div class="summary-title">直近の体重 (前回比)</div>
+                <div class="summary-values">
+                    <span id="summary-weight" class="summary-main-weight">--</span>
+                    <span id="summary-diff" class="summary-diff diff-zero">--</span>
+                </div>
+            </div>
+            <div class="summary-block right-align">
+                <div class="summary-title">現在のBMI</div>
+                <div id="summary-bmi" class="summary-bmi-val">--</div>
+            </div>
+        </div>
+        
+        <div class="board-grid">
+            <div class="board-cell full-width">
+                <div class="board-label">表示中の日付</div>
+                <div id="board-date" class="board-value date">--</div>
+            </div>
+            <div class="board-cell">
+                <div class="board-label">始値 (最初)</div>
+                <div id="board-open" class="board-value">--</div>
+            </div>
+            <div class="board-cell">
+                <div class="board-label">最高値</div>
+                <div id="board-high" class="board-value">--</div>
+            </div>
+            <div class="board-cell">
+                <div class="board-label">最安値</div>
+                <div id="board-low" class="board-value">--</div>
+            </div>
+            <div class="board-cell">
+                <div class="board-label">終値 (最後)</div>
+                <div id="board-close" class="board-value">--</div>
+            </div>
+            <div class="board-cell">
+                <div class="board-label">期間内最高</div>
+                <div id="board-period-high" class="board-value">--</div>
+            </div>
+            <div class="board-cell">
+                <div class="board-label">期間内最安</div>
+                <div id="board-period-low" class="board-value">--</div>
+            </div>
+            <div class="board-cell">
+                <div class="board-label target-high">適正上限 (25)</div>
+                <div id="board-target-high" class="board-value">--</div>
+            </div>
+            <div class="board-cell">
+                <div class="board-label target-center">理想中心 (22)</div>
+                <div id="board-target-center" class="board-value">--</div>
+            </div>
+            <div class="board-cell">
+                <div class="board-label target-low">適正下限 (18.5)</div>
+                <div id="board-target-low" class="board-value">--</div>
+            </div>
+        </div>
+
+        <div class="chart-controls">
+            <select id="range-selector" class="range-select" onchange="updateChart()">
+                <option value="all">全期間</option>
+                <option value="30">直近30日</option>
+                <option value="14">直近14日</option>
+                <option value="7">直近7日</option>
+            </select>
+        </div>
+
+        <div id="main-chart"></div>
+    </div>
+
+    <div class="card">
+        <h2>Log</h2>
+        <div id="history-container" class="history-list">
+            </div>
+        <div class="hint-text">※ 日時部分を長押し（またはクリック長押し）で削除できます</div>
+    </div>
+
+    <div class="card">
+        <h2>Profile</h2>
+        <div class="profile-layout">
+            <div class="form-group">
+                <label for="profile-height">身長 (cm)</label>
+                <input type="number" id="profile-height" step="0.1" value="170.0">
+                <button type="button" class="btn-profile-save" onclick="saveProfile()">設定を保存</button>
+            </div>
+            
+            <div class="bmi-display-box">
+                <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">現在の算出BMI</span>
+                <span id="current-bmi-value" class="bmi-value">--</span>
+            </div>
+
+            <div class="range-box">
+                <div class="range-title">算出された適正範囲 (BMI基準)</div>
+                
+                <div class="range-block">
+                    <span class="range-label">理想の中心値 (BMI 22):</span>
+                    <span id="range-bmi-220" class="range-val">-- kg</span>
+                </div>
+                
+                <div class="range-block">
+                    <span class="range-label">優良範囲 (BMI 21 - 23):</span>
+                    <span id="range-bmi-good" class="range-val">-- kg</span>
+                </div>
+                
+                <div class="range-block">
+                    <span class="range-label">一般適正範囲 (BMI 18.5 - 25):</span>
+                    <span id="range-bmi-normal" class="range-val">-- kg</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="help-modal" class="modal-overlay" onclick="toggleModal(false)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3>MyLog マニュアル</h3>
+            <p>MyLogは、日々の体重や行動ログを記録し、長期的な安定と理想の適正範囲を維持するための健康管理ツールです。</p>
+            <ul>
+                <li><strong>高速入力対応:</strong> 体重欄に「655」のようにドットを省いて打つと、自動的に「65.5」へ補正されます。</li>
+                <li><strong>メモのみの記録:</strong> 体重欄を空欄にして、メモ（日記や行動ログ）だけを保存することも可能です。</li>
+                <li><strong>ストレスフリー設計:</strong> 画面内の必要以上の「kg」単位の連続を徹底排除。数値のみがクリアに確認できます。</li>
+                <li><strong>スマホ完全最適化:</strong> グラフのピンチ・スクロールズームを制限し、さらに邪魔なポップアップ（ツールチップ）を廃止。触れた位置の正確な情報は、すべて上部の板情報テーブルへと瞬時に同期されます。</li>
+                <li><strong>範囲連動型インジケーター:</strong> 期間プルダウンを変更すると、「期間内最高」「期間内最安」も、指定された範囲内だけで自動計算・再マッピングされます。</li>
+            </ul>
+            <button class="btn-close" onclick="toggleModal(false)">閉じる</button>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script>
+        // --- 状態管理グローバル変数 ---
+        let logs = [];
+        let chart = null;
+        let profile = { height: 170.0 };
+
+        let computedRanges = {
+            center: 22,
+            goodMin: 21,
+            goodMax: 23,
+            normalMin: 18.5,
+            normalMax: 25
+        };
+
+        // --- 初期化処理 ---
+        window.addEventListener('DOMContentLoaded', () => {
+            initDateTime();
+            loadLocalStorage();
+            calculateRanges();
+            updateSummaryIndicator();
+            renderHistory();
+            initChart();
+            generateReport();
+        });
+
+        function initDateTime() {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('input-date').value = now.toISOString().slice(0, 16);
+        }
+
+        function loadLocalStorage() {
+            const storedLogs = localStorage.getItem('weight_logs');
+            if (storedLogs) {
+                logs = JSON.parse(storedLogs);
+            } else {
+                // デモ用初期データ
+                const today = new Date();
+                logs = [];
+                for(let i = 45; i >= 0; i--) {
+                    const d = new Date();
+                    d.setDate(today.getDate() - i);
+                    const baseWeight = 66 + Math.sin(i * 0.2) * 1.5 + (Math.random() - 0.5) * 0.6;
+                    logs.push({
+                        id: Date.now() - i * 86400000 - 10000,
+                        date: new Date(d.setHours(8, 0, 0)).toISOString().slice(0, 16),
+                        weight: parseFloat(baseWeight.toFixed(1)),
+                        memo: i % 5 === 0 ? "朝の計測。順調。" : ""
+                    });
+                    if(i % 3 === 0) {
+                        logs.push({
+                            id: Date.now() - i * 86400000,
+                            date: new Date(d.setHours(20, 0, 0)).toISOString().slice(0, 16),
+                            weight: parseFloat((baseWeight + 0.6).toFixed(1)),
+                            memo: "夜。夕食後。"
+                        });
+                    }
+                }
+                localStorage.setItem('weight_logs', JSON.stringify(logs));
+            }
+
+            const storedProfile = localStorage.getItem('weight_profile');
+            if (storedProfile) {
+                profile = JSON.parse(storedProfile);
+                document.getElementById('profile-height').value = profile.height;
+            }
+        }
+
+        function saveProfile() {
+            const heightInput = document.getElementById('profile-height').value;
+            profile.height = parseFloat(heightInput) || 170.0;
+            localStorage.setItem('weight_profile', JSON.stringify(profile));
+            
+            showToast("身長を保存しました");
+            calculateRanges();
+            generateReport();
+            if (chart) {
+                updateChart(); 
+            }
+        }
+
+        function calculateRanges() {
+            const hMeter = profile.height / 100;
+            const hSquare = hMeter * hMeter;
+
+            const r185 = (hSquare * 18.5).toFixed(1);
+            const r210 = (hSquare * 21.0).toFixed(1);
+            const r220 = (hSquare * 22.0).toFixed(1);
+            const r230 = (hSquare * 23.0).toFixed(1);
+            const r250 = (hSquare * 25.0).toFixed(1);
+
+            document.getElementById('range-bmi-220').innerText = `${r220} kg`;
+            document.getElementById('range-bmi-good').innerText = `${r210} - ${r230} kg`;
+            document.getElementById('range-bmi-normal').innerText = `${r185} - ${r250} kg`;
+
+            // ダッシュボード板情報テーブルへの埋め込み
+            document.getElementById('board-target-high').innerText = r250;
+            document.getElementById('board-target-center').innerText = r220;
+            document.getElementById('board-target-low').innerText = r185;
+
+            computedRanges.center = hSquare * 22.0;
+            computedRanges.goodMin = hSquare * 21.0;
+            computedRanges.goodMax = hSquare * 23.0;
+            computedRanges.normalMin = hSquare * 18.5;
+            computedRanges.normalMax = hSquare * 25.0;
+
+            updateBMIDisplay();
+        }
+
+        function updateBMIDisplay() {
+            const bmiValueEl = document.getElementById('current-bmi-value');
+            const summaryBmiEl = document.getElementById('summary-bmi');
+            const validWeightLogs = logs.filter(l => l.weight !== null && l.weight !== undefined && !isNaN(l.weight));
+            
+            if (validWeightLogs.length === 0) {
+                bmiValueEl.innerText = "--";
+                summaryBmiEl.innerText = "--";
+                return;
+            }
+
+            const latestWeight = validWeightLogs[validWeightLogs.length - 1].weight;
+            const hMeter = profile.height / 100;
+            const currentBMI = latestWeight / (hMeter * hMeter);
+            
+            const bmiString = currentBMI.toFixed(1);
+            bmiValueEl.innerText = bmiString;
+            summaryBmiEl.innerText = bmiString;
+        }
+
+        function updateSummaryIndicator() {
+            const weightEl = document.getElementById('summary-weight');
+            const diffEl = document.getElementById('summary-diff');
+
+            const validWeightLogs = logs.filter(l => l.weight !== null && l.weight !== undefined && !isNaN(l.weight));
+
+            if (validWeightLogs.length === 0) {
+                weightEl.innerText = "--";
+                diffEl.innerText = "--";
+                diffEl.className = "summary-diff diff-zero";
+                return;
+            }
+
+            const latestLog = validWeightLogs[validWeightLogs.length - 1];
+            weightEl.innerText = latestLog.weight.toFixed(1);
+
+            if (validWeightLogs.length >= 2) {
+                const prevLog = validWeightLogs[validWeightLogs.length - 2];
+                const diff = latestLog.weight - prevLog.weight;
+                const formattedDiff = diff > 0 ? `+${diff.toFixed(1)}` : diff.toFixed(1);
+
+                diffEl.innerText = formattedDiff;
+
+                if (diff > 0) {
+                    diffEl.className = "summary-diff diff-plus";
+                } else if (diff < 0) {
+                    diffEl.className = "summary-diff diff-minus";
+                } else {
+                    diffEl.className = "summary-diff diff-zero";
+                }
+            } else {
+                diffEl.innerText = "First";
+                diffEl.className = "summary-diff diff-zero";
+            }
+
+            updateBMIDisplay();
+        }
+
+        function saveLog(e) {
+            e.preventDefault();
+            const dateVal = document.getElementById('input-date').value;
+            const weightInputRaw = document.getElementById('input-weight').value;
+            const memoVal = document.getElementById('input-memo').value;
+
+            if (!dateVal) return;
+
+            let weightVal = null;
+            if (weightInputRaw !== '') {
+                weightVal = parseFloat(weightInputRaw);
+                if (weightVal >= 100) {
+                    const converted = parseFloat((weightVal / 10).toFixed(1));
+                    showToast(`自動補正: ${weightVal} → ${converted}`);
+                    weightVal = converted;
+                }
+            }
+
+            if (weightVal === null && memoVal.trim() === '') {
+                showToast("体重またはメモを入力してください");
+                return;
+            }
+
+            const newLog = {
+                id: Date.now(),
+                date: dateVal,
+                weight: weightVal, 
+                memo: memoVal
+            };
+
+            logs.push(newLog);
+            logs.sort((a, b) => new Date(a.date) - new Date(b.date));
+            localStorage.setItem('weight_logs', JSON.stringify(logs));
+
+            showToast("ログを保存しました");
+            document.getElementById('input-weight').value = '';
+            document.getElementById('input-memo').value = '';
+            initDateTime();
+
+            updateSummaryIndicator();
+            renderHistory();
+            updateChart();
+            generateReport();
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerText = message;
+            
+            toast.addEventListener('click', () => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 250);
+            });
+
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 250);
+                }
+            }, 3000);
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('history-container');
+            container.innerHTML = '';
+
+            if (logs.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);">データがありません</div>';
+                return;
+            }
+
+            const reversedLogs = [...logs].reverse();
+
+            reversedLogs.forEach(log => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+
+                const formattedDate = log.date.replace('T', ' ');
+
+                const meta = document.createElement('div');
+                meta.className = 'history-meta';
+
+                const dateEl = document.createElement('span');
+                dateEl.className = 'history-date';
+                dateEl.innerHTML = `📅 ${formattedDate}`;
+                
+                setupLongPress(dateEl, log.id);
+
+                const weightEl = document.createElement('span');
+                weightEl.className = 'history-weight';
+                weightEl.innerText = (log.weight !== null && log.weight !== undefined) ? log.weight.toFixed(1) : '';
+
+                meta.appendChild(dateEl);
+                meta.appendChild(weightEl);
+                item.appendChild(meta);
+
+                if (log.memo) {
+                    const memoEl = document.createElement('div');
+                    memoEl.className = 'history-memo';
+                    memoEl.innerText = `📝 ${log.memo}`;
+                    item.appendChild(memoEl);
+                }
+
+                container.appendChild(item);
+            });
+        }
+
+        function setupLongPress(element, id) {
+            let pressTimer;
+            const startPress = (e) => { pressTimer = setTimeout(() => { deleteLogConfirm(id); }, 800); };
+            const cancelPress = () => { clearTimeout(pressTimer); };
+
+            element.addEventListener('mousedown', startPress);
+            element.addEventListener('mouseup', cancelPress);
+            element.addEventListener('mouseleave', cancelPress);
+            element.addEventListener('touchstart', startPress, { passive: true });
+            element.addEventListener('touchend', cancelPress, { passive: true });
+            element.addEventListener('touchcancel', cancelPress, { passive: true });
+        }
+
+        function deleteLogConfirm(id) {
+            const logItem = logs.find(l => l.id === id);
+            if (!logItem) return;
+
+            const displayWeight = logItem.weight ? `${logItem.weight}` : "メモのみ";
+            if (confirm(`【確認】\n${logItem.date.replace('T', ' ')} のログ(${displayWeight}) を削除しますか？`)) {
+                logs = logs.filter(l => l.id !== id);
+                localStorage.setItem('weight_logs', JSON.stringify(logs));
+                showToast("データが削除されました");
+                
+                updateSummaryIndicator();
+                renderHistory();
+                updateChart();
+                generateReport();
+            }
+        }
+
+        function generateReport() {
+            const badge = document.getElementById('status-badge');
+            const reportBox = document.getElementById('report-box');
+            const validWeightLogs = logs.filter(l => l.weight !== null && l.weight !== undefined);
+
+            if (validWeightLogs.length === 0) {
+                badge.className = "badge badge-review";
+                badge.innerText = "⚠️ データ不足";
+                reportBox.innerText = "現在の体重データが登録されていません。まずは今日のログを記録しましょう。";
+                return;
+            }
+
+            const latest = validWeightLogs[validWeightLogs.length - 1];
+            const currentWeight = latest.weight;
+
+            let volatility = 0;
+            if (validWeightLogs.length >= 3) {
+                const lastThree = validWeightLogs.slice(-3);
+                volatility = Math.max(...lastThree.map(l => l.weight)) - Math.min(...lastThree.map(l => l.weight));
+            }
+
+            let status = 'fair';
+            let statusText = '⚖️ 安定圏内';
+            let advice = '';
+
+            if (currentWeight >= computedRanges.goodMin && currentWeight <= computedRanges.goodMax) {
+                status = 'prime';
+                statusText = '🏆 ベストコンディション';
+                advice = `現在の体重は理想的な優良範囲を美しく維持しています。`;
+            } else if (currentWeight >= computedRanges.normalMin && currentWeight <= computedRanges.normalMax) {
+                status = 'fair';
+                statusText = '⚖️ 適正範囲内';
+                advice = `一般適正範囲内に位置しています。目標の理想値（${computedRanges.center.toFixed(1)}）に向けて、現在の生活習慣のベースを保ちましょう。`;
+            } else {
+                status = 'review';
+                statusText = '⚠️ 要調整ゾーン';
+                advice = `現在、適正範囲から外れています。極端な増減は避け、身体に負荷の少ないアプローチを検討してください。`;
+            }
+
+            if (volatility > 1.5) {
+                advice += ` なお、直近のデータに一時的な急変動が観測されています。健康維持においては、急激な変化よりも「なだらかな推移」を長期維持することが最大の目標です。一喜一憂せず、落ち着いて生活習慣や計測タイミングを揃えてみましょう。`;
+            } else {
+                const compliments = [
+                    " 日々の安定した推移は、毎日の適切な習慣の証明です。",
+                    " 美しい巡航速度です。このなだらかなリズムを大切にしていきましょう。",
+                    " グラフの滑らかさが、体内環境の健全性を雄弁に物語っています。"
+                ];
+                advice += compliments[Math.floor(Math.random() * compliments.length)];
+            }
+
+            badge.className = `badge badge-${status}`;
+            badge.innerText = statusText;
+            reportBox.innerText = advice;
+        }
+
+        function getDailyCandlestickData(filterDays) {
+            const dailyGroups = {};
+            const validWeightLogs = logs.filter(l => l.weight !== null && l.weight !== undefined);
+
+            validWeightLogs.forEach(log => {
+                const dateKey = log.date.split('T')[0];
+                if (!dailyGroups[dateKey]) { dailyGroups[dateKey] = []; }
+                dailyGroups[dateKey].push(log);
+            });
+
+            let sortedDates = Object.keys(dailyGroups).sort((a, b) => new Date(a) - new Date(b));
+
+            if (filterDays !== 'all') {
+                const limitDate = new Date();
+                limitDate.setDate(limitDate.getDate() - parseInt(filterDays));
+                sortedDates = sortedDates.filter(d => new Date(d) >= limitDate);
+            }
+
+            const candlestickSeries = [];
+            const rawDayData = [];
+
+            sortedDates.forEach(dateStr => {
+                const dayLogs = dailyGroups[dateStr];
+                dayLogs.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                const open = dayLogs[0].weight;
+                const close = dayLogs[dayLogs.length - 1].weight;
+                const high = Math.max(...dayLogs.map(l => l.weight));
+                const low = Math.min(...dayLogs.map(l => l.weight));
+
+                const timestamp = new Date(dateStr).getTime();
+
+                candlestickSeries.push({ x: timestamp, y: [open, high, low, close] });
+                rawDayData.push({ x: timestamp, close: close });
+            });
+
+            const ma7Series = [];
+            const ma30Series = [];
+
+            for (let i = 0; i < rawDayData.length; i++) {
+                if (i >= 6) {
+                    let sum = 0;
+                    for (let j = 0; j < 7; j++) sum += rawDayData[i - j].close;
+                    ma7Series.push({ x: rawDayData[i].x, y: parseFloat((sum / 7).toFixed(2)) });
+                }
+                if (i >= 29) {
+                    let sum = 0;
+                    for (let j = 0; j < 30; j++) sum += rawDayData[i - j].close;
+                    ma30Series.push({ x: rawDayData[i].x, y: parseFloat((sum / 30).toFixed(2)) });
+                }
+            }
+
+            return { candlestick: candlestickSeries, ma7: ma7Series, ma30: ma30Series };
+        }
+
+        function initChart() {
+            const dataObj = getDailyCandlestickData('all');
+            updatePeriodExtremeValues(dataObj.candlestick);
+
+            const options = {
+                series: [
+                    { name: '日足', type: 'candlestick', data: dataObj.candlestick },
+                    { name: '7日移動平均', type: 'line', data: dataObj.ma7 },
+                    { name: '30日移動平均', type: 'line', data: dataObj.ma30 }
+                ],
+                chart: {
+                    type: 'candlestick',
+                    height: 320,
+                    id: 'weight_chart',
+                    background: 'transparent',
+                    toolbar: { show: false },
+                    // ズーム・スクロールピンチ操作を完全に不許可
+                    zoom: { enabled: false },
+                    scrolling: { enabled: false },
+                    events: {
+                        mouseMove: function(event, chartContext, config) { updateBoardLabels(config); },
+                        mouseLeave: function() { resetBoardToLatest(); }
+                    }
+                },
+                theme: { mode: 'dark' },
+                stroke: { width: [1, 2, 2], curve: 'smooth' },
+                colors: ['#2962ff', '#e91e63', '#08d158'],
+                plotOptions: {
+                    candlestick: {
+                        colors: { upward: '#f23645', downward: '#08d158' },
+                        wick: { useFilledColors: true }
+                    }
+                },
+                xaxis: {
+                    type: 'datetime',
+                    labels: {
+                        style: { colors: '#848e9c', fontFamily: 'JetBrains Mono' },
+                        datetimeFormatter: { month: 'yyyy-MM', day: 'MM/dd' }
+                    },
+                    axisBorder: { color: '#2a2e39' },
+                    axisTicks: { color: '#2a2e39' }
+                },
+                yaxis: {
+                    labels: {
+                        style: { colors: '#848e9c', fontFamily: 'JetBrains Mono' },
+                        formatter: function (val) { return val ? val.toFixed(1) : ""; }
+                    }
+                },
+                // ポップアップ表示(ツールチップ)を非表示にし、視認性をボードに一本化
+                tooltip: {
+                    enabled: false
+                },
+                grid: { borderColor: '#2a2e39' },
+                annotations: { yaxis: [] }
+            };
+
+            chart = new ApexCharts(document.querySelector("#main-chart"), options);
+            chart.render().then(() => {
+                updateChartAnnotations();
+                resetBoardToLatest();
+            });
+        }
+
+        function updateChartAnnotations() {
+            chart.updateOptions({
+                annotations: {
+                    yaxis: [
+                        {
+                            y: computedRanges.center,
+                            borderColor: 'rgba(41, 98, 255, 0.4)',
+                            strokeDashArray: 0,
+                            label: { show: false }
+                        },
+                        {
+                            y: computedRanges.normalMax,
+                            borderColor: 'rgba(242, 54, 69, 0.3)',
+                            strokeDashArray: 4,
+                            label: { show: false }
+                        },
+                        {
+                            y: computedRanges.normalMin,
+                            borderColor: 'rgba(8, 209, 88, 0.3)',
+                            strokeDashArray: 4,
+                            label: { show: false }
+                        }
+                    ]
+                }
+            });
+        }
+
+        function updateChart() {
+            const range = document.getElementById('range-selector').value;
+            const dataObj = getDailyCandlestickData(range);
+
+            // 選択期間に基づいて期間内最高・最安を再計算(連動)
+            updatePeriodExtremeValues(dataObj.candlestick);
+
+            chart.updateSeries([
+                { name: '日足', type: 'candlestick', data: dataObj.candlestick },
+                { name: '7日移動平均', type: 'line', data: dataObj.ma7 },
+                { name: '30日移動平均', type: 'line', data: dataObj.ma30 }
+            ]);
+
+            updateChartAnnotations();
+            updateBMIDisplay();
+
+            setTimeout(() => { resetBoardToLatest(); }, 100);
+        }
+
+        // 選択されたプルダウンのデータ範囲に基づいて最高・最安値を精密マッピング
+        function updatePeriodExtremeValues(candlestickData) {
+            if (!candlestickData || candlestickData.length === 0) {
+                document.getElementById('board-period-high').innerText = '--';
+                document.getElementById('board-period-low').innerText = '--';
+                return;
+            }
+            const highs = candlestickData.map(d => d.y[1]);
+            const lows = candlestickData.map(d => d.y[2]);
+            document.getElementById('board-period-high').innerText = Math.max(...highs).toFixed(1);
+            document.getElementById('board-period-low').innerText = Math.min(...lows).toFixed(1);
+        }
+
+        function updateBoardLabels(config) {
+            const dataPointIndex = config.dataPointIndex;
+            if (dataPointIndex === undefined || dataPointIndex < 0) return;
+
+            const w = config.w;
+            const candleData = w.config.series[0].data[dataPointIndex];
+            if (!candleData) return;
+
+            const dateObj = new Date(candleData.x);
+            const dateStr = `${dateObj.getFullYear()}/${String(dateObj.getMonth()+1).padStart(2,'0')}/${String(dateObj.getDate()).padStart(2,'0')}`;
+
+            document.getElementById('board-date').innerText = dateStr;
+            document.getElementById('board-open').innerText = candleData.y[0].toFixed(1);
+            document.getElementById('board-high').innerText = candleData.y[1].toFixed(1);
+            document.getElementById('board-low').innerText = candleData.y[2].toFixed(1);
+            document.getElementById('board-close').innerText = candleData.y[3].toFixed(1);
+        }
+
+        function resetBoardToLatest() {
+            const range = document.getElementById('range-selector').value;
+            const dataObj = getDailyCandlestickData(range);
+            const candles = dataObj.candlestick;
+
+            if (!candles || candles.length === 0) {
+                document.getElementById('board-date').innerText = '--';
+                document.getElementById('board-open').innerText = '--';
+                document.getElementById('board-high').innerText = '--';
+                document.getElementById('board-low').innerText = '--';
+                document.getElementById('board-close').innerText = '--';
+                return;
+            }
+
+            const latestCandle = candles[candles.length - 1];
+            const dateObj = new Date(latestCandle.x);
+            const dateStr = `${dateObj.getFullYear()}/${String(dateObj.getMonth()+1).padStart(2,'0')}/${String(dateObj.getDate()).padStart(2,'0')} (期間内最新)`;
+
+            document.getElementById('board-date').innerText = dateStr;
+            document.getElementById('board-open').innerText = latestCandle.y[0].toFixed(1);
+            document.getElementById('board-high').innerText = latestCandle.y[1].toFixed(1);
+            document.getElementById('board-low').innerText = latestCandle.y[2].toFixed(1);
+            document.getElementById('board-close').innerText = latestCandle.y[3].toFixed(1);
+        }
+
+        function toggleModal(show) {
+            const modal = document.getElementById('help-modal');
+            if (show) { modal.classList.add('active'); } else { modal.classList.remove('active'); }
+        }
+    </script>
+</body>
+</html>
