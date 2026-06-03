@@ -298,9 +298,9 @@
             width: auto;
         }
 
-        /* --- 履歴リスト（全幅フラット化＆高さを1.5倍に拡張） --- */
+        /* --- 履歴リスト --- */
         .history-list {
-            max-height: 420px; /* 280pxから1.5倍に拡張 */
+            max-height: 420px;
             overflow-y: auto;
             margin: 0 -16px;   /* 親要素のパディングを相殺して全幅化 */
             padding: 0 16px;
@@ -310,7 +310,7 @@
             flex-direction: column;
             padding: 12px 0;   /* 左右の余白を削り上下のみに */
             border-bottom: 1px solid var(--border-color);
-            background-color: transparent; /* 背景カード感を廃止 */
+            background-color: transparent;
             transition: background-color 0.15s;
             user-select: none;
             -webkit-user-select: none;
@@ -340,7 +340,7 @@
             font-size: 0.85rem;
             color: var(--text-main);
             white-space: pre-wrap;
-            padding-left: 0; /* 絵文字削除に伴いパディング調整 */
+            padding-left: 0;
             line-height: 1.5;
         }
         .hint-text {
@@ -441,32 +441,6 @@
             border-color: var(--color-positive);
         }
 
-        /* --- モーダル --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.7);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 1000; opacity: 0; pointer-events: none;
-            transition: opacity 0.2s;
-            padding: 16px;
-        }
-        .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        .modal-content {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px; max-width: 500px; width: 100%;
-            max-height: 80vh; overflow-y: auto;
-        }
-        .modal-content h3 { margin-bottom: 12px; color: var(--text-bright); }
-        .modal-content p, .modal-content li { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
-        .modal-content ul { padding-left: 20px; margin-bottom: 12px; }
-        .btn-close {
-            background-color: var(--theme-blue); color: #fff; border: none;
-            padding: 8px 16px; border-radius: 6px; cursor: pointer; float: right; margin-top: 12px;
-        }
-
         /* --- トースト通知 --- */
         #toast-container {
             position: fixed;
@@ -497,41 +471,9 @@
 </head>
 <body>
 
-        <div class="nav-container">
+    <div class="nav-container">
         <div class="brand-title">MyLog</div>
         <a href="howto.html" class="btn-help">📖 HOW TO</a>
-    </div>
-
-    <div class="card">
-        <h2>Report</h2>
-        <div class="status-header">
-            <span id="status-badge" class="badge badge-fair">Analyzing...</span>
-        </div>
-        <div id="report-box" class="report-text">
-            データを入力すると、現在の状況に合わせたアドバイスがここに表示されます。
-        </div>
-    </div>
-
-    <div class="card">
-        <h2>Log recording</h2>
-        <form id="log-form" onsubmit="saveLog(event)">
-            <div class="form-group">
-                <label for="input-date">Date and time</label>
-                <input type="datetime-local" id="input-date" required>
-            </div>
-            <div class="form-group">
-                <label for="input-weight">Weight ※空白可</label>
-                <div class="weight-input-container">
-                    <input type="number" id="input-weight" step="0.1" placeholder="例: 65.3 または 653">
-                    <span class="weight-unit">kg</span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="input-memo">Memo ※空白可</label>
-                <textarea id="input-memo" rows="2" placeholder="行動ログ・日記などを入力"></textarea>
-            </div>
-            <button type="submit" class="btn-submit">Save Log</button>
-        </form>
     </div>
 
     <div class="card">
@@ -607,6 +549,38 @@
     </div>
 
     <div class="card">
+        <h2>Report</h2>
+        <div class="status-header">
+            <span id="status-badge" class="badge badge-fair">Analyzing...</span>
+        </div>
+        <div id="report-box" class="report-text">
+            データを入力すると、現在の状況に合わせたアドバイスがここに表示されます。
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Log recording</h2>
+        <form id="log-form" onsubmit="saveLog(event)">
+            <div class="form-group">
+                <label for="input-date">Date and time</label>
+                <input type="datetime-local" id="input-date" required>
+            </div>
+            <div class="form-group">
+                <label for="input-weight">Weight ※空白可</label>
+                <div class="weight-input-container">
+                    <input type="number" id="input-weight" step="0.1" placeholder="例: 65.3 または 653">
+                    <span class="weight-unit">kg</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="input-memo">Memo ※空白可</label>
+                <textarea id="input-memo" rows="2" placeholder="行動ログ・日記などを入力"></textarea>
+            </div>
+            <button type="submit" class="btn-submit">Save Log</button>
+        </form>
+    </div>
+
+    <div class="card">
         <h2>Log</h2>
         <div id="history-container" class="history-list">
             </div>
@@ -649,22 +623,7 @@
     </div>
 
     <div class="system-danger-zone">
-        <button class="btn-danger-reset" onclick="resetAllDataData()">🗑️ すべてのデータをリセット</button>
-    </div>
-
-    <div id="help-modal" class="modal-overlay" onclick="toggleModal(false)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <h3>MyLog マニュアル</h3>
-            <p>MyLogは、日々の体重や行動ログを記録し、長期的な安定と理想の適正範囲を維持するための健康管理ツールです。</p>
-            <ul>
-                <li><strong>高速入力対応:</strong> 体重欄に「655」のようにドットを省いて打つと、自動的に「65.5」へ補正されます。</li>
-                <li><strong>メモのみの記録:</strong> 体重欄を空欄にして、メモ（日記や行動ログ）だけを保存することも可能です。</li>
-                <li><strong>全幅フラット仕様:</strong> ログ表示の枠線をなくし、スマートに情報を凝縮。1.5倍の拡張ウィンドウで一度に多くの履歴を見渡せます。</li>
-                <li><strong>高精度タップ連動:</strong> グラフのローソク足をタップまたはマウスでホバーすると、上部の板情報データ（始値・高値・安値・終値）が完全に同期して変化します。スマホでも確実に確認できます。</li>
-                <li><strong>一括リセット機能:</strong> ページ最下部から、プリセットのサンプルデータを含めた全てのデータを安全に完全一括消去できます。</li>
-            </ul>
-            <button class="btn-close" onclick="toggleModal(false)">閉じる</button>
-        </div>
+        <button class="btn-danger-reset" onclick="resetAllData()">🗑️ すべてのデータをリセット</button>
     </div>
 
     <div id="toast-container"></div>
@@ -940,7 +899,7 @@
                 if (log.memo) {
                     const memoEl = document.createElement('div');
                     memoEl.className = 'history-memo';
-                    memoEl.innerText = log.memo; // 📝 絵文字を完全に撤廃
+                    memoEl.innerText = log.memo;
                     item.appendChild(memoEl);
                 }
 
@@ -978,7 +937,7 @@
             }
         }
 
-        function resetAllDataData() {
+        function resetAllData() {
             if (confirm("【警告】\nすべてのサンプルデータおよび記録ログを完全に消去しますか？この操作は戻せません。")) {
                 if (confirm("本当に本当によろしいですか？（すべての履歴が空になります）")) {
                     logs = [];
@@ -1266,11 +1225,6 @@
             document.getElementById('board-high').innerText = latestCandle.y[1].toFixed(1);
             document.getElementById('board-low').innerText = latestCandle.y[2].toFixed(1);
             document.getElementById('board-close').innerText = latestCandle.y[3].toFixed(1);
-        }
-
-        function toggleModal(show) {
-            const modal = document.getElementById('help-modal');
-            if (show) { modal.classList.add('active'); } else { modal.classList.remove('active'); }
         }
     </script>
 </body>
