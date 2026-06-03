@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyLog</title>
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -454,7 +457,7 @@
         }
         .btn-profile-save:hover { background-color: var(--theme-blue); }
 
-        /* --- 【新規】バックアップUIデザイン --- */
+        /* --- バックアップUIデザイン --- */
         .backup-flex {
             display: flex;
             gap: 12px;
@@ -728,7 +731,7 @@
             calculateRanges();
             updateSummaryIndicator();
             renderHistory();
-            initChart(); // 初期設定でこの内部から「直近30日」を読み込むように調整
+            initChart();
             generateReport();
         });
 
@@ -802,7 +805,6 @@
             document.getElementById('range-bmi-good').innerText = `${r210} - ${r230} kg`;
             document.getElementById('range-bmi-normal').innerText = `${r185} - ${r250} kg`;
 
-            // グラフ下インジケーターへの埋め込み
             document.getElementById('board-target-high').innerText = `${r250}kg`;
             document.getElementById('board-target-center').innerText = `${r220}kg`;
             document.getElementById('board-target-low').innerText = `${r185}kg`;
@@ -1031,7 +1033,6 @@
             }
         }
 
-        // --- 【新規】JSONエクスポート機能 ---
         function exportDataJSON() {
             if (logs.length === 0) {
                 showToast("エクスポートするデータがありません");
@@ -1056,7 +1057,6 @@
             showToast("JSONファイルをエクスポートしました");
         }
 
-        // --- 【新規】JSONインポート機能 ---
         function importDataJSON(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1066,7 +1066,6 @@
                 try {
                     const parsedData = JSON.parse(e.target.result);
                     
-                    // 簡易的なデータ整合性チェック
                     if (!Array.isArray(parsedData)) {
                         throw new Error("データが配列形式ではありません。");
                     }
@@ -1082,7 +1081,6 @@
                         
                         showToast("バックアップデータを復元しました");
                         
-                        // 全UIおよびグラフの再更新
                         updateSummaryIndicator();
                         renderHistory();
                         updateChart();
@@ -1091,7 +1089,6 @@
                 } catch (error) {
                     alert(`【エラー】インポートに失敗しました。\n原因: ${error.message}`);
                 } finally {
-                    // 同じファイルを再度選択できるようにリセット
                     document.getElementById('file-input').value = "";
                 }
             };
@@ -1209,7 +1206,6 @@
         }
 
         function initChart() {
-            // 【アップデート】初期表示をセレクターの値（30日）に合わせる
             const defaultRange = document.getElementById('range-selector').value;
             const dataObj = getDailyCandlestickData(defaultRange);
             updatePeriodExtremeValues(dataObj.candlestick);
