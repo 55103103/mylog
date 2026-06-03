@@ -4,12 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyLog</title>
+    
+    <!-- アプリケーションアイコン設定 -->
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
     
+    <!-- PWA (Progressive Web Apps) 設定 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0b0e14">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- ApexCharts -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <style>
         /* --- デザインシステム & 変数 --- */
@@ -291,7 +301,7 @@
             width: auto;
         }
 
-        /* --- グラフ下インジケーター（ターゲット基準値の表示エリア） --- */
+        /* --- グラフ下インジケーター --- */
         .chart-bottom-indicators {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -541,11 +551,13 @@
 </head>
 <body>
 
+    <!-- ナビゲーション -->
     <div class="nav-container">
         <div class="brand-title">MyLog</div>
         <a href="howto.html" class="btn-help">📖 HOW TO</a>
     </div>
 
+    <!-- 1. 入力フォーム (Log recording) -->
     <div class="card">
         <h2>Log recording</h2>
         <form id="log-form" onsubmit="saveLog(event)">
@@ -568,9 +580,11 @@
         </form>
     </div>
 
+    <!-- 2. ダッシュボード ＆ チャートウィンドウ (Dashboard) -->
     <div class="card">
         <h2>Dashboard & Chart <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal; margin-left: auto;">(kg / BMI)</span></h2>
         
+        <!-- 直近体重・前回比 ＆ 現在のBMI サマリーエリア -->
         <div class="latest-summary-container">
             <div class="summary-block">
                 <div class="summary-title">直近の体重 (前回比)</div>
@@ -585,6 +599,7 @@
             </div>
         </div>
         
+        <!-- 板情報：スマホ最適化レイアウト -->
         <div class="board-grid">
             <div class="board-cell full-width">
                 <span class="board-label">表示中の日付</span>
@@ -625,8 +640,10 @@
             </select>
         </div>
 
+        <!-- メインチャート描画領域 -->
         <div id="main-chart"></div>
 
+        <!-- グラフ下インジケーター -->
         <div class="chart-bottom-indicators">
             <div class="indicator-item">
                 <span class="indicator-label"><span class="ind-dot ind-high"></span>適正上限 (BMI 25)</span>
@@ -643,6 +660,7 @@
         </div>
     </div>
 
+    <!-- 3. 概況・AIレポート (Report) -->
     <div class="card">
         <h2>Report</h2>
         <div class="status-header">
@@ -653,13 +671,16 @@
         </div>
     </div>
 
+    <!-- 4. 入力履歴リスト (Log) -->
     <div class="card">
         <h2>Log</h2>
         <div id="history-container" class="history-list">
-            </div>
+            <!-- 動的に生成 -->
+        </div>
         <div class="hint-text">※ 日時部分を長押し（またはクリック長押し）で削除できます</div>
     </div>
 
+    <!-- 5. プロフィール設定 (Profile) -->
     <div class="card">
         <h2>Profile</h2>
         <div class="profile-layout">
@@ -669,11 +690,13 @@
                 <button type="button" class="btn-profile-save" onclick="saveProfile()">設定を保存</button>
             </div>
             
+            <!-- 現在のBMI表示 -->
             <div class="bmi-display-box">
                 <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">現在の算出BMI</span>
                 <span id="current-bmi-value" class="bmi-value">--</span>
             </div>
 
+            <!-- 算出された適正範囲 -->
             <div class="range-box">
                 <div class="range-title">算出された適正範囲 (BMI基準)</div>
                 
@@ -695,6 +718,7 @@
         </div>
     </div>
 
+    <!-- 6. データバックアップセクション (Data Backup) -->
     <div class="card">
         <h2>Data Backup</h2>
         <div class="backup-flex">
@@ -704,13 +728,25 @@
         </div>
     </div>
 
+    <!-- 最下部：危険地帯 -->
     <div class="system-danger-zone">
         <button class="btn-danger-reset" onclick="resetAllData()">🗑️ すべてのデータをリセット</button>
     </div>
 
+    <!-- トースター通知用コンテナ -->
     <div id="toast-container"></div>
 
+    <!-- --- コアアプリケーションロジック --- -->
     <script>
+        // --- PWA サービスワーカー登録 ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('ServiceWorker 登録成功', reg.scope))
+                    .catch(err => console.log('ServiceWorker 登録失敗', err));
+            });
+        }
+
         // --- 状態管理グローバル変数 ---
         let logs = [];
         let chart = null;
