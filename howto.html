@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyLog - ユーザーガイド</title>
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -176,6 +175,21 @@
         .dot-ma30 { background-color: #08d158; }
         .dot-blue { background-color: var(--theme-blue); }
 
+        /* インフォメーションボックス */
+        .info-box {
+            background-color: rgba(41, 98, 255, 0.05);
+            border-left: 4px solid var(--theme-blue);
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            margin: 14px 0;
+            font-size: 0.85rem;
+        }
+        .info-box-title {
+            font-weight: bold;
+            color: var(--text-bright);
+            margin-bottom: 4px;
+        }
+
         .footer-note {
             text-align: center;
             font-size: 0.8rem;
@@ -187,20 +201,17 @@
 </head>
 <body>
 
-    <!-- ナビゲーション -->
     <div class="nav-container">
         <div class="brand-title">MyLog ドキュメント</div>
         <a href="index.html" class="btn-back">📊 アプリに戻る</a>
     </div>
 
-    <!-- イントロダクション -->
     <div class="card">
         <h1>ユーザーガイド ＆ ツール仕様書</h1>
         <p class="lead-text">MyLogは体重やメモを気軽に記録して、株価チャートのようなインターフェースで客観的に分析できるヘルスログアプリです。</p>
         <p>一般的なダイエットアプリのように「目標値との単純比較」や「一喜一憂の感情論」をなくし、純粋なデータトレンド（進行方向）を読み解くために設計されています。</p>
     </div>
 
-    <!-- コア機能の解説 -->
     <div class="card">
         <h2>1. 画面レイアウトと操作フロー</h2>
         <p>アプリはスマートフォンでの高速なルーティンワークを想定し、縦長画面で直感的にスクロール・入力ができる「ワンボード・デザイン」を採用しています。</p>
@@ -212,18 +223,21 @@
             <li>体重を空欄にしてメモ（日記や運動、食事ログ）だけを残すことも可能です。</li>
         </ul>
 
-        <h3>② 中央部：Dashboard & Chart（テクニカル分析）</h3>
-        <p>入力されたログは即座に集計され、画面中央の「板情報（テーブル）」と「メインチャート」へと反映されます。スマホ画面を圧迫しないよう、情報は1行でコンパクトに集約されています。</p>
+        <h3>② 中央部：Dashboard & Chart（テクニテクニカル分析）</h3>
+        <p>入力されたログは即座に集計され、画面中央の「板情報（テーブル）」と「メインチャート」へと反映されます。</p>
+        <ul>
+            <li><span class="highlight">初期表示の最適化：</span> 起動時は自動的に<span class="highlight">「直近30日」</span>の範囲が選択され、最新のトレンドにフォーカスして描画されます。期間はセレクトボックスからいつでも「全期間」「14日」「7日」に切り替え可能です。</li>
+        </ul>
         
-        <h3>③ 下部：Report ＆ Log ＆ Profile</h3>
+        <h3>③ 下部：Report ＆ Log ＆ Profile ＆ Data Backup</h3>
         <ul>
             <li><span class="highlight">Report：</span> 単なる数値の増減ではなく、データの「ボラティリティ（変動率）」を検知してAIが知的な巡航アドバイスを生成します。</li>
             <li><span class="highlight">Log：</span> 過去の全履歴。誤入力を削除したい場合は、<span class="highlight">日時部分を「長押し」</span>（PCの場合はクリック長押し）することで、その場で安全に個別削除できます。</li>
             <li><span class="highlight">Profile：</span> あなたの身長を設定します。すべてのBMI境界値およびグラフの背景色レイヤーは、この身長を元に完全自動計算されます。</li>
+            <li><span class="highlight">Data Backup：</span> ローカルストレージ内の全データをJSONファイルとしてエクスポート・インポートするための、安全性とポータビリティに特化した管理セクションです。</li>
         </ul>
     </div>
 
-    <!-- チャートと板情報の仕様 -->
     <div class="card">
         <h2>2. テクニカル・チャートの読み方</h2>
         <p>MyLogは、1日の体重の「うねり（朝・夜の差など）」を視覚化するため、ヘルスケアアプリでありながら<span class="highlight">ローソク足（Candlestick）チャート</span>を採用しています。</p>
@@ -251,7 +265,6 @@
         </ul>
     </div>
 
-    <!-- アナリティクスレイヤー -->
     <div class="card">
         <h2>3. アナリティクス・レイヤー（背景色）の仕様</h2>
         <p>グラフ内での視認性と美しさを両立するため、あなたの身長に合わせた「適正範囲」がグラフの背景にレイヤーとして常に描画されています。テキストはグラフ内のオブジェクトを邪魔しないよう、左端に綺麗に整列されています。</p>
@@ -269,16 +282,23 @@
         </ul>
     </div>
 
-    <!-- データポリシー -->
     <div class="card">
-        <h2>4. データの取り扱いとプライバシー</h2>
+        <h2>4. データの取り扱いとポータブル運用</h2>
+        <p>MyLogは、ユーザー自身が自分のデータを100%管理・コントロールできる「セルフカストディ（自己管理）」設計となっています。</p>
+        
         <ul>
-            <li><span class="highlight">完全ローカル動作：</span> 入力された身長や体重、メモなどの全データは、外部のサーバーへ一切送信されず、すべてあなた自身のスマートフォンのブラウザ（LocalStorage）にのみ安全に暗号・保存されます。</li>
-            <li><span class="highlight">リセット機能：</span> アプリの最下部にある「すべてのデータをリセット」ボタンから、いつでも全てのローカルデータを一括して完全に消去することができます。</li>
+            <li><span class="highlight">完全ローカル動作：</span> 入力された身長や体重、メモなどの全データは、外部のサーバーへ一切送信されず、すべてあなた自身のスマートフォンのブラウザ（LocalStorage）にのみ安全に保存されます。</li>
+            <li><span class="highlight">📤 JSONエクスポート（バックアップ）：</span> 記録された全データを1タップでJSON形式のファイルとしてローカルにダウンロードできます。ブラウザのキャッシュクリア対策として、こまめな保存を推奨します。</li>
+            <li><span class="highlight">📥 JSONインポート（復元・移行）：</span> エクスポートしたファイルを読み込むことで、過去のログデータを完全に復元したり、機種変更時の新しい端末へ一瞬でデータを移動させたりできます。</li>
+            <li><span class="highlight">🗑️ すべてのデータをリセット：</span> アプリの最下部にあるボタンから、ローカルデータを一括で完全消去できます。</li>
         </ul>
+
+        <div class="info-box">
+            <div class="info-box-title">💡 セキュリティを保った「一時リセット運用」について</div>
+            <p>アプリの挙動テストや、一時的にデータを隠したい場合などは、一度【エクスポート】してファイルを安全に手元に保管したあと、【リセット】を実行してアプリを空にします。検証等が終わったあとは、そのファイルを【インポート】するだけで、外部にデータを漏らすことなく安全に元のログライフを再開できます。</p>
+        </div>
     </div>
 
-    <!-- フッター -->
     <div class="footer-note">
         MyLog Technical Document — Designed for Premium Self-Quantification.
     </div>

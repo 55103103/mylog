@@ -237,10 +237,9 @@
             color: var(--theme-blue);
         }
 
-        /* --- 【アップデート】板情報：スマホ最適化グリッドレイアウト --- */
+        /* --- 板情報：スマホ最適化グリッドレイアウト --- */
         .board-grid {
             display: grid;
-            /* スマホファーストで2列固定 */
             grid-template-columns: repeat(2, 1fr);
             gap: 1px;
             background-color: var(--border-color);
@@ -256,7 +255,6 @@
             justify-content: space-between;
             align-items: center;
         }
-        /* 日付セルだけは2列ぶち抜きで最上部に配置 */
         .board-cell.full-width {
             grid-column: span 2;
         }
@@ -456,9 +454,39 @@
         }
         .btn-profile-save:hover { background-color: var(--theme-blue); }
 
+        /* --- 【新規】バックアップUIデザイン --- */
+        .backup-flex {
+            display: flex;
+            gap: 12px;
+            margin-top: 4px;
+        }
+        .btn-backup {
+            flex: 1;
+            background-color: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .btn-backup:hover {
+            border-color: var(--border-focus);
+            color: var(--text-bright);
+        }
+        #file-input {
+            display: none;
+        }
+
         /* システムデータリセットボタン */
         .system-danger-zone {
-            margin-top: 32px;
+            margin-top: 24px;
             padding-top: 16px;
             border-top: 1px dashed var(--border-color);
             text-align: center;
@@ -588,7 +616,7 @@
         <div class="chart-controls">
             <select id="range-selector" class="range-select" onchange="updateChart()">
                 <option value="all">全期間</option>
-                <option value="30">直近30日</option>
+                <option value="30" selected>直近30日</option>
                 <option value="14">直近14日</option>
                 <option value="7">直近7日</option>
             </select>
@@ -664,6 +692,15 @@
         </div>
     </div>
 
+    <div class="card">
+        <h2>Data Backup</h2>
+        <div class="backup-flex">
+            <button class="btn-backup" onclick="exportDataJSON()">📤 JSONエクスポート</button>
+            <button class="btn-backup" onclick="document.getElementById('file-input').click()">📥 JSONインポート</button>
+            <input type="file" id="file-input" accept=".json" onchange="importDataJSON(event)">
+        </div>
+    </div>
+
     <div class="system-danger-zone">
         <button class="btn-danger-reset" onclick="resetAllData()">🗑️ すべてのデータをリセット</button>
     </div>
@@ -691,7 +728,7 @@
             calculateRanges();
             updateSummaryIndicator();
             renderHistory();
-            initChart();
+            initChart(); // 初期設定でこの内部から「直近30日」を読み込むように調整
             generateReport();
         });
 
@@ -994,6 +1031,73 @@
             }
         }
 
+        // --- 【新規】JSONエクスポート機能 ---
+        function exportDataJSON() {
+            if (logs.length === 0) {
+                showToast("エクスポートするデータがありません");
+                return;
+            }
+            
+            const dataStr = JSON.stringify(logs, null, 2);
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
+            const now = new Date();
+            const dateStr = now.toISOString().slice(0,10).replace(/-/g, '');
+            
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.href = url;
+            downloadAnchor.download = `mylog_backup_${dateStr}.json`;
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            document.body.removeChild(downloadAnchor);
+            URL.revokeObjectURL(url);
+            
+            showToast("JSONファイルをエクスポートしました");
+        }
+
+        // --- 【新規】JSONインポート機能 ---
+        function importDataJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsedData = JSON.parse(e.target.result);
+                    
+                    // 簡易的なデータ整合性チェック
+                    if (!Array.isArray(parsedData)) {
+                        throw new Error("データが配列形式ではありません。");
+                    }
+                    
+                    if (parsedData.length > 0 && (!parsedData[0].hasOwnProperty('date') || !parsedData[0].hasOwnProperty('weight'))) {
+                        throw new Error("ログデータの形式が正しくありません。");
+                    }
+
+                    if (confirm(`【バックアップ復元】\nファイルから ${parsedData.length} 件のログを読み込みました。\n現在のブラウザのデータは上書きされますが、よろしいですか？`)) {
+                        logs = parsedData;
+                        logs.sort((a, b) => new Date(a.date) - new Date(b.date));
+                        localStorage.setItem('weight_logs', JSON.stringify(logs));
+                        
+                        showToast("バックアップデータを復元しました");
+                        
+                        // 全UIおよびグラフの再更新
+                        updateSummaryIndicator();
+                        renderHistory();
+                        updateChart();
+                        generateReport();
+                    }
+                } catch (error) {
+                    alert(`【エラー】インポートに失敗しました。\n原因: ${error.message}`);
+                } finally {
+                    // 同じファイルを再度選択できるようにリセット
+                    document.getElementById('file-input').value = "";
+                }
+            };
+            reader.readAsText(file);
+        }
+
         function generateReport() {
             const badge = document.getElementById('status-badge');
             const reportBox = document.getElementById('report-box');
@@ -1105,7 +1209,9 @@
         }
 
         function initChart() {
-            const dataObj = getDailyCandlestickData('all');
+            // 【アップデート】初期表示をセレクターの値（30日）に合わせる
+            const defaultRange = document.getElementById('range-selector').value;
+            const dataObj = getDailyCandlestickData(defaultRange);
             updatePeriodExtremeValues(dataObj.candlestick);
 
             const options = {
