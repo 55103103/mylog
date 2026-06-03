@@ -237,10 +237,10 @@
             color: var(--theme-blue);
         }
 
-        /* --- 板情報（情報テーブル） --- */
+        /* --- 板情報（情報テーブルの省スペース・1行最適化） --- */
         .board-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(1, 1fr);
             gap: 1px;
             background-color: var(--border-color);
             border: 1px solid var(--border-color);
@@ -249,23 +249,25 @@
             margin-bottom: 16px;
         }
         @media(min-width: 480px) {
-            .board-grid { grid-template-columns: repeat(4, 1fr); }
+            .board-grid { grid-template-columns: repeat(2, 1fr); }
         }
         .board-cell {
             background-color: var(--bg-input);
-            padding: 10px;
-            text-align: center;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between; /* ラベルと数値を左右に振り分け */
+            align-items: center;
         }
         .board-cell.full-width {
-            grid-column: span 2;
+            grid-column: span 1;
         }
         @media(min-width: 480px) {
-            .board-cell.full-width { grid-column: span 4; }
+            .board-cell.full-width { grid-column: span 2; }
         }
         .board-label {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
-            margin-bottom: 4px;
+            margin-bottom: 0; /* 下マージンを排除 */
         }
         .board-value {
             font-family: var(--font-mono);
@@ -477,6 +479,28 @@
     </div>
 
     <div class="card">
+        <h2>Log recording</h2>
+        <form id="log-form" onsubmit="saveLog(event)">
+            <div class="form-group">
+                <label for="input-date">Date and time</label>
+                <input type="datetime-local" id="input-date" required>
+            </div>
+            <div class="form-group">
+                <label for="input-weight">Weight ※空白可</label>
+                <div class="weight-input-container">
+                    <input type="number" id="input-weight" step="0.1" placeholder="例: 65.3 または 653">
+                    <span class="weight-unit">kg</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="input-memo">Memo ※空白可</label>
+                <textarea id="input-memo" rows="2" placeholder="行動ログ・日記などを入力"></textarea>
+            </div>
+            <button type="submit" class="btn-submit">Save Log</button>
+        </form>
+    </div>
+
+    <div class="card">
         <h2>Dashboard & Chart <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal; margin-left: auto;">(kg / BMI)</span></h2>
         
         <div class="latest-summary-container">
@@ -495,44 +519,44 @@
         
         <div class="board-grid">
             <div class="board-cell full-width">
-                <div class="board-label">表示中の日付</div>
-                <div id="board-date" class="board-value date">--</div>
+                <span class="board-label">表示中の日付</span>
+                <span id="board-date" class="board-value date">--</span>
             </div>
             <div class="board-cell">
-                <div class="board-label">始値 (最初)</div>
-                <div id="board-open" class="board-value">--</div>
+                <span class="board-label">始値 (最初)</span>
+                <span id="board-open" class="board-value">--</span>
             </div>
             <div class="board-cell">
-                <div class="board-label">最高値</div>
-                <div id="board-high" class="board-value">--</div>
+                <span class="board-label">最高値</span>
+                <span id="board-high" class="board-value">--</span>
             </div>
             <div class="board-cell">
-                <div class="board-label">最安値</div>
-                <div id="board-low" class="board-value">--</div>
+                <span class="board-label">最安値</span>
+                <span id="board-low" class="board-value">--</span>
             </div>
             <div class="board-cell">
-                <div class="board-label">終値 (最後)</div>
-                <div id="board-close" class="board-value">--</div>
+                <span class="board-label">終値 (最後)</span>
+                <span id="board-close" class="board-value">--</span>
             </div>
             <div class="board-cell">
-                <div class="board-label">期間内最高</div>
-                <div id="board-period-high" class="board-value">--</div>
+                <span class="board-label">期間内最高</span>
+                <span id="board-period-high" class="board-value">--</span>
             </div>
             <div class="board-cell">
-                <div class="board-label">期間内最安</div>
-                <div id="board-period-low" class="board-value">--</div>
+                <span class="board-label">期間内最安</span>
+                <span id="board-period-low" class="board-value">--</span>
             </div>
             <div class="board-cell">
-                <div class="board-label target-high">適正上限 (25)</div>
-                <div id="board-target-high" class="board-value">--</div>
+                <span class="board-label target-high">適正上限 (25)</span>
+                <span id="board-target-high" class="board-value">--</span>
             </div>
             <div class="board-cell">
-                <div class="board-label target-center">理想中心 (22)</div>
-                <div id="board-target-center" class="board-value">--</div>
+                <span class="board-label target-center">理想中心 (22)</span>
+                <span id="board-target-center" class="board-value">--</span>
             </div>
             <div class="board-cell">
-                <div class="board-label target-low">適正下限 (18.5)</div>
-                <div id="board-target-low" class="board-value">--</div>
+                <span class="board-label target-low">適正下限 (18.5)</span>
+                <span id="board-target-low" class="board-value">--</span>
             </div>
         </div>
 
@@ -556,28 +580,6 @@
         <div id="report-box" class="report-text">
             データを入力すると、現在の状況に合わせたアドバイスがここに表示されます。
         </div>
-    </div>
-
-    <div class="card">
-        <h2>Log recording</h2>
-        <form id="log-form" onsubmit="saveLog(event)">
-            <div class="form-group">
-                <label for="input-date">Date and time</label>
-                <input type="datetime-local" id="input-date" required>
-            </div>
-            <div class="form-group">
-                <label for="input-weight">Weight ※空白可</label>
-                <div class="weight-input-container">
-                    <input type="number" id="input-weight" step="0.1" placeholder="例: 65.3 または 653">
-                    <span class="weight-unit">kg</span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="input-memo">Memo ※空白可</label>
-                <textarea id="input-memo" rows="2" placeholder="行動ログ・日記などを入力"></textarea>
-            </div>
-            <button type="submit" class="btn-submit">Save Log</button>
-        </form>
     </div>
 
     <div class="card">
@@ -1126,26 +1128,56 @@
         }
 
         function updateChartAnnotations() {
+            // 【重要】グラフ内オブジェクトと被らないよう、ラベルテキストは最左端（left）に綺麗に揃えて配置
             chart.updateOptions({
                 annotations: {
                     yaxis: [
                         {
+                            // 1. 理想の中心値 (BMI 22): 青い実線
                             y: computedRanges.center,
-                            borderColor: 'rgba(41, 98, 255, 0.4)',
+                            borderColor: '#2962ff',
                             strokeDashArray: 0,
-                            label: { show: false }
+                            borderWidth: 2,
+                            label: {
+                                borderColor: '#2962ff',
+                                style: { color: '#fff', background: '#2962ff', fontFamily: 'Noto Sans JP', fontSize: '10px' },
+                                text: `理想中心 (${computedRanges.center.toFixed(1)}kg)`,
+                                position: 'left',
+                                textAnchor: 'start',
+                                offsetX: 5
+                            }
                         },
                         {
-                            y: computedRanges.normalMax,
-                            borderColor: 'rgba(242, 54, 69, 0.3)',
-                            strokeDashArray: 4,
-                            label: { show: false }
+                            // 2. 優良範囲 (BMI 21 - 23): 薄いグリーンの帯
+                            y: computedRanges.goodMin,
+                            y2: computedRanges.goodMax,
+                            fillColor: '#08d158',
+                            opacity: 0.06,
+                            label: {
+                                borderColor: 'transparent',
+                                style: { color: '#08d158', background: 'transparent', fontFamily: 'Noto Sans JP', fontSize: '10px', fontWeight: 'bold' },
+                                text: '■ 優良範囲 (BMI 21-23)',
+                                position: 'left',
+                                textAnchor: 'start',
+                                offsetX: 5,
+                                offsetY: -10
+                            }
                         },
                         {
+                            // 3. 一般適正範囲 (BMI 18.5 - 25): さらにつつみ込む薄いブルーの帯
                             y: computedRanges.normalMin,
-                            borderColor: 'rgba(8, 209, 88, 0.3)',
-                            strokeDashArray: 4,
-                            label: { show: false }
+                            y2: computedRanges.normalMax,
+                            fillColor: '#2962ff',
+                            opacity: 0.03,
+                            label: {
+                                borderColor: 'transparent',
+                                style: { color: '#7495ff', background: 'transparent', fontFamily: 'Noto Sans JP', fontSize: '10px' },
+                                text: '■ 適正範囲 (BMI 18.5-25)',
+                                position: 'left',
+                                textAnchor: 'start',
+                                offsetX: 5,
+                                offsetY: 10
+                            }
                         }
                     ]
                 }
@@ -1218,7 +1250,7 @@
 
             const latestCandle = candles[candles.length - 1];
             const dateObj = new Date(latestCandle.x);
-            const dateStr = `${dateObj.getFullYear()}/${String(dateObj.getMonth()+1).padStart(2,'0')}/${String(dateObj.getDate()).padStart(2,'0')} (期間内最新)`;
+            const dateStr = `${dateObj.getFullYear()}/${String(dateObj.getMonth()+1).padStart(2,'0')}/${String(dateObj.getDate()).padStart(2,'0')} (最新)`;
 
             document.getElementById('board-date').innerText = dateStr;
             document.getElementById('board-open').innerText = latestCandle.y[0].toFixed(1);

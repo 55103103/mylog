@@ -3,25 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyLog - チュートリアル & マニュアル</title>
+    <title>MyLog - ユーザーガイド</title>
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* --- アプリ本体と完全に同期したデザインシステム --- */
+        /* --- index.html と完全同期したプレミアム・ダークテーマ --- */
         :root {
             --bg-body: #0b0e14;
             --bg-card: #131722;
             --bg-input: #1e222d;
             --border-color: #2a2e39;
-            --border-focus: #434651;
             --text-main: #c5c7d0;
             --text-bright: #ffffff;
             --text-muted: #848e9c;
             --theme-blue: #2962ff;
-            --theme-blue-hover: #1e4bd6;
-            --color-positive: #f23645;
-            --color-negative: #08d158;
+            --color-positive: #f23645; /* 陽線 / 上昇 */
+            --color-negative: #08d158; /* 陰線 / 下落 */
             --font-main: 'Noto Sans JP', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
         }
@@ -36,382 +35,253 @@
             background-color: var(--bg-body);
             color: var(--text-main);
             font-family: var(--font-main);
-            padding: 24px 16px;
-            max-width: 720px;
+            padding: 16px;
+            max-width: 800px;
             margin: 0 auto;
+            padding-bottom: 60px;
             line-height: 1.7;
         }
 
         /* --- ヘッダー --- */
-        header {
-            text-align: center;
-            margin-bottom: 32px;
-            padding-bottom: 16px;
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
             border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
         }
-
         .brand-title {
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             font-weight: 700;
             color: var(--text-bright);
             font-family: var(--font-mono);
             letter-spacing: -0.5px;
-            margin-bottom: 8px;
         }
-
-        /* タイトルリンクのスタイルリセット */
-        .brand-link {
+        .btn-back {
+            background-color: var(--theme-blue);
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 700;
             text-decoration: none;
-            color: inherit;
-            transition: color 0.2s;
+            transition: background-color 0.2s;
         }
-        .brand-link:hover .brand-title {
-            color: var(--theme-blue);
-        }
-
-        .subtitle {
-            font-size: 0.95rem;
-            color: var(--text-muted);
+        .btn-back:hover {
+            background-color: #1e4bd6;
         }
 
-        /* --- セクション・カードスタイル --- */
+        /* --- カードスタイル --- */
         .card {
             background-color: var(--bg-card);
             border-radius: 12px;
             border: 1px solid var(--border-color);
-            padding: 24px;
+            padding: 20px;
             margin-bottom: 20px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
+        h1 {
+            font-size: 1.5rem;
+            color: var(--text-bright);
+            margin-bottom: 8px;
+        }
+        .lead-text {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+        }
+
         h2 {
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             color: var(--text-bright);
             border-left: 4px solid var(--theme-blue);
             padding-left: 10px;
-            margin-bottom: 18px;
+            margin-top: 8px;
+            margin-bottom: 16px;
             font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
         h3 {
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: var(--text-bright);
             margin: 16px 0 8px 0;
-            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         p {
-            margin-bottom: 14px;
-            font-size: 0.95rem;
-        }
-
-        /* --- 特殊タイポグラフィ --- */
-        blockquote {
-            background: linear-gradient(135deg, var(--bg-input), #171c28);
-            border: 1px solid var(--border-color);
-            border-left: 4px solid var(--theme-blue);
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
             color: var(--text-main);
         }
 
-        blockquote p {
-            margin-bottom: 0;
-            font-weight: 500;
-        }
-
-        .highlight-text {
-            color: var(--text-bright);
-            font-weight: bold;
-        }
-
-        /* --- リストスタイル --- */
         ul, ol {
-            padding-left: 20px;
+            margin-left: 20px;
             margin-bottom: 16px;
-        }
-
-        li {
-            margin-bottom: 8px;
-            font-size: 0.95rem;
-        }
-
-        li strong {
-            color: var(--text-bright);
-        }
-
-        /* --- ステップ表記 --- */
-        .step-list {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        .step-item {
-            position: relative;
-            padding-left: 28px;
-            margin-bottom: 16px;
-        }
-
-        .step-item::before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            top: 2px;
-            width: 18px;
-            height: 18px;
-            background-color: rgba(41, 98, 255, 0.2);
-            border: 1px solid var(--theme-blue);
-            color: var(--theme-blue);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: bold;
-        }
-
-        /* --- テーブル仕様（全幅フラット） --- */
-        .table-container {
-            width: 100%;
-            overflow-x: auto;
-            margin: 16px 0;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
             font-size: 0.9rem;
         }
 
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid var(--border-color);
+        li {
+            margin-bottom: 6px;
         }
 
-        th {
-            background-color: var(--bg-input);
+        /* --- 特殊コンポーネント --- */
+        .highlight {
             color: var(--text-bright);
-            font-weight: 700;
-        }
-
-        td {
-            color: var(--text-main);
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        .line-blue { color: #5c85ff; font-weight: bold; }
-        .line-red { color: #ff6b76; font-weight: bold; }
-        .line-green { color: #52ec8b; font-weight: bold; }
-
-        /* --- FAQエリア --- */
-        .faq-item {
-            margin-bottom: 18px;
-            padding-bottom: 14px;
-            border-bottom: 1px dashed var(--border-color);
-        }
-
-        .faq-item:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-
-        .faq-q {
-            font-weight: 700;
-            color: var(--text-bright);
-            display: flex;
-            gap: 6px;
-            margin-bottom: 4px;
-        }
-
-        .faq-q::before {
-            content: "Q.";
-            color: var(--color-positive);
-        }
-
-        .faq-a {
-            display: flex;
-            gap: 6px;
-            color: var(--text-main);
-        }
-
-        .faq-a::before {
-            content: "A.";
-            color: var(--color-negative);
             font-weight: bold;
         }
 
-        /* --- フッター・戻るボタン --- */
-        footer {
-            text-align: center;
-            margin-top: 32px;
+        .code-inline {
+            font-family: var(--font-mono);
+            background-color: var(--bg-input);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #f1fa8c;
+            font-size: 0.85rem;
         }
 
-        .btn-back {
-            background-color: var(--theme-blue);
-            color: #ffffff;
-            border: 1px solid var(--theme-blue);
-            padding: 14px 40px;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
+        /* モックアップ風の要素 */
+        .mock-board {
+            display: inline-flex;
+            justify-content: space-between;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            min-width: 160px;
+            margin: 4px 0;
+        }
+        .mock-label { color: var(--text-muted); }
+        .mock-value { color: var(--text-bright); font-weight: bold; }
+
+        /* カラーバッジ */
+        .color-dot {
             display: inline-block;
-            box-shadow: 0 4px 12px rgba(41, 98, 255, 0.3);
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            vertical-align: middle;
+            margin-right: 6px;
         }
+        .dot-up { background-color: var(--color-positive); }
+        .dot-down { background-color: var(--color-negative); }
+        .dot-ma7 { background-color: #e91e63; }
+        .dot-ma30 { background-color: #08d158; }
+        .dot-blue { background-color: var(--theme-blue); }
 
-        .btn-back:hover {
-            background-color: var(--theme-blue-hover);
-            border-color: var(--theme-blue-hover);
-            box-shadow: 0 4px 16px rgba(41, 98, 255, 0.4);
+        .footer-note {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 40px;
+            font-family: var(--font-mono);
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <a href="index.html" class="brand-link">
-            <div class="brand-title">MyLog</div>
-        </a>
-        <div class="subtitle">User Tutorial & Manual</div>
-    </header>
-
-    <blockquote>
-        <p>「体重の波を、トレードのように乗りこなす。データはあなただけのもの。」</p>
-    </blockquote>
-    
-    <div class="card">
-        <p>MyLogへようこそ！このアプリは、単に体重を記録して一喜一憂するための場所ではありません。日々の体重変動を「チャートの波」として客観的に捉え、あなたにとっての『理想のレンジ（適正範囲）』を長期的にキープするためのスマートログツールです。</p>
-        <p class="highlight-text">完全ローカル完結型のプライバシー最優先設計のため、デリケートな身体データを誰かに見られる心配は一切ありません。</p>
+    <!-- ナビゲーション -->
+    <div class="nav-container">
+        <div class="brand-title">MyLog ドキュメント</div>
+        <a href="index.html" class="btn-back">📊 アプリに戻る</a>
     </div>
 
+    <!-- イントロダクション -->
     <div class="card">
-        <h2>🔒 MyLogの安心セキュリティ仕様</h2>
-        <p>体重や日記といった究極のプライベートデータを守るため、MyLogは以下の強固なセキュリティ体制で構築されています。</p>
-        
-        <h3>1. サーバーへの送信は「ゼロ」：完全ローカル管理</h3>
-        <p>入力されたデータは、インターネット上のサーバーには一切送信されません。すべてあなたがお使いのスマートフォンやPCのブラウザ内部（Local Storage）のみに安全に保存されます。</p>
-        
-        <h3>2. アカウント登録・ログイン不要</h3>
-        <p>メールアドレスやパスワード、名前などの個人情報を登録する必要がそもそもないため、個人情報流出（データのハッキング）のリスク自体が構造上、存在しません。</p>
-        
-        <h3>3. 防犯対策としての「全データ一括消去」</h3>
-        <p>万が一、端末を他人に貸し出す際や破棄する際も、アプリ最下部のリセットボタンから一瞬で全てのデータを完全にブラウザから抹消できます。サーバーにバックアップが残ることもないため、形跡すら残りません。</p>
+        <h1>ユーザーガイド ＆ ツール仕様書</h1>
+        <p class="lead-text">MyLogは体重やメモを気軽に記録して、株価チャートのようなインターフェースで客観的に分析できるヘルスログアプリです。</p>
+        <p>一般的なダイエットアプリのように「目標値との単純比較」や「一喜一憂の感情論」をなくし、純粋なデータトレンド（進行方向）を読み解くために設計されています。</p>
     </div>
 
+    <!-- コア機能の解説 -->
     <div class="card">
-        <h2>🚀 クイックスタート（最初の3ステップ）</h2>
-        <p>使い始めはとてもシンプルです。まずは以下の3ステップを試してみましょう。</p>
+        <h2>1. 画面レイアウトと操作フロー</h2>
+        <p>アプリはスマートフォンでの高速なルーティンワークを想定し、縦長画面で直感的にスクロール・入力ができる「ワンボード・デザイン」を採用しています。</p>
         
-        <ul class="step-list">
-            <li class="step-item">
-                <strong>STEP 1：まずは「身長」を設定しよう（初期設定）</strong><br>
-                一番下の <strong>Profile</strong> エリアであなたの身長を入力し、「設定を保存」をタップしてください。身長に基づいた「理想の中心値（BMI 22）」や「一般適正範囲」が自動で算出され、ダッシュボードに反映されます。もちろんこの身長データも外部には送信されません。
+        <h3>① 最上部：Log recording（データ即時入力）</h3>
+        <p>アプリを起動して、スクロールすることなく即座に現在のデータを記録できます。日付は自動で現在時刻にセットされます。</p>
+        <ul>
+            <li><span class="highlight">スマート補正機能：</span> 体重入力で小数点を打ち忘れても（例: <span class="code-inline">653</span> と入力）、アプリが自動で検知して <span class="code-inline">65.3 kg</span> へスマートに自動補正します。</li>
+            <li>体重を空欄にしてメモ（日記や運動、食事ログ）だけを残すことも可能です。</li>
+        </ul>
+
+        <h3>② 中央部：Dashboard & Chart（テクニカル分析）</h3>
+        <p>入力されたログは即座に集計され、画面中央の「板情報（テーブル）」と「メインチャート」へと反映されます。スマホ画面を圧迫しないよう、情報は1行でコンパクトに集約されています。</p>
+        
+        <h3>③ 下部：Report ＆ Log ＆ Profile</h3>
+        <ul>
+            <li><span class="highlight">Report：</span> 単なる数値の増減ではなく、データの「ボラティリティ（変動率）」を検知してAIが知的な巡航アドバイスを生成します。</li>
+            <li><span class="highlight">Log：</span> 過去の全履歴。誤入力を削除したい場合は、<span class="highlight">日時部分を「長押し」</span>（PCの場合はクリック長押し）することで、その場で安全に個別削除できます。</li>
+            <li><span class="highlight">Profile：</span> あなたの身長を設定します。すべてのBMI境界値およびグラフの背景色レイヤーは、この身長を元に完全自動計算されます。</li>
+        </ul>
+    </div>
+
+    <!-- チャートと板情報の仕様 -->
+    <div class="card">
+        <h2>2. テクニカル・チャートの読み方</h2>
+        <p>MyLogは、1日の体重の「うねり（朝・夜の差など）」を視覚化するため、ヘルスケアアプリでありながら<span class="highlight">ローソク足（Candlestick）チャート</span>を採用しています。</p>
+
+        <h3>💡 4本値（板情報）の定義</h3>
+        <p>チャート上のローソク足にマウスカーソルを合わせるか、タップすると、その日の詳細データが1行に並んだ「板情報（テーブル）」にリアルタイム表示されます。</p>
+        <div>
+            <div class="mock-board"><span class="mock-label">始値 (最初)</span><span class="mock-value">その日一番最初に測った体重</span></div><br>
+            <div class="mock-board"><span class="mock-label">最高値</span><span class="mock-value">その日で最も重かった体重</span></div><br>
+            <div class="mock-board"><span class="mock-label">最安値</span><span class="mock-value">その日で最も軽かった体重</span></div><br>
+            <div class="mock-board"><span class="mock-label">終値 (最後)</span><span class="mock-value">その日一番最後に測った体重（日足の基準）</span></div>
+        </div>
+
+        <h3>🎨 ローソク足の色分け</h3>
+        <ul>
+            <li><span class="color-dot dot-up"></span><span class="highlight">陽線（赤色）：</span> 朝より夜の方が体重が増えた（終値 ＞ 始値）日を表します。</li>
+            <li><span class="color-dot dot-down"></span><span class="highlight">陰線（緑色）：</span> 朝より夜の方が体重が減った（終値 ＜ 始値）日を表します。</li>
+        </ul>
+
+        <h3>📈 移動平均線（Moving Average）</h3>
+        <p>日々の細かい水分量や食事によるブレ（ノイズ）をかき消し、本来の体重のトレンドを掴むためのインジケーターです。</p>
+        <ul>
+            <li><span class="color-dot dot-ma7"></span><span class="highlight">7日移動平均線（ピンク）：</span> 超短期的なトレンド。現在の生活リズムの直近の傾きを示します。</li>
+            <li><span class="color-dot dot-ma30"></span><span class="highlight">30日移動平均線（緑）：</span> 中長期的なトレンド。脂肪の増減の本質的な方向性を示します。</li>
+        </ul>
+    </div>
+
+    <!-- アナリティクスレイヤー -->
+    <div class="card">
+        <h2>3. アナリティクス・レイヤー（背景色）の仕様</h2>
+        <p>グラフ内での視認性と美しさを両立するため、あなたの身長に合わせた「適正範囲」がグラフの背景にレイヤーとして常に描画されています。テキストはグラフ内のオブジェクトを邪魔しないよう、左端に綺麗に整列されています。</p>
+        
+        <ul>
+            <li><span class="color-dot dot-blue"></span><span class="highlight">理想の中心線（青色実線）：</span>
+                健康統計上、最も病気になりにくいとされる <span class="highlight">BMI 22</span> の絶対的な基準線です。
             </li>
-            <li class="step-item">
-                <strong>STEP 2：今日のログを記録してみよう</strong><br>
-                <strong>Log recording</strong> エリアで、今の体重を入力して「Save Log」をタップ！<br>
-                <span style="font-size: 0.9rem; color: var(--text-muted);">※体重は空欄で、その日の行動や体調の「メモ（日記）だけ」を残すことも可能です。安全なあなただけの秘密の日記帳になります。</span>
+            <li><span class="highlight">優良範囲（薄グリーンの帯）：</span>
+                理想中心を挟む <span class="highlight">BMI 21 ～ 23</span> のゾーン。ここをキープして巡航することが、このアプリにおける「ベストコンディション」を意味します。
             </li>
-            <li class="step-item">
-                <strong>STEP 3：ダッシュボードを見てみよう</strong><br>
-                記録が完了すると、上部の <strong>Report</strong> エリアでAI（ローカルロジック）が現在の状態を即座に分析。さらに、中央の <strong>Dashboard</strong> のグラフへリアルタイムにプロットされます。
+            <li><span class="highlight">一般適正範囲（薄ブルーの帯）：</span>
+                医学的な適正基準である <span class="highlight">BMI 18.5 ～ 25</span> のゾーン。チャートのローソク足や移動平均線がこの帯の中に収まっている限り、健康上の問題はありません。
             </li>
         </ul>
     </div>
 
+    <!-- データポリシー -->
     <div class="card">
-        <h2>💡 知っておくと便利な「プロ技」3選</h2>
-        
-        <h3>① 爆速で入力する「ドット（.）省略テク」</h3>
-        <p>テンキーで「65.3」と打つとき、わざわざドットを打つのは面倒ですよね。MyLogでは、<strong>「653」と入力して保存するだけで、自動的に「65.3kg」へとスマートに補正</strong>されます。毎日の入力を1秒でも短縮するためのこだわりです。</p>
-
-        <h3>② チャートと完全に同期する「板情報テーブル」</h3>
-        <p>グラフ（ローソク足）の棒をタップしたりマウスを乗せたりすると、上部の四角いテーブル（始値・高値・安値・終値）の数字がリアルタイムに変化します。スマホのタップにも高精度に連動し、1日の「朝一番（始値）」から「夜（終値）」の動きがトレードのように一目で追うことができます。</p>
-
-        <h3>③ 間間違えて入力した時は「長押し削除」</h3>
-        <p>履歴（Log）に間違ったデータを保存してしまっても大丈夫。<strong>履歴の日時（📅のプロット部分）を長押し（スマホならタップ長押し、PCならクリック長押し）</strong> すると、ピンポイントでそのログを安全に削除できます。</p>
+        <h2>4. データの取り扱いとプライバシー</h2>
+        <ul>
+            <li><span class="highlight">完全ローカル動作：</span> 入力された身長や体重、メモなどの全データは、外部のサーバーへ一切送信されず、すべてあなた自身のスマートフォンのブラウザ（LocalStorage）にのみ安全に暗号・保存されます。</li>
+            <li><span class="highlight">リセット機能：</span> アプリの最下部にある「すべてのデータをリセット」ボタンから、いつでも全てのローカルデータを一括して完全に消去することができます。</li>
+        </ul>
     </div>
 
-    <div class="card">
-        <h2>📊 グラフの「見方」がわかる！ミニ解説</h2>
-        <p>MyLogのグラフには、あなたの健康的なレンジを視覚化する3つのラインが引かれています。</p>
-        
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ライン（色）</th>
-                        <th>意味</th>
-                        <th>アプローチのアドバイス</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="line-blue">青い実線</td>
-                        <td>理想の中心（BMI 22）</td>
-                        <td>ここがあなたの「ベースキャンプ」です。</td>
-                    </tr>
-                    <tr>
-                        <td class="line-red">赤い点線</td>
-                        <td>適正上限（BMI 25）</td>
-                        <td>この線を超えてきたら、少し生活を引き締めるサイン。</td>
-                    </tr>
-                    <tr>
-                        <td class="line-green">緑の点線</td>
-                        <td>適正下限（BMI 18.5）</td>
-                        <td>これを下回ると痩せすぎです。しっかり栄養を摂りましょう。</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0;">
-            📌 <strong>アプリからの大切なお約束：</strong><br>
-            体重は、前日に食べたものの水分量や塩分で、1〜2kgは簡単に上下します。単日の「点」を見るのではなく、7日・30日移動平均線（ピンクや緑の滑らかな線）の「線」を見て、<strong>「全体的になだらかな波を描けているか」</strong>をチェックするのが、MyLog流のスマートな健康管理です。
-        </p>
+    <!-- フッター -->
+    <div class="footer-note">
+        MyLog Technical Document — Designed for Premium Self-Quantification.
     </div>
-
-    <div class="card">
-        <h2>❓ FAQ（よくある質問）</h2>
-        
-        <div class="faq-item">
-            <div class="faq-q">毎日同じ時間に測らないとダメですか？</div>
-            <div class="faq-a">
-                <div>いつ測っても大丈夫です！MyLogは自動で「その日の最初と最後」を判別してグラフ化します。ただ、推移をピュアに比較したい場合は「朝起きてお手洗いを済ませた後」など、条件を揃えるのがおすすめです。</div>
-            </div>
-        </div>
-
-        <div class="faq-item">
-            <div class="faq-q">スマホを機種変更するとき、データはどうなりますか？</div>
-            <div class="faq-a">
-                <div>完全ローカル完結型セキュリティの特性上、自動的なクラウド同期はありません。新しい端末へ移行する場合は、最下部のボタンで一度すべてリセットし、新しい端末で心機一転スタートすることをおすすめします（今後のアップデートでデータのエクスポート機能も検討中です）。</div>
-            </div>
-        </div>
-
-        <div class="faq-item">
-            <div class="faq-q">家族で同じPCを使っている場合、データは見られますか？</div>
-            <div class="faq-a">
-                <div>同じPCで「同じブラウザの同じユーザープロファイル」を使っている場合は、ローカルストレージが共有されるため共通のデータが表示されます。家族に見られたくない場合は、ブラウザの「シークレットモード」でアプリを開くか、ブラウザのユーザーアカウントを分けてご利用ください。</div>
-            </div>
-        </div>
-    </div>
-
-    <footer>
-        <a href="index.html" class="btn-back">アプリに戻る</a>
-    </footer>
 
 </body>
 </html>
