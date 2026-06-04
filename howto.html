@@ -2,24 +2,31 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyLog - ユーザーガイド</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MyLog - HOW TO</title>
+    
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    
     <style>
-        /* --- index.html と完全同期したプレミアム・ダークテーマ --- */
+        /* --- デザインシステム & 変数 (index.htmlと完全同期) --- */
         :root {
             --bg-body: #0b0e14;
             --bg-card: #131722;
             --bg-input: #1e222d;
-            --border-color: #2a2e39;
+            --border-color: #3a3f50; 
+            --border-focus: #52586c;
             --text-main: #c5c7d0;
             --text-bright: #ffffff;
             --text-muted: #848e9c;
             --theme-blue: #2962ff;
-            --color-positive: #f23645; /* 陽線 / 上昇 */
-            --color-negative: #08d158; /* 陰線 / 下落 */
+            --theme-blue-hover: #1e4bd6;
+            --color-positive: #f23645; 
+            --color-negative: #08d158; 
             --font-main: 'Noto Sans JP', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
         }
@@ -28,6 +35,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -38,17 +46,60 @@
             max-width: 800px;
             margin: 0 auto;
             padding-bottom: 60px;
-            line-height: 1.7;
         }
 
-        /* --- ヘッダー --- */
+        h2 {
+            font-size: 1.1rem;
+            color: var(--text-bright);
+            border-left: 4px solid var(--theme-blue);
+            padding-left: 8px;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        h3 {
+            font-size: 0.95rem;
+            color: var(--text-bright);
+            margin: 18px 0 8px 0;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        p {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            color: var(--text-main);
+        }
+
+        ul, ol {
+            padding-left: 20px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        li {
+            margin-bottom: 6px;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- ナビゲーション --- */
         .nav-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 12px;
+            margin-bottom: 12px;
         }
         .brand-title {
             font-size: 1.4rem;
@@ -58,249 +109,186 @@
             letter-spacing: -0.5px;
         }
         .btn-back {
-            background-color: var(--theme-blue);
-            color: #ffffff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-decoration: none;
-            transition: background-color 0.2s;
-        }
-        .btn-back:hover {
-            background-color: #1e4bd6;
-        }
-
-        /* --- カードスタイル --- */
-        .card {
-            background-color: var(--bg-card);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        h1 {
-            font-size: 1.5rem;
-            color: var(--text-bright);
-            margin-bottom: 8px;
-        }
-        .lead-text {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            margin-bottom: 16px;
-        }
-
-        h2 {
-            font-size: 1.15rem;
-            color: var(--text-bright);
-            border-left: 4px solid var(--theme-blue);
-            padding-left: 10px;
-            margin-top: 8px;
-            margin-bottom: 16px;
-            font-weight: 700;
-        }
-
-        h3 {
-            font-size: 0.95rem;
-            color: var(--text-bright);
-            margin: 16px 0 8px 0;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        p {
-            font-size: 0.9rem;
-            margin-bottom: 12px;
+            background-color: var(--bg-input);
             color: var(--text-main);
-        }
-
-        ul, ol {
-            margin-left: 20px;
-            margin-bottom: 16px;
-            font-size: 0.9rem;
-        }
-
-        li {
-            margin-bottom: 6px;
-        }
-
-        /* --- 特殊コンポーネント --- */
-        .highlight {
-            color: var(--text-bright);
-            font-weight: bold;
-        }
-
-        .code-inline {
-            font-family: var(--font-mono);
-            background-color: var(--bg-input);
-            padding: 2px 6px;
-            border-radius: 4px;
-            color: #f1fa8c;
-            font-size: 0.85rem;
-        }
-
-        /* モックアップ風の要素 */
-        .mock-board {
-            display: inline-flex;
-            justify-content: space-between;
-            background-color: var(--bg-input);
             border: 1px solid var(--border-color);
             padding: 6px 12px;
             border-radius: 6px;
-            font-family: var(--font-mono);
+            cursor: pointer;
             font-size: 0.85rem;
-            min-width: 160px;
-            margin: 4px 0;
+            text-decoration: none;
+            transition: all 0.2s;
         }
-        .mock-label { color: var(--text-muted); }
-        .mock-value { color: var(--text-bright); font-weight: bold; }
-
-        /* カラーバッジ */
-        .color-dot {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 3px;
-            vertical-align: middle;
-            margin-right: 6px;
+        .btn-back:hover {
+            border-color: var(--border-focus);
+            color: var(--text-bright);
         }
-        .dot-up { background-color: var(--color-positive); }
-        .dot-down { background-color: var(--color-negative); }
-        .dot-ma7 { background-color: #e91e63; }
-        .dot-ma30 { background-color: #08d158; }
-        .dot-blue { background-color: var(--theme-blue); }
 
-        /* インフォメーションボックス */
-        .info-box {
-            background-color: rgba(41, 98, 255, 0.05);
-            border-left: 4px solid var(--theme-blue);
-            padding: 12px 16px;
+        blockquote {
+            background-color: rgba(30, 34, 45, 0.5);
+            border-left: 4px solid var(--text-muted);
+            padding: 12px;
+            margin: 14px 0;
             border-radius: 0 8px 8px 0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .highlight-text {
+            color: var(--text-bright);
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
             margin: 14px 0;
             font-size: 0.85rem;
         }
-        .info-box-title {
-            font-weight: bold;
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: var(--bg-input);
             color: var(--text-bright);
-            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        td strong {
+            color: var(--text-bright);
         }
 
-        .footer-note {
-            text-align: center;
+        .badge-mock {
             font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-top: 40px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-right: 6px;
+        }
+        .mock-prime {
+            background-color: rgba(41, 98, 255, 0.12);
+            border: 1px solid rgba(41, 98, 255, 0.5);
+            color: #4facfe;
+        }
+        .mock-fair {
+            background-color: rgba(8, 209, 88, 0.08);
+            border: 1px solid rgba(8, 209, 88, 0.4);
+            color: var(--color-negative);
+        }
+        .mock-review {
+            background-color: rgba(242, 54, 69, 0.08);
+            border: 1px solid rgba(242, 54, 69, 0.4);
+            color: var(--color-positive);
+        }
+
+        .score-mock {
             font-family: var(--font-mono);
+            color: #ffb703;
+            font-weight: 700;
+            background-color: var(--bg-input);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
         }
     </style>
 </head>
 <body>
 
     <div class="nav-container">
-        <div class="brand-title">MyLog ドキュメント</div>
-        <a href="index.html" class="btn-back">📊 アプリに戻る</a>
+        <div class="brand-title">MyLog │ HOW TO</div>
+        <a href="index.html" class="btn-back">📊 BACK TO APP</a>
     </div>
 
     <div class="card">
-        <h1>ユーザーガイド ＆ ツール仕様書</h1>
-        <p class="lead-text">MyLogは体重やメモを気軽に記録して、株価チャートのようなインターフェースで客観的に分析できるヘルスログアプリです。</p>
-        <p>一般的なダイエットアプリのように「目標値との単純比較」や「一喜一憂の感情論」をなくし、純粋なデータトレンド（進行方向）を読み解くために設計されています。</p>
+        <h2>MyLog のコンセプト</h2>
+        <p>MyLogは、金融商品の投資チャート（TradingView等）のテクニカル分析思想をヘルスケアに応用した、<span class="highlight-text">持続可能な体重管理ダッシュボード</span>です。</p>
+        <p>日々の体重の数値だけにとらわれる必要はありません。1日の細かな変動をキャッチし、健康的な生活習慣の「プロセス（行動）」をハックして楽しむために設計されています。</p>
     </div>
 
     <div class="card">
-        <h2>1. 画面レイアウトと操作フロー</h2>
-        <p>アプリはスマートフォンでの高速なルーティンワークを想定し、縦長画面で直感的にスクロール・入力ができる「ワンボード・デザイン」を採用しています。</p>
+        <h2>ヘルススコア（SCORE）の仕組み</h2>
+        <p>単に適正体重の中心値を100点満点とする評価ではありません。ネガティブな変動があっても記録を避けることにつながらないよう、<span class="highlight-text">「記録頻度（努力）」</span>と<span class="highlight-text">「移動平均の安定（継続的な維持）」</span>に特化した独自の2大評価軸（各50点満点）でリアルタイム採点します。</p>
         
-        <h3>① 最上部：Log recording（データ即時入力）</h3>
-        <p>アプリを起動して、スクロールすることなく即座に現在のデータを記録できます。日付は自動で現在時刻にセットされます。</p>
-        <ul>
-            <li><span class="highlight">スマート補正機能：</span> 体重入力で小数点を打ち忘れても（例: <span class="code-inline">653</span> と入力）、アプリが自動で検知して <span class="code-inline">65.3 kg</span> へスマートに自動補正します。</li>
-            <li>体重を空欄にしてメモ（日記や運動、食事ログ）だけを残すことも可能です。</li>
-        </ul>
+        <h3>2つの評価軸と配点ルール</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 25%;">評価項目</th>
+                    <th style="width: 15%;">持ち点</th>
+                    <th>採点条件</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>① 記録アクティビティ</strong></td>
+                    <td><strong>50点</strong></td>
+                    <td>
+                        過去7日間のうち、毎日の「記録回数（メモのみ含む）」に応じて段階加点：<br>
+                        ・1回目の記録がある日数 × 2点（最大14点）<br>
+                        ・2回目の記録がある日数 × 2点（最大14点）<br>
+                        ・3回目の記録がある日数 × 2点（最大14点）<br>
+                        ・<span class="highlight-text">【週30回以上ボーナス】</span> 総記録回数が30回以上なら <span class="highlight-text">＋8点</span><br>
+                        <small style="color:var(--text-muted);">※1日4回以上の高頻度な記録を行うことで、ローソク足に詳細な「ヒゲ（高値・安値）」が形成され、精緻なテクニカル分析が可能になります。</small>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>② コンディション</strong></td>
+                    <td><strong>50点</strong></td>
+                    <td>
+                        直近の1点データではなく、中長期トレンド（移動平均線）の維持状態を評価：<br>
+                        ・過去7日間の <span class="highlight-text">MA7（7日移動平均）がすべて一般適正範囲内</span> ＝ <strong>30点</strong><br>
+                        ・過去7日間の <span class="highlight-text">MA7（7日移動平均）がすべて優良範囲内</span> ＝ <strong>40点</strong><br>
+                        ・<span class="highlight-text">【長期維持ボーナス】</span> 過去7日間の MA30 もすべて優良範囲内なら <span class="highlight-text">＋10点</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
-        <h3>② 中央部：Dashboard & Chart（テクニテクニカル分析）</h3>
-        <p>入力されたログは即座に集計され、画面中央の「板情報（テーブル）」と「メインチャート」へと反映されます。</p>
-        <ul>
-            <li><span class="highlight">初期表示の最適化：</span> 起動時は自動的に<span class="highlight">「直近30日」</span>の範囲が選択され、最新のトレンドにフォーカスして描画されます。期間はセレクトボックスからいつでも「全期間」「14日」「7日」に切り替え可能です。</li>
-        </ul>
-        
-        <h3>③ 下部：Report ＆ Log ＆ Profile ＆ Data Backup</h3>
-        <ul>
-            <li><span class="highlight">Report：</span> 単なる数値の増減ではなく、データの「ボラティリティ（変動率）」を検知してAIが知的な巡航アドバイスを生成します。</li>
-            <li><span class="highlight">Log：</span> 過去の全履歴。誤入力を削除したい場合は、<span class="highlight">日時部分を「長押し」</span>（PCの場合はクリック長押し）することで、その場で安全に個別削除できます。</li>
-            <li><span class="highlight">Profile：</span> あなたの身長を設定します。すべてのBMI境界値およびグラフの背景色レイヤーは、この身長を元に完全自動計算されます。</li>
-            <li><span class="highlight">Data Backup：</span> ローカルストレージ内の全データをJSONファイルとしてエクスポート・インポートするための、安全性とポータビリティに特化した管理セクションです。</li>
-        </ul>
+        <blockquote>
+            💡 <strong>ネガティブ・レコーディングの推奨：</strong><br>
+            一時的な暴飲暴食などで体重が急増したときも、スコアが暴落することはありません。むしろ、その時こそ高頻度で記録を残すことで「① アクティビティ点」がフルに加算されます。また、数日間の急な増減では「移動平均線（MA）」は崩れないため、安心して現実をログに刻んでください。
+        </blockquote>
     </div>
 
     <div class="card">
-        <h2>2. テクニカル・チャートの読み方</h2>
-        <p>MyLogは、1日の体重の「うねり（朝・夜の差など）」を視覚化するため、ヘルスケアアプリでありながら<span class="highlight">ローソク足（Candlestick）チャート</span>を採用しています。</p>
-
-        <h3>💡 4本値（板情報）の定義</h3>
-        <p>チャート上のローソク足にマウスカーソルを合わせるか、タップすると、その日の詳細データが1行に並んだ「板情報（テーブル）」にリアルタイム表示されます。</p>
-        <div>
-            <div class="mock-board"><span class="mock-label">始値 (最初)</span><span class="mock-value">その日一番最初に測った体重</span></div><br>
-            <div class="mock-board"><span class="mock-label">最高値</span><span class="mock-value">その日で最も重かった体重</span></div><br>
-            <div class="mock-board"><span class="mock-label">最安値</span><span class="mock-value">その日で最も軽かった体重</span></div><br>
-            <div class="mock-board"><span class="mock-label">終値 (最後)</span><span class="mock-value">その日一番最後に測った体重（日足の基準）</span></div>
-        </div>
-
-        <h3>🎨 ローソク足の色分け</h3>
-        <ul>
-            <li><span class="color-dot dot-up"></span><span class="highlight">陽線（赤色）：</span> 朝より夜の方が体重が増えた（終値 ＞ 始値）日を表します。</li>
-            <li><span class="color-dot dot-down"></span><span class="highlight">陰線（緑色）：</span> 朝より夜の方が体重が減った（終値 ＜ 始値）日を表します。</li>
-        </ul>
-
-        <h3>📈 移動平均線（Moving Average）</h3>
-        <p>日々の細かい水分量や食事によるブレ（ノイズ）をかき消し、本来の体重のトレンドを掴むためのインジケーターです。</p>
-        <ul>
-            <li><span class="color-dot dot-ma7"></span><span class="highlight">7日移動平均線（ピンク）：</span> 超短期的なトレンド。現在の生活リズムの直近の傾きを示します。</li>
-            <li><span class="color-dot dot-ma30"></span><span class="highlight">30日移動平均線（緑）：</span> 中長期的なトレンド。脂肪の増減の本質的な方向性を示します。</li>
-        </ul>
-    </div>
-
-    <div class="card">
-        <h2>3. アナリティクス・レイヤー（背景色）の仕様</h2>
-        <p>グラフ内での視認性と美しさを両立するため、あなたの身長に合わせた「適正範囲」がグラフの背景にレイヤーとして常に描画されています。テキストはグラフ内のオブジェクトを邪魔しないよう、左端に綺麗に整列されています。</p>
+        <h2>Report ウィンドウの演出と見方</h2>
+        <p>画面中段の「Report」では、現在の状況をプロ仕様のアラートバッジ（背景＋枠線）とAIテキストでフィードバックします。</p>
         
         <ul>
-            <li><span class="color-dot dot-blue"></span><span class="highlight">理想の中心線（青色実線）：</span>
-                健康統計上、最も病気になりにくいとされる <span class="highlight">BMI 22</span> の絶対的な基準線です。
-            </li>
-            <li><span class="highlight">優良範囲（薄グリーンの帯）：</span>
-                理想中心を挟む <span class="highlight">BMI 21 ～ 23</span> のゾーン。ここをキープして巡航することが、このアプリにおける「ベストコンディション」を意味します。
-            </li>
-            <li><span class="highlight">一般適正範囲（薄ブルーの帯）：</span>
-                医学的な適正基準である <span class="highlight">BMI 18.5 ～ 25</span> のゾーン。チャートのローソク足や移動平均線がこの帯の中に収まっている限り、健康上の問題はありません。
-            </li>
+            <li><span class="badge-mock mock-prime">🏆 ベストコンディション</span> <br>現在のリアルタイム体重が、身体への負担が最も少ない理想的な「優良範囲（BMI 21〜23）」に収まっている状態です。</li>
+            <li><span class="badge-mock mock-fair">⚖️ 適正範囲内</span> <br>標準的な医学的適正範囲（BMI 18.5〜25）を維持できている状態です。理想の中心値（BMI 22）を目指すベースになります。</li>
+            <li><span class="badge-mock mock-review">⚠️ 要調整ゾーン</span> <br>適正の境界線を越えて体重が上下している状態です。まずは計測リズムを整えるアドバイスが表示されます。</li>
         </ul>
+        
+        <p>右側に表示される <span class="score-mock">SCORE 92</span> などの数値は、あなたの行動と状態が連動して上下します。100点満点を目指して日々の記録をコントロールしましょう。</p>
     </div>
 
     <div class="card">
-        <h2>4. データの取り扱いとポータブル運用</h2>
-        <p>MyLogは、ユーザー自身が自分のデータを100%管理・コントロールできる「セルフカストディ（自己管理）」設計となっています。</p>
+        <h2>チャートと板情報の高度な活用</h2>
         
-        <ul>
-            <li><span class="highlight">完全ローカル動作：</span> 入力された身長や体重、メモなどの全データは、外部のサーバーへ一切送信されず、すべてあなた自身のスマートフォンのブラウザ（LocalStorage）にのみ安全に保存されます。</li>
-            <li><span class="highlight">📤 JSONエクスポート（バックアップ）：</span> 記録された全データを1タップでJSON形式のファイルとしてローカルにダウンロードできます。ブラウザのキャッシュクリア対策として、こまめな保存を推奨します。</li>
-            <li><span class="highlight">📥 JSONインポート（復元・移行）：</span> エクスポートしたファイルを読み込むことで、過去のログデータを完全に復元したり、機種変更時の新しい端末へ一瞬でデータを移動させたりできます。</li>
-            <li><span class="highlight">🗑️ すべてのデータをリセット：</span> アプリの最下部にあるボタンから、ローカルデータを一括で完全消去できます。</li>
-        </ul>
+        <h3>日足ローソク足チャート</h3>
+        <p>1日の中に複数の記録がある場合、その日の「始値（最初の記録）」「終値（最後の記録）」「最高値」「最安値」を形成し、1本の<span class="highlight-text">「ローソク足」</span>に凝縮されます。当日の体重が朝より夜に減少していれば<span style="color:var(--color-negative); font-weight:bold;">緑色（陰線）</span>、増加していれば<span style="color:var(--color-positive); font-weight:bold;">赤色（陽線）</span>で描画されます。</p>
 
-        <div class="info-box">
-            <div class="info-box-title">💡 セキュリティを保った「一時リセット運用」について</div>
-            <p>アプリの挙動テストや、一時的にデータを隠したい場合などは、一度【エクスポート】してファイルを安全に手元に保管したあと、【リセット】を実行してアプリを空にします。検証等が終わったあとは、そのファイルを【インポート】するだけで、外部にデータを漏らすことなく安全に元のログライフを再開できます。</p>
-        </div>
+        <h3>移動平均線（MA）</h3>
+        <p>日々の微細なノイズを取り除くため、7日移動平均線（ピンク）と30日移動平均線（グリーン）を搭載しています。ローソク足がこのラインを上抜けたか下抜けたかで、体重の方向性（トレンド）をテクニカルに分析できます。</p>
+
+        <h3>インタラクティブ板情報</h3>
+        <p>チャートエリアをホバー（またはタッチ）すると、その日付の「四本値」が上部の板情報にリアルタイム連動表示されます。指を離すと、自動的に最新（今日）のデータにホールドされます。</p>
     </div>
 
-    <div class="footer-note">
-        MyLog Technical Document — Designed for Premium Self-Quantification.
+    <div class="card">
+        <h2>その他の便利な機能</h2>
+        
+        <h3>桁数自動補正入力</h3>
+        <p>入力を限界まで高速化するため、例えば「65.3kg」と打ちたいとき、ドットを省いて <span class="highlight-text">「653」</span> と入力して保存するだけで、アプリが自動的に「65.3kg」へスマートに補正します。</p>
+
+        <h3>長押し削除機能</h3>
+        <p>入力を誤ってしまった場合は、一番下の「Log History（履歴リスト）」にある<span class="highlight-text">「📅 日時（絵文字の部分）」を長押し</span>（スマホならタップホールド、PCならクリック長押し）することで、特定のログをピンポイントで安全に削除できます。</p>
+
+        <h3>ローカル完結＆PWAバックアップ</h3>
+        <p>MyLogはサーバーにデータを一切送信しない完全プライバシー設計です。ブラウザのローカルストレージに保存されます。端末の変更やデータの保護を行いたい場合は、「Data Backup」セクションからいつでもJSONファイルをエクスポート・インポートできます。</p>
     </div>
 
 </body>

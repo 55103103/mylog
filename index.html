@@ -23,7 +23,6 @@
             --bg-body: #0b0e14;
             --bg-card: #131722;
             --bg-input: #1e222d;
-            /* 境界線・枠線を見やすく少し明るめのグレーに調整 */
             --border-color: #3a3f50; 
             --border-focus: #52586c;
             --text-main: #c5c7d0;
@@ -31,8 +30,8 @@
             --text-muted: #848e9c;
             --theme-blue: #2962ff;
             --theme-blue-hover: #1e4bd6;
-            --color-positive: #f23645; /* 体重増加・警告（赤系） */
-            --color-negative: #08d158; /* 体重減少・健全（緑系） */
+            --color-positive: #f23645; 
+            --color-negative: #08d158; 
             --font-main: 'Noto Sans JP', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
         }
@@ -106,19 +105,18 @@
             color: var(--text-bright);
         }
 
-        /* --- 圧縮版入力フォーム (Log recording) --- */
+        /* --- 入力フォーム --- */
         .recording-card {
-            padding: 12px 16px; 
+            padding: 16px; 
         }
         .form-group {
             margin-bottom: 12px; 
         }
         
-        /* Weight用ラベルスタイルのカスタム（白色・入力欄と同じフォントサイズ） */
         .label-weight {
             display: block;
-            font-size: 1rem; /* 入力欄と同じサイズ */
-            color: var(--text-bright) !important; /* 純粋な白色に変更 */
+            font-size: 1rem; 
+            color: var(--text-bright) !important; 
             font-weight: 500;
             margin-bottom: 6px;
         }
@@ -126,7 +124,7 @@
         input, select {
             width: 100%;
             background-color: var(--bg-input);
-            border: 1px solid var(--border-color); /* 視認性の高い枠線 */
+            border: 1px solid var(--border-color); 
             color: var(--text-bright);
             padding: 10px;
             border-radius: 8px;
@@ -137,19 +135,17 @@
         input:focus, select:focus {
             outline: none;
             border-color: var(--theme-blue);
-            /* アクティブな入力欄をさらに分かりやすくするグロー効果 */
-            box-shadow: 0 0 i 0 4px rgba(41, 98, 255, 0.25);
+            box-shadow: 0 0 0 4px rgba(41, 98, 255, 0.25);
         }
         input[type="datetime-local"] {
             font-family: var(--font-mono);
         }
         
-        /* メモ入力欄：枠線なし、下線のみ、デフォルト1行 */
         textarea#input-memo {
             width: 100%;
             background-color: transparent;
             border: none;
-            border-bottom: 1px solid var(--border-color); /* 下線の視認性強化 */
+            border-bottom: 1px solid var(--border-color); 
             color: var(--text-bright);
             padding: 8px 0;
             border-radius: 0;
@@ -191,7 +187,7 @@
             background-color: var(--theme-blue-hover);
         }
 
-        /* --- 直近の状況 サマリー表示エリア --- */
+        /* --- サマリー表示エリア --- */
         .latest-summary-container {
             background: linear-gradient(135deg, var(--bg-input), #171c28);
             border: 1px solid var(--border-color);
@@ -245,7 +241,7 @@
             color: var(--theme-blue);
         }
 
-        /* --- 板情報：スマホ最適化グリッドレイアウト --- */
+        /* --- 板情報 --- */
         .board-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -296,6 +292,10 @@
             width: auto;
         }
 
+        .chart-wrapper {
+            margin: 0 -4px;
+        }
+
         /* --- グラフ下インジケーター --- */
         .chart-bottom-indicators {
             display: grid;
@@ -342,6 +342,86 @@
         .ind-high { background-color: #ff6b76; }
         .ind-center { background-color: var(--theme-blue); }
         .ind-low { background-color: #08d158; }
+
+        /* --- Reportウィンドウ演出パーツ --- */
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            gap: 12px;
+        }
+        
+        /* 枠線＆背景色を強化したTradingView風ステータスバッジ */
+        .status-badge-box {
+            font-size: 0.9rem;
+            font-weight: 700;
+            padding: 8px 16px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            letter-spacing: 0.5px;
+        }
+        .badge-box-prime {
+            background-color: rgba(41, 98, 255, 0.12);
+            border: 1px solid rgba(41, 98, 255, 0.5);
+            color: #4facfe;
+        }
+        .badge-box-fair {
+            background-color: rgba(8, 209, 88, 0.08);
+            border: 1px solid rgba(8, 209, 88, 0.4);
+            color: var(--color-negative);
+        }
+        .badge-box-review {
+            background-color: rgba(242, 54, 69, 0.08);
+            border: 1px solid rgba(242, 54, 69, 0.4);
+            color: var(--color-positive);
+        }
+        .badge-box-loading {
+            background-color: rgba(132, 142, 156, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+        }
+
+        /* スコア表示用ブロック */
+        .score-container {
+            background: linear-gradient(135deg, #1e222d, #141823);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .score-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            font-family: var(--font-mono);
+            letter-spacing: 0.5px;
+        }
+        .score-num-wrap {
+            font-family: var(--font-mono);
+            display: flex;
+            align-items: baseline;
+        }
+        .score-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffb703; /* ゴールド系の配色 */
+            text-shadow: 0 0 10px rgba(255, 183, 3, 0.2);
+        }
+        .score-max {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-left: 2px;
+        }
+
+        .report-text {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-main);
+        }
 
         /* --- 履歴リスト --- */
         .history-list {
@@ -462,7 +542,7 @@
         }
         .btn-profile-save:hover { background-color: var(--theme-blue); }
 
-        /* --- バックアップUIデザイン --- */
+        /* --- バックアップUI --- */
         .backup-flex {
             display: flex;
             gap: 12px;
@@ -492,7 +572,6 @@
             display: none;
         }
 
-        /* システムデータリセットボタン */
         .system-danger-zone {
             margin-top: 24px;
             padding-top: 16px;
@@ -552,6 +631,7 @@
     </div>
 
     <div class="card recording-card">
+        <h2>Log Input</h2>
         <form id="log-form" onsubmit="saveLog(event)">
             <div class="form-group">
                 <input type="datetime-local" id="input-date" required>
@@ -571,7 +651,7 @@
     </div>
 
     <div class="card">
-        <h2>Dashboard & Chart <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal; margin-left: auto;">(kg / BMI)</span></h2>
+        <h2>Dashboard <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal; margin-left: auto;">(kg / BMI)</span></h2>
         
         <div class="latest-summary-container">
             <div class="summary-block">
@@ -627,7 +707,9 @@
             </select>
         </div>
 
-        <div id="main-chart"></div>
+        <div class="chart-wrapper">
+            <div id="main-chart"></div>
+        </div>
 
         <div class="chart-bottom-indicators">
             <div class="indicator-item">
@@ -647,18 +729,28 @@
 
     <div class="card">
         <h2>Report</h2>
-        <div class="status-header">
-            <span id="status-badge" class="badge badge-fair">Analyzing...</span>
+        
+        <div class="report-header">
+            <div id="status-badge-box" class="status-badge-box badge-box-loading">
+                Analyzing...
+            </div>
+            <div class="score-container">
+                <span class="score-label">SCORE</span>
+                <div class="score-num-wrap">
+                    <span id="score-display" class="score-value">--</span>
+                    <span class="score-max">/100</span>
+                </div>
+            </div>
         </div>
+        
         <div id="report-box" class="report-text">
             データを入力すると、現在の状況に合わせたアドバイスがここに表示されます。
         </div>
     </div>
 
     <div class="card">
-        <h2>Log</h2>
-        <div id="history-container" class="history-list">
-            </div>
+        <h2>Log History</h2>
+        <div id="history-container" class="history-list"></div>
         <div class="hint-text">※ 日時部分を長押し（またはクリック長押し）で削除できます</div>
     </div>
 
@@ -713,7 +805,6 @@
     <div id="toast-container"></div>
 
     <script>
-        // --- PWA サービスワーカー登録 ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
@@ -722,7 +813,6 @@
             });
         }
 
-        // --- 状態管理グローバル変数 ---
         let logs = [];
         let chart = null;
         let profile = { height: 170.0 };
@@ -735,7 +825,6 @@
             normalMax: 25
         };
 
-        // --- 初期化処理 ---
         window.addEventListener('DOMContentLoaded', () => {
             initDateTime();
             loadLocalStorage();
@@ -757,7 +846,6 @@
             if (storedLogs) {
                 logs = JSON.parse(storedLogs);
             } else {
-                // デモ用初期データ生成
                 const today = new Date();
                 logs = [];
                 for(let i = 45; i >= 0; i--) {
@@ -765,19 +853,29 @@
                     d.setDate(today.getDate() - i);
                     const baseWeight = 66 + Math.sin(i * 0.2) * 1.5 + (Math.random() - 0.5) * 0.6;
                     logs.push({
-                        id: Date.now() - i * 86400000 - 10000,
-                        date: new Date(d.setHours(8, 0, 0)).toISOString().slice(0, 16),
+                        id: Date.now() - i * 86400000 - 30000,
+                        date: new Date(d.setHours(7, 0, 0)).toISOString().slice(0, 16),
                         weight: parseFloat(baseWeight.toFixed(1)),
-                        memo: i % 5 === 0 ? "朝の計測。順調。" : ""
+                        memo: "朝の計測。"
                     });
-                    if(i % 3 === 0) {
-                        logs.push({
-                            id: Date.now() - i * 86400000,
-                            date: new Date(d.setHours(20, 0, 0)).toISOString().slice(0, 16),
-                            weight: parseFloat((baseWeight + 0.6).toFixed(1)),
-                            memo: "夜。夕食後。"
-                        });
-                    }
+                    logs.push({
+                        id: Date.now() - i * 86400000 - 20000,
+                        date: new Date(d.setHours(12, 30, 0)).toISOString().slice(0, 16),
+                        weight: parseFloat((baseWeight + 0.3).toFixed(1)),
+                        memo: "昼食前。"
+                    });
+                    logs.push({
+                        id: Date.now() - i * 86400000 - 10000,
+                        date: new Date(d.setHours(18, 0, 0)).toISOString().slice(0, 16),
+                        weight: parseFloat((baseWeight - 0.2).toFixed(1)),
+                        memo: "夕方運動後。"
+                    });
+                    logs.push({
+                        id: Date.now() - i * 86400000,
+                        date: new Date(d.setHours(22, 0, 0)).toISOString().slice(0, 16),
+                        weight: parseFloat((baseWeight + 0.6).toFixed(1)),
+                        memo: "夜。入浴後。"
+                    });
                 }
                 localStorage.setItem('weight_logs', JSON.stringify(logs));
             }
@@ -1076,11 +1174,9 @@
             reader.onload = function(e) {
                 try {
                     const parsedData = JSON.parse(e.target.result);
-                    
                     if (!Array.isArray(parsedData)) {
                         throw new Error("データが配列形式ではありません。");
                     }
-                    
                     if (parsedData.length > 0 && (!parsedData[0].hasOwnProperty('date') || !parsedData[0].hasOwnProperty('weight'))) {
                         throw new Error("ログデータの形式が正しくありません。");
                     }
@@ -1106,58 +1202,161 @@
             reader.readAsText(file);
         }
 
+        /* --- スコア計算 ＆ レポート生成ロジック（最新版） --- */
         function generateReport() {
-            const badge = document.getElementById('status-badge');
+            const badgeBox = document.getElementById('status-badge-box');
+            const scoreDisplay = document.getElementById('score-display');
             const reportBox = document.getElementById('report-box');
+            
             const validWeightLogs = logs.filter(l => l.weight !== null && l.weight !== undefined);
 
             if (validWeightLogs.length === 0) {
-                badge.className = "badge badge-review";
-                badge.innerText = "⚠️ データ不足";
-                reportBox.innerText = "現在の体重データが登録されていません。まずは今日のログを記録しましょう。";
+                badgeBox.className = "status-badge-box badge-box-review";
+                badgeBox.innerText = "⚠️ データ不足";
+                scoreDisplay.innerText = "0";
+                reportBox.innerText = "現在の体重データが登録されていません。まずは最初のログを記録しましょう。";
                 return;
             }
 
             const latest = validWeightLogs[validWeightLogs.length - 1];
             const currentWeight = latest.weight;
 
-            let volatility = 0;
-            if (validWeightLogs.length >= 3) {
-                const lastThree = validWeightLogs.slice(-3);
-                volatility = Math.max(...lastThree.map(l => l.weight)) - Math.min(...lastThree.map(l => l.weight));
+            // --- 独自アルゴリズムによるヘルススコア算出 (満点 100) ---
+            let score_activity = 0;   // ① 記録アクティビティ (Max 50)
+            let score_condition = 0;  // ② コンディション (Max 50)
+
+            const today = new Date();
+            const hMeter = profile.height / 100;
+            const hSquare = hMeter * hMeter;
+
+            // ==========================================
+            // ① 記録アクティビティの計算 (Max 50)
+            // ==========================================
+            const logCountPerDay = {};
+            let totalLogsPast7Days = 0;
+
+            for (let i = 0; i < 7; i++) {
+                const d = new Date();
+                d.setDate(today.getDate() - i);
+                const dateStr = d.toISOString().split('T')[0];
+                logCountPerDay[dateStr] = 0;
             }
 
-            let status = 'fair';
-            let statusText = '⚖️ 安定圏内';
+            logs.forEach(l => {
+                const logDateStr = l.date.split('T')[0];
+                if (logCountPerDay.hasOwnProperty(logDateStr)) {
+                    logCountPerDay[logDateStr]++;
+                    totalLogsPast7Days++;
+                }
+            });
+
+            Object.keys(logCountPerDay).forEach(dateStr => {
+                const count = logCountPerDay[dateStr];
+                if (count >= 1) score_activity += 2; 
+                if (count >= 2) score_activity += 2; 
+                if (count >= 3) score_activity += 2; 
+            });
+
+            if (totalLogsPast7Days >= 30) {
+                score_activity += 8;
+            }
+            if (score_activity > 50) score_activity = 50; 
+
+
+            // ==========================================
+            // ② コンディションの計算 (Max 50)
+            // ==========================================
+            const chartDataObj = getDailyCandlestickData('all');
+            const ma7List = chartDataObj.ma7;
+            const ma30List = chartDataObj.ma30;
+
+            let ma7PerfectGood = true;   // すべて優良範囲 (BMI 21-23)
+            let ma7PerfectNormal = true; // すべて一般適正範囲 (BMI 18.5-25)
+            let ma30PerfectGood = true;  // すべて優良範囲 (BMI 21-23)
+            
+            let ma7CheckedDays = 0;
+            let ma30CheckedDays = 0;
+
+            // 直近7日間のMA7データを検証
+            for (let i = 0; i < 7; i++) {
+                const targetIdx = ma7List.length - 1 - i;
+                if (targetIdx >= 0) {
+                    ma7CheckedDays++;
+                    const ma7Val = ma7List[targetIdx].y;
+                    const bmi = ma7Val / hSquare;
+                    
+                    if (bmi < 21.0 || bmi > 23.0) ma7PerfectGood = false;
+                    if (bmi < 18.5 || bmi > 25.0) ma7PerfectNormal = false;
+                } else {
+                    ma7PerfectGood = false;
+                    ma7PerfectNormal = false;
+                }
+
+                // 直近7日間のMA30データを検証
+                const targetIdx30 = ma30List.length - 1 - i;
+                if (targetIdx30 >= 0) {
+                    ma30CheckedDays++;
+                    const ma30Val = ma30List[targetIdx30].y;
+                    const bmi30 = ma30Val / hSquare;
+                    if (bmi30 < 21.0 || bmi30 > 23.0) ma30PerfectGood = false;
+                } else {
+                    ma30PerfectGood = false;
+                }
+            }
+
+            // コンディション階層別採点
+            if (ma7CheckedDays >= 7 && ma7PerfectGood) {
+                score_condition = 40;     
+            } else if (ma7CheckedDays >= 7 && ma7PerfectNormal) {
+                score_condition = 30;     
+            } else {
+                score_condition = 10;     
+            }
+
+            if (ma30CheckedDays >= 7 && ma30PerfectGood) {
+                score_condition += 10;
+            }
+
+            // ==========================================
+            // スコア合計と画面反映
+            // ==========================================
+            const totalScore = score_activity + score_condition;
+            scoreDisplay.innerText = totalScore;
+
+            // ステータス演出バッジの分岐（直近のリアルタイム体重で判定）
+            let statusClass = 'badge-box-fair';
+            let statusText = '⚖️ 適正範囲内';
             let advice = '';
 
             if (currentWeight >= computedRanges.goodMin && currentWeight <= computedRanges.goodMax) {
-                status = 'prime';
+                statusClass = 'badge-box-prime';
                 statusText = '🏆 ベストコンディション';
-                advice = `現在の体重は理想的な優良範囲を美しく維持しています。`;
+                advice = `現在のリアルタイム体重は理想的な「優良範囲」です。`;
             } else if (currentWeight >= computedRanges.normalMin && currentWeight <= computedRanges.normalMax) {
-                status = 'fair';
+                statusClass = 'badge-box-fair';
                 statusText = '⚖️ 適正範囲内';
-                advice = `一般適正範囲内に位置しています。目標の理想値（${computedRanges.center.toFixed(1)}）に向けて、現在の生活習慣のベースを保ちましょう。`;
+                advice = `現在のリアルタイム体重は「一般適正範囲内」に位置しています。`;
             } else {
-                status = 'review';
+                statusClass = 'badge-box-review';
                 statusText = '⚠️ 要調整ゾーン';
-                advice = `現在、適正範囲から外れています。極端な増減は避け、身体に負荷の少ないアプローチを検討してください。`;
+                advice = `現在、リアルタイム体重が適正の境界線を越えています。`;
             }
 
-            if (volatility > 1.5) {
-                advice += ` なお、直近のデータに一時的な急変動が観測されています。健康維持においては、急激な変化よりも「なだらかな推移」を長期維持することが最大の目標です。一喜一憂せず、落ち着いて生活習慣や計測タイミングを揃えてみましょう。`;
+            // テクニカル・フィードバック
+            advice += ` 【現在のスコア: ${totalScore}点】`;
+            
+            if (totalScore >= 90) {
+                advice += ` 驚異的なコントロールです！高頻度なローソク足形成（アクティビティ:${score_activity}点）と、中長期トレンド（MA）の完全な巡航維持が両立されています。`;
+            } else if (totalScore >= 70) {
+                advice += ` 優れた運用状態です。現在の計測頻度を維持しつつ、7日移動平均線（MA7）が安定して適正〜優良ゾーンに乗ってくることで、さらに上のステージへ進めます。`;
             } else {
-                const compliments = [
-                    " 日々の安定した推移は、毎日の適切な習慣の証明です。",
-                    " 美しい巡航速度です。このなだらかなリズムを大切にしていきましょう。",
-                    " グラフの滑らかさが、体内環境の健全性を雄弁に物語っています。"
-                ];
-                advice += compliments[Math.floor(Math.random() * compliments.length)];
+                advice += ` 体重の増減を恐れず、まずは1日3〜4回のマルチタイム計測を重ねてローソク足に「ヒゲ」を描き、アクティビティスコアを積み上げましょう。`;
             }
 
-            badge.className = `badge badge-${status}`;
-            badge.innerText = statusText;
+            advice += ` （過去7日間の総記録回数: ${totalLogsPast7Days}回）`;
+
+            badgeBox.className = `status-badge-box ${statusClass}`;
+            badgeBox.innerText = statusText;
             reportBox.innerText = advice;
         }
 
@@ -1262,14 +1461,18 @@
                 },
                 yaxis: {
                     labels: {
+                        minWidth: 32,
+                        maxWidth: 32,
+                        offsetX: -6,
                         style: { colors: '#848e9c', fontFamily: 'JetBrains Mono' },
                         formatter: function (val) { return val ? val.toFixed(1) : ""; }
                     }
                 },
-                tooltip: {
-                    enabled: false
+                tooltip: { enabled: false },
+                grid: { 
+                    borderColor: '#2a2e39',
+                    padding: { left: 0, right: 8 }
                 },
-                grid: { borderColor: '#2a2e39' },
                 annotations: { yaxis: [] }
             };
 
