@@ -23,8 +23,9 @@
             --bg-body: #0b0e14;
             --bg-card: #131722;
             --bg-input: #1e222d;
-            --border-color: #2a2e39;
-            --border-focus: #434651;
+            /* 境界線・枠線を見やすく少し明るめのグレーに調整 */
+            --border-color: #3a3f50; 
+            --border-focus: #52586c;
             --text-main: #c5c7d0;
             --text-bright: #ffffff;
             --text-muted: #848e9c;
@@ -107,31 +108,37 @@
 
         /* --- 圧縮版入力フォーム (Log recording) --- */
         .recording-card {
-            padding: 12px 16px; /* パディングを詰めてコンパクトに */
+            padding: 12px 16px; 
         }
         .form-group {
-            margin-bottom: 10px; /* 隙間を縮小 */
+            margin-bottom: 12px; 
         }
-        .form-group label {
+        
+        /* Weight用ラベルスタイルのカスタム（白色・入力欄と同じフォントサイズ） */
+        .label-weight {
             display: block;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-bottom: 4px;
+            font-size: 1rem; /* 入力欄と同じサイズ */
+            color: var(--text-bright) !important; /* 純粋な白色に変更 */
+            font-weight: 500;
+            margin-bottom: 6px;
         }
+
         input, select {
             width: 100%;
             background-color: var(--bg-input);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border-color); /* 視認性の高い枠線 */
             color: var(--text-bright);
             padding: 10px;
             border-radius: 8px;
             font-size: 1rem;
             font-family: var(--font-main);
-            transition: border-color 0.2s;
+            transition: all 0.2s ease;
         }
-        input:focus {
+        input:focus, select:focus {
             outline: none;
             border-color: var(--theme-blue);
+            /* アクティブな入力欄をさらに分かりやすくするグロー効果 */
+            box-shadow: 0 0 i 0 4px rgba(41, 98, 255, 0.25);
         }
         input[type="datetime-local"] {
             font-family: var(--font-mono);
@@ -142,7 +149,7 @@
             width: 100%;
             background-color: transparent;
             border: none;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color); /* 下線の視認性強化 */
             color: var(--text-bright);
             padding: 8px 0;
             border-radius: 0;
@@ -540,7 +547,7 @@
 <body>
 
     <div class="nav-container">
-        <div class="brand-title">MyLog</div>
+        <div class="brand-title">MyLog Healthcare</div>
         <a href="howto.html" class="btn-help">📖 HOW TO</a>
     </div>
 
@@ -550,7 +557,7 @@
                 <input type="datetime-local" id="input-date" required>
             </div>
             <div class="form-group">
-                <label for="input-weight">Weight ※10倍自動補正対応</label>
+                <label for="input-weight" class="label-weight">Weight ※空白可</label>
                 <div class="weight-input-container">
                     <input type="number" id="input-weight" step="0.1" placeholder="例: 65.3 または 653">
                     <span class="weight-unit">kg</span>
