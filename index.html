@@ -352,7 +352,6 @@
             gap: 12px;
         }
         
-        /* 枠線＆背景色を強化したTradingView風ステータスバッジ */
         .status-badge-box {
             font-size: 0.9rem;
             font-weight: 700;
@@ -383,7 +382,6 @@
             color: var(--text-muted);
         }
 
-        /* スコア表示用ブロック */
         .score-container {
             background: linear-gradient(135deg, #1e222d, #141823);
             border: 1px solid var(--border-color);
@@ -408,7 +406,7 @@
         .score-value {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #ffb703; /* ゴールド系の配色 */
+            color: #ffb703;
             text-shadow: 0 0 10px rgba(255, 183, 3, 0.2);
         }
         .score-max {
@@ -421,6 +419,56 @@
             font-size: 0.9rem;
             line-height: 1.6;
             color: var(--text-main);
+        }
+
+        /* --- Reportウィンドウ内訳用の追加スタイル --- */
+        .score-breakdown {
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px dashed var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .breakdown-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .breakdown-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+        }
+        .breakdown-label {
+            color: var(--text-main);
+            font-weight: 500;
+        }
+        .breakdown-points {
+            font-family: var(--font-mono);
+            color: var(--text-bright);
+            font-weight: 700;
+        }
+        .breakdown-bar-bg {
+            width: 100%;
+            height: 6px;
+            background-color: var(--bg-input);
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .breakdown-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--theme-blue), #4facfe);
+            width: 0%;
+            transition: width 0.4s ease;
+            border-radius: 3px;
+        }
+        .breakdown-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            padding-left: 2px;
         }
 
         /* --- 履歴リスト --- */
@@ -626,7 +674,7 @@
 <body>
 
     <div class="nav-container">
-        <div class="brand-title">MyLog Healthcare</div>
+        <div class="brand-title">MyLog</div>
         <a href="howto.html" class="btn-help">📖 HOW TO</a>
     </div>
 
@@ -746,6 +794,8 @@
         <div id="report-box" class="report-text">
             データを入力すると、現在の状況に合わせたアドバイスがここに表示されます。
         </div>
+
+        <div id="report-breakdown" class="score-breakdown" style="display: none;"></div>
     </div>
 
     <div class="card">
@@ -1202,11 +1252,12 @@
             reader.readAsText(file);
         }
 
-        /* --- スコア計算 ＆ レポート生成ロジック（最新版） --- */
+        /* --- スコア計算 ＆ レポート生成ロジック（内訳拡張版） --- */
         function generateReport() {
             const badgeBox = document.getElementById('status-badge-box');
             const scoreDisplay = document.getElementById('score-display');
             const reportBox = document.getElementById('report-box');
+            const breakdownBox = document.getElementById('report-breakdown');
             
             const validWeightLogs = logs.filter(l => l.weight !== null && l.weight !== undefined);
 
@@ -1215,6 +1266,7 @@
                 badgeBox.innerText = "⚠️ データ不足";
                 scoreDisplay.innerText = "0";
                 reportBox.innerText = "現在の体重データが登録されていません。まずは最初のログを記録しましょう。";
+                breakdownBox.style.display = "none";
                 return;
             }
 
@@ -1257,8 +1309,10 @@
                 if (count >= 3) score_activity += 2; 
             });
 
+            let hasBonus = false;
             if (totalLogsPast7Days >= 30) {
                 score_activity += 8;
+                hasBonus = true;
             }
             if (score_activity > 50) score_activity = 50; 
 
@@ -1277,7 +1331,6 @@
             let ma7CheckedDays = 0;
             let ma30CheckedDays = 0;
 
-            // 直近7日間のMA7データを検証
             for (let i = 0; i < 7; i++) {
                 const targetIdx = ma7List.length - 1 - i;
                 if (targetIdx >= 0) {
@@ -1292,7 +1345,6 @@
                     ma7PerfectNormal = false;
                 }
 
-                // 直近7日間のMA30データを検証
                 const targetIdx30 = ma30List.length - 1 - i;
                 if (targetIdx30 >= 0) {
                     ma30CheckedDays++;
@@ -1304,7 +1356,6 @@
                 }
             }
 
-            // コンディション階層別採点
             if (ma7CheckedDays >= 7 && ma7PerfectGood) {
                 score_condition = 40;     
             } else if (ma7CheckedDays >= 7 && ma7PerfectNormal) {
@@ -1313,8 +1364,10 @@
                 score_condition = 10;     
             }
 
+            let hasMa30Bonus = false;
             if (ma30CheckedDays >= 7 && ma30PerfectGood) {
                 score_condition += 10;
+                hasMa30Bonus = true;
             }
 
             // ==========================================
@@ -1323,7 +1376,7 @@
             const totalScore = score_activity + score_condition;
             scoreDisplay.innerText = totalScore;
 
-            // ステータス演出バッジの分岐（直近のリアルタイム体重で判定）
+            // ステータス演出バッジの分岐
             let statusClass = 'badge-box-fair';
             let statusText = '⚖️ 適正範囲内';
             let advice = '';
@@ -1342,22 +1395,62 @@
                 advice = `現在、リアルタイム体重が適正の境界線を越えています。`;
             }
 
-            // テクニカル・フィードバック
             advice += ` 【現在のスコア: ${totalScore}点】`;
-            
             if (totalScore >= 90) {
-                advice += ` 驚異的なコントロールです！高頻度なローソク足形成（アクティビティ:${score_activity}点）と、中長期トレンド（MA）の完全な巡航維持が両立されています。`;
+                advice += ` 驚異的なコントロールです！高頻度なローソク足形成と、中長期トレンド（MA）の完全な巡航維持が両立されています。`;
             } else if (totalScore >= 70) {
                 advice += ` 優れた運用状態です。現在の計測頻度を維持しつつ、7日移動平均線（MA7）が安定して適正〜優良ゾーンに乗ってくることで、さらに上のステージへ進めます。`;
             } else {
                 advice += ` 体重の増減を恐れず、まずは1日3〜4回のマルチタイム計測を重ねてローソク足に「ヒゲ」を描き、アクティビティスコアを積み上げましょう。`;
             }
 
-            advice += ` （過去7日間の総記録回数: ${totalLogsPast7Days}回）`;
-
             badgeBox.className = `status-badge-box ${statusClass}`;
             badgeBox.innerText = statusText;
             reportBox.innerText = advice;
+
+            // ==========================================
+            // スコア内訳（Breakdown）の動的レンダリング
+            // ==========================================
+            const activityPct = (score_activity / 50) * 100;
+            const conditionPct = (score_condition / 50) * 100;
+
+            let activityHint = `過去7日間で1日3回スタンプ。3回/日を増やすと加点されます。`;
+            if (hasBonus) {
+                activityHint = `🔥 【週30回以上ボーナス獲得！】 素晴らしいログ密度です。`;
+            } else if (totalLogsPast7Days > 0) {
+                activityHint = `過去7日間の総記録回数: <strong>${totalLogsPast7Days}回</strong>（あと ${30 - totalLogsPast7Days}回 で +8点 ボーナス）`;
+            }
+
+            let conditionHint = `直近7日間の移動平均線（MA7）を適正〜優良ゾーンに安定させると得点が伸びます。`;
+            if (hasMa30Bonus) {
+                conditionHint = `💎 【長期維持ボーナス獲得！】 MA30も優良範囲をキープしています。`;
+            } else if (score_condition >= 40) {
+                conditionHint = `MA7は完璧です。過去7日間のMA30もすべて優良範囲に入ると長期維持ボーナス（+10点）が入ります。`;
+            }
+
+            breakdownBox.innerHTML = `
+                <div class="breakdown-item">
+                    <div class="breakdown-meta">
+                        <span class="breakdown-label">① 記録アクティビティ（ログ頻度・努力）</span>
+                        <span class="breakdown-points">${score_activity} / 50 点</span>
+                    </div>
+                    <div class="breakdown-bar-bg">
+                        <div class="breakdown-bar-fill" style="width: ${activityPct}%;"></div>
+                    </div>
+                    <div class="breakdown-hint">${activityHint}</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="breakdown-meta">
+                        <span class="breakdown-label">② コンディション（移動平均・トレンド維持）</span>
+                        <span class="breakdown-points">${score_condition} / 50 点</span>
+                    </div>
+                    <div class="breakdown-bar-bg">
+                        <div class="breakdown-bar-fill" style="width: ${conditionPct}%;"></div>
+                    </div>
+                    <div class="breakdown-hint">${conditionHint}</div>
+                </div>
+            `;
+            breakdownBox.style.display = "flex";
         }
 
         function getDailyCandlestickData(filterDays) {
