@@ -717,7 +717,7 @@
         
         <div class="board-grid">
             <div class="board-cell full-width">
-                <span class="board-label">表示中の日付</span>
+                <span class="board-label">表示中の日付/期間</span>
                 <span id="board-date" class="board-value date">--</span>
             </div>
             <div class="board-cell">
@@ -748,10 +748,10 @@
 
         <div class="chart-controls">
             <select id="range-selector" class="range-select" onchange="updateChart()">
-                <option value="all">全期間</option>
-                <option value="30" selected>直近30日</option>
-                <option value="14">直近14日</option>
-                <option value="7">直近7日</option>
+                <option value="D" selected>日足 (Daily)</option>
+                <option value="W">週足 (Weekly)</option>
+                <option value="M">月足 (Monthly)</option>
+                <option value="Y">年足 (Yearly)</option>
             </select>
         </div>
 
@@ -896,6 +896,7 @@
             if (storedLogs) {
                 logs = JSON.parse(storedLogs);
             } else {
+                // 初回読み込み時のダミーデータ生成（約45日分）
                 const today = new Date();
                 logs = [];
                 for(let i = 45; i >= 0; i--) {
@@ -1186,7 +1187,12 @@
                     
                     updateSummaryIndicator();
                     renderHistory();
-                    updateChart();
+                    
+                    if (chart) {
+                        chart.destroy();
+                        chart = null;
+                    }
+                    initChart();
                     generateReport();
                 }
             }
@@ -1240,7 +1246,12 @@
                         
                         updateSummaryIndicator();
                         renderHistory();
-                        updateChart();
+                        
+                        if (chart) {
+                            chart.destroy();
+                            chart = null;
+                        }
+                        initChart();
                         generateReport();
                     }
                 } catch (error) {
@@ -1252,7 +1263,7 @@
             reader.readAsText(file);
         }
 
-        /* --- スコア計算 ＆ レポート生成ロジック（内訳拡張版） --- */
+        /* --- スコア計算 ＆ レポート生成ロジック（常に日足ベースの絶対計算） --- */
         function generateReport() {
             const badgeBox = document.getElementById('status-badge-box');
             const scoreDisplay = document.getElementById('score-display');
@@ -1273,17 +1284,14 @@
             const latest = validWeightLogs[validWeightLogs.length - 1];
             const currentWeight = latest.weight;
 
-            // --- 独自アルゴリズムによるヘルススコア算出 (満点 100) ---
-            let score_activity = 0;   // ① 記録アクティビティ (Max 50)
-            let score_condition = 0;  // ② コンディション (Max 50)
+            let score_activity = 0;   
+            let score_condition = 0;  
 
             const today = new Date();
             const hMeter = profile.height / 100;
             const hSquare = hMeter * hMeter;
 
-            // ==========================================
             // ① 記録アクティビティの計算 (Max 50)
-            // ==========================================
             const logCountPerDay = {};
             let totalLogsPast7Days = 0;
 
@@ -1316,17 +1324,14 @@
             }
             if (score_activity > 50) score_activity = 50; 
 
+            // ② コンディションの計算 (日足全体のローデータから移動平均を計算)
+            const dailyDataObj = getAllTimeframeCandlestickData('D');
+            const ma7List = dailyDataObj.ma7;
+            const ma30List = dailyDataObj.ma30;
 
-            // ==========================================
-            // ② コンディションの計算 (Max 50)
-            // ==========================================
-            const chartDataObj = getDailyCandlestickData('all');
-            const ma7List = chartDataObj.ma7;
-            const ma30List = chartDataObj.ma30;
-
-            let ma7PerfectGood = true;   // すべて優良範囲 (BMI 21-23)
-            let ma7PerfectNormal = true; // すべて一般適正範囲 (BMI 18.5-25)
-            let ma30PerfectGood = true;  // すべて優良範囲 (BMI 21-23)
+            let ma7PerfectGood = true;   
+            let ma7PerfectNormal = true; 
+            let ma30PerfectGood = true;  
             
             let ma7CheckedDays = 0;
             let ma30CheckedDays = 0;
@@ -1337,7 +1342,6 @@
                     ma7CheckedDays++;
                     const ma7Val = ma7List[targetIdx].y;
                     const bmi = ma7Val / hSquare;
-                    
                     if (bmi < 21.0 || bmi > 23.0) ma7PerfectGood = false;
                     if (bmi < 18.5 || bmi > 25.0) ma7PerfectNormal = false;
                 } else {
@@ -1370,13 +1374,9 @@
                 hasMa30Bonus = true;
             }
 
-            // ==========================================
-            // スコア合計と画面反映
-            // ==========================================
             const totalScore = score_activity + score_condition;
             scoreDisplay.innerText = totalScore;
 
-            // ステータス演出バッジの分岐
             let statusClass = 'badge-box-fair';
             let statusText = '⚖️ 適正範囲内';
             let advice = '';
@@ -1408,9 +1408,6 @@
             badgeBox.innerText = statusText;
             reportBox.innerText = advice;
 
-            // ==========================================
-            // スコア内訳（Breakdown）の動的レンダリング
-            // ==========================================
             const activityPct = (score_activity / 50) * 100;
             const conditionPct = (score_condition / 50) * 100;
 
@@ -1453,69 +1450,117 @@
             breakdownBox.style.display = "flex";
         }
 
-        function getDailyCandlestickData(filterDays) {
-            const dailyGroups = {};
+        /* --- ローデータ全体からローソク足および移動平均を構築するベース関数 --- */
+        function getAllTimeframeCandlestickData(timeframe) {
             const validWeightLogs = logs.filter(l => l.weight !== null && l.weight !== undefined);
+            const groups = {};
 
-            validWeightLogs.forEach(log => {
-                const dateKey = log.date.split('T')[0];
-                if (!dailyGroups[dateKey]) { dailyGroups[dateKey] = []; }
-                dailyGroups[dateKey].push(log);
-            });
-
-            let sortedDates = Object.keys(dailyGroups).sort((a, b) => new Date(a) - new Date(b));
-
-            if (filterDays !== 'all') {
-                const limitDate = new Date();
-                limitDate.setDate(limitDate.getDate() - parseInt(filterDays));
-                sortedDates = sortedDates.filter(d => new Date(d) >= limitDate);
+            function getMondayBasedWeekStr(dateObj) {
+                const d = new Date(dateObj);
+                const day = d.getDay();
+                const diff = d.getDate() - day + (day === 0 ? -6 : 1); 
+                const monday = new Date(d.setDate(diff));
+                return monday.toISOString().split('T')[0];
             }
 
+            validWeightLogs.forEach(log => {
+                const logDate = new Date(log.date);
+                let key = "";
+
+                if (timeframe === 'D') {
+                    key = log.date.split('T')[0];
+                } else if (timeframe === 'W') {
+                    key = getMondayBasedWeekStr(logDate);
+                } else if (timeframe === 'M') {
+                    key = `${logDate.getFullYear()}-${String(logDate.getMonth() + 1).padStart(2, '0')}`;
+                } else if (timeframe === 'Y') {
+                    key = `${logDate.getFullYear()}`;
+                }
+                
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(log);
+            });
+
+            const sortedKeys = Object.keys(groups).sort();
             const candlestickSeries = [];
-            const rawDayData = [];
+            const rawCloseData = [];
 
-            sortedDates.forEach(dateStr => {
-                const dayLogs = dailyGroups[dateStr];
-                dayLogs.sort((a, b) => new Date(a.date) - new Date(b.date));
+            sortedKeys.forEach(keyStr => {
+                const periodLogs = groups[keyStr];
+                periodLogs.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-                const open = dayLogs[0].weight;
-                const close = dayLogs[dayLogs.length - 1].weight;
-                const high = Math.max(...dayLogs.map(l => l.weight));
-                const low = Math.min(...dayLogs.map(l => l.weight));
+                const open = periodLogs[0].weight;
+                const close = periodLogs[periodLogs.length - 1].weight;
+                const high = Math.max(...periodLogs.map(l => l.weight));
+                const low = Math.min(...periodLogs.map(l => l.weight));
 
-                const timestamp = new Date(dateStr).getTime();
+                let timestamp = 0;
+                if (timeframe === 'D' || timeframe === 'W') {
+                    timestamp = new Date(keyStr).getTime();
+                } else if (timeframe === 'M') {
+                    timestamp = new Date(`${keyStr}-01`).getTime();
+                } else if (timeframe === 'Y') {
+                    timestamp = new Date(`${keyStr}-01-01`).getTime();
+                }
 
                 candlestickSeries.push({ x: timestamp, y: [open, high, low, close] });
-                rawDayData.push({ x: timestamp, close: close });
+                rawCloseData.push({ x: timestamp, close: close });
             });
 
             const ma7Series = [];
             const ma30Series = [];
-
-            for (let i = 0; i < rawDayData.length; i++) {
-                if (i >= 6) {
-                    let sum = 0;
-                    for (let j = 0; j < 7; j++) sum += rawDayData[i - j].close;
-                    ma7Series.push({ x: rawDayData[i].x, y: parseFloat((sum / 7).toFixed(2)) });
-                }
-                if (i >= 29) {
-                    let sum = 0;
-                    for (let j = 0; j < 30; j++) sum += rawDayData[i - j].close;
-                    ma30Series.push({ x: rawDayData[i].x, y: parseFloat((sum / 30).toFixed(2)) });
+            if (timeframe === 'D') {
+                for (let i = 0; i < rawCloseData.length; i++) {
+                    if (i >= 6) {
+                        let sum = 0;
+                        for (let j = 0; j < 7; j++) sum += rawCloseData[i - j].close;
+                        ma7Series.push({ x: rawCloseData[i].x, y: parseFloat((sum / 7).toFixed(2)) });
+                    }
+                    if (i >= 29) {
+                        let sum = 0;
+                        for (let j = 0; j < 30; j++) sum += rawCloseData[i - j].close;
+                        ma30Series.push({ x: rawCloseData[i].x, y: parseFloat((sum / 30).toFixed(2)) });
+                    }
                 }
             }
 
             return { candlestick: candlestickSeries, ma7: ma7Series, ma30: ma30Series };
         }
 
+        /* --- 【今回のメイン修正】直近30本のみにスライスして取得する関数 --- */
+        function getRecent30CandlestickData(timeframe) {
+            const fullData = getAllTimeframeCandlestickData(timeframe);
+            
+            // 直近30本分に切り出す（データが30本未満の場合はすべて反映されます）
+            const sliceCount = 30;
+            const slicedCandlestick = fullData.candlestick.slice(-sliceCount);
+            
+            // 移動平均線もローソク足の期間と一致するタイムスタンプのものだけを抽出
+            let slicedMa7 = [];
+            let slicedMa30 = [];
+            
+            if (slicedCandlestick.length > 0) {
+                const minTimestamp = slicedCandlestick[0].x;
+                slicedMa7 = fullData.ma7.filter(d => d.x >= minTimestamp);
+                slicedMa30 = fullData.ma30.filter(d => d.x >= minTimestamp);
+            }
+
+            return {
+                candlestick: slicedCandlestick,
+                ma7: slicedMa7,
+                ma30: slicedMa30
+            };
+        }
+
         function initChart() {
-            const defaultRange = document.getElementById('range-selector').value;
-            const dataObj = getDailyCandlestickData(defaultRange);
+            const defaultTimeframe = document.getElementById('range-selector').value;
+            // 直近30本分のデータのみを取得
+            const dataObj = getRecent30CandlestickData(defaultTimeframe);
             updatePeriodExtremeValues(dataObj.candlestick);
 
             const options = {
                 series: [
-                    { name: '日足', type: 'candlestick', data: dataObj.candlestick },
+                    { name: 'ローソク足', type: 'candlestick', data: dataObj.candlestick },
                     { name: '7日移動平均', type: 'line', data: dataObj.ma7 },
                     { name: '30日移動平均', type: 'line', data: dataObj.ma30 }
                 ],
@@ -1525,8 +1570,8 @@
                     id: 'weight_chart',
                     background: 'transparent',
                     toolbar: { show: false },
-                    zoom: { enabled: false },
-                    scrolling: { enabled: false },
+                    zoom: { enabled: false },      // 拡大縮小機能をオフ
+                    scrolling: { enabled: false }, // スライスによる強制制限のためスクロールもオフ
                     events: {
                         mouseMove: function(event, chartContext, config) { updateBoardLabels(config); },
                         dataPointMouseEnter: function(event, chartContext, config) { updateBoardLabels(config); },
@@ -1547,7 +1592,7 @@
                     type: 'datetime',
                     labels: {
                         style: { colors: '#848e9c', fontFamily: 'JetBrains Mono' },
-                        datetimeFormatter: { month: 'yyyy-MM', day: 'MM/dd' }
+                        datetimeFormatter: { year: 'yyyy年', month: 'yyyy/MM', day: 'MM/dd' }
                     },
                     axisBorder: { color: '#2a2e39' },
                     axisTicks: { color: '#2a2e39' }
@@ -1577,6 +1622,7 @@
         }
 
         function updateChartAnnotations() {
+            if (!chart) return;
             chart.updateOptions({
                 annotations: {
                     yaxis: [
@@ -1630,15 +1676,21 @@
         }
 
         function updateChart() {
-            const range = document.getElementById('range-selector').value;
-            const dataObj = getDailyCandlestickData(range);
+            if (!chart) return;
+
+            const timeframe = document.getElementById('range-selector').value;
+            // セレクター変更時も直近30本分のみを取得して反映
+            const dataObj = getRecent30CandlestickData(timeframe);
 
             updatePeriodExtremeValues(dataObj.candlestick);
 
+            const finalMa7 = (timeframe === 'D') ? dataObj.ma7 : [];
+            const finalMa30 = (timeframe === 'D') ? dataObj.ma30 : [];
+
             chart.updateSeries([
-                { name: '日足', type: 'candlestick', data: dataObj.candlestick },
-                { name: '7日移動平均', type: 'line', data: dataObj.ma7 },
-                { name: '30日移動平均', type: 'line', data: dataObj.ma30 }
+                { name: (timeframe === 'D' ? '日足' : timeframe === 'W' ? '週足' : timeframe === 'M' ? '月足' : '年足'), type: 'candlestick', data: dataObj.candlestick },
+                { name: '7日移動平均', type: 'line', data: finalMa7 },
+                { name: '30日移動平均', type: 'line', data: finalMa30 }
             ]);
 
             updateChartAnnotations();
@@ -1659,6 +1711,28 @@
             document.getElementById('board-period-low').innerText = Math.min(...lows).toFixed(1);
         }
 
+        function formatBoardDateStr(timestamp, tf) {
+            const dateObj = new Date(timestamp);
+            const y = dateObj.getFullYear();
+            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const d = String(dateObj.getDate()).padStart(2, '0');
+
+            if (tf === 'D') {
+                return `${y}/${m}/${d}`;
+            } else if (tf === 'W') {
+                const sundayObj = new Date(timestamp);
+                sundayObj.setDate(sundayObj.getDate() + 6);
+                const sm = String(sundayObj.getMonth() + 1).padStart(2, '0');
+                const sd = String(sundayObj.getDate()).padStart(2, '0');
+                return `${y}/${m}/${d} 〜 ${sundayObj.getFullYear()}/${sm}/${sd}`;
+            } else if (tf === 'M') {
+                return `${y}年 ${m}月足`;
+            } else if (tf === 'Y') {
+                return `${y}年足`;
+            }
+            return `${y}/${m}/${d}`;
+        }
+
         function updateBoardLabels(config) {
             const dataPointIndex = config.dataPointIndex;
             if (dataPointIndex === undefined || dataPointIndex < 0) return;
@@ -1669,10 +1743,8 @@
             const candleData = w.config.series[0].data[dataPointIndex];
             if (!candleData || !candleData.y) return;
 
-            const dateObj = new Date(candleData.x);
-            const dateStr = `${dateObj.getFullYear()}/${String(dateObj.getMonth()+1).padStart(2,'0')}/${String(dateObj.getDate()).padStart(2,'0')}`;
-
-            document.getElementById('board-date').innerText = dateStr;
+            const tf = document.getElementById('range-selector').value;
+            document.getElementById('board-date').innerText = formatBoardDateStr(candleData.x, tf);
             document.getElementById('board-open').innerText = candleData.y[0].toFixed(1);
             document.getElementById('board-high').innerText = candleData.y[1].toFixed(1);
             document.getElementById('board-low').innerText = candleData.y[2].toFixed(1);
@@ -1680,8 +1752,8 @@
         }
 
         function resetBoardToLatest() {
-            const range = document.getElementById('range-selector').value;
-            const dataObj = getDailyCandlestickData(range);
+            const tf = document.getElementById('range-selector').value;
+            const dataObj = getRecent30CandlestickData(tf);
             const candles = dataObj.candlestick;
 
             if (!candles || candles.length === 0) {
@@ -1694,10 +1766,9 @@
             }
 
             const latestCandle = candles[candles.length - 1];
-            const dateObj = new Date(latestCandle.x);
-            const dateStr = `${dateObj.getFullYear()}/${String(dateObj.getMonth()+1).padStart(2,'0')}/${String(dateObj.getDate()).padStart(2,'0')} (最新)`;
+            const dateStr = formatBoardDateStr(latestCandle.x, tf);
 
-            document.getElementById('board-date').innerText = dateStr;
+            document.getElementById('board-date').innerText = `${dateStr} (最新)`;
             document.getElementById('board-open').innerText = latestCandle.y[0].toFixed(1);
             document.getElementById('board-high').innerText = latestCandle.y[1].toFixed(1);
             document.getElementById('board-low').innerText = latestCandle.y[2].toFixed(1);
