@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MyLog</title>
+    <title>MyLog Healthcare</title>
     
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
@@ -83,7 +83,7 @@
             margin-bottom: 12px;
         }
         .brand-title {
-            font-size: 1.4rem;
+            font-size: 1.25rem;
             font-weight: 700;
             color: var(--text-bright);
             font-family: var(--font-mono);
@@ -348,14 +348,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             gap: 12px;
         }
         
         .status-badge-box {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 700;
-            padding: 8px 16px;
+            padding: 8px 12px;
             border-radius: 6px;
             display: inline-flex;
             align-items: center;
@@ -421,7 +421,7 @@
             color: var(--text-main);
         }
 
-        /* --- Reportウィンドウ内訳用の追加スタイル --- */
+        /* --- Reportウィンドウ内訳用のスタイル --- */
         .score-breakdown {
             margin-top: 16px;
             padding-top: 14px;
@@ -439,6 +439,7 @@
             display: flex;
             justify-content: space-between;
             font-size: 0.8rem;
+            margin-bottom: 2px;
         }
         .breakdown-label {
             color: var(--text-main);
@@ -674,7 +675,7 @@
 <body>
 
     <div class="nav-container">
-        <div class="brand-title">MyLog</div>
+        <div class="brand-title">MyLog Healthcare</div>
         <a href="howto.html" class="btn-help">📖 HOW TO</a>
     </div>
 
@@ -792,7 +793,7 @@
         </div>
         
         <div id="report-box" class="report-text">
-            データを入力すると、現在の状況に合わせたアドバイスがここに表示されます。
+            データを入力すると、客観的なテクニカル分析がここに表示されます。
         </div>
 
         <div id="report-breakdown" class="score-breakdown" style="display: none;"></div>
@@ -896,7 +897,6 @@
             if (storedLogs) {
                 logs = JSON.parse(storedLogs);
             } else {
-                // 初回読み込み時のダミーデータ生成（約45日分）
                 const today = new Date();
                 logs = [];
                 for(let i = 45; i >= 0; i--) {
@@ -910,22 +910,10 @@
                         memo: "朝の計測。"
                     });
                     logs.push({
-                        id: Date.now() - i * 86400000 - 20000,
-                        date: new Date(d.setHours(12, 30, 0)).toISOString().slice(0, 16),
-                        weight: parseFloat((baseWeight + 0.3).toFixed(1)),
-                        memo: "昼食前。"
-                    });
-                    logs.push({
                         id: Date.now() - i * 86400000 - 10000,
-                        date: new Date(d.setHours(18, 0, 0)).toISOString().slice(0, 16),
-                        weight: parseFloat((baseWeight - 0.2).toFixed(1)),
-                        memo: "夕方運動後。"
-                    });
-                    logs.push({
-                        id: Date.now() - i * 86400000,
-                        date: new Date(d.setHours(22, 0, 0)).toISOString().slice(0, 16),
-                        weight: parseFloat((baseWeight + 0.6).toFixed(1)),
-                        memo: "夜。入浴後。"
+                        date: new Date(d.setHours(20, 0, 0)).toISOString().slice(0, 16),
+                        weight: parseFloat((baseWeight + 0.5).toFixed(1)),
+                        memo: "夜、食事後。"
                     });
                 }
                 localStorage.setItem('weight_logs', JSON.stringify(logs));
@@ -1055,7 +1043,7 @@
             }
 
             if (weightVal === null && memoVal.trim() === '') {
-                showToast("体重またはメモを入力してください");
+                showToast("データが空です");
                 return;
             }
 
@@ -1108,7 +1096,7 @@
             container.innerHTML = '';
 
             if (logs.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);">データがありません</div>';
+                container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);; font-size:0.9rem;">データがありません</div>';
                 return;
             }
 
@@ -1263,7 +1251,7 @@
             reader.readAsText(file);
         }
 
-        /* --- スコア計算 ＆ レポート生成ロジック（常に日足ベースの絶対計算） --- */
+        /* --- 【修正】見出しなし・140文字以内・純粋テキスト評価ロジック --- */
         function generateReport() {
             const badgeBox = document.getElementById('status-badge-box');
             const scoreDisplay = document.getElementById('score-display');
@@ -1276,7 +1264,7 @@
                 badgeBox.className = "status-badge-box badge-box-review";
                 badgeBox.innerText = "⚠️ データ不足";
                 scoreDisplay.innerText = "0";
-                reportBox.innerText = "現在の体重データが登録されていません。まずは最初のログを記録しましょう。";
+                reportBox.innerText = "データが未登録です。ログを記録するとテクニカル分析が開始されます。";
                 breakdownBox.style.display = "none";
                 return;
             }
@@ -1290,8 +1278,9 @@
             const today = new Date();
             const hMeter = profile.height / 100;
             const hSquare = hMeter * hMeter;
+            const currentBMI = currentWeight / hSquare;
 
-            // ① 記録アクティビティの計算 (Max 50)
+            // ① データ密度の計算 (Max 50)
             const logCountPerDay = {};
             let totalLogsPast7Days = 0;
 
@@ -1324,7 +1313,7 @@
             }
             if (score_activity > 50) score_activity = 50; 
 
-            // ② コンディションの計算 (日足全体のローデータから移動平均を計算)
+            // ② コンディションの計算
             const dailyDataObj = getAllTimeframeCandlestickData('D');
             const ma7List = dailyDataObj.ma7;
             const ma30List = dailyDataObj.ma30;
@@ -1377,58 +1366,70 @@
             const totalScore = score_activity + score_condition;
             scoreDisplay.innerText = totalScore;
 
-            let statusClass = 'badge-box-fair';
-            let statusText = '⚖️ 適正範囲内';
-            let advice = '';
-
-            if (currentWeight >= computedRanges.goodMin && currentWeight <= computedRanges.goodMax) {
-                statusClass = 'badge-box-prime';
-                statusText = '🏆 ベストコンディション';
-                advice = `現在のリアルタイム体重は理想的な「優良範囲」です。`;
-            } else if (currentWeight >= computedRanges.normalMin && currentWeight <= computedRanges.normalMax) {
-                statusClass = 'badge-box-fair';
-                statusText = '⚖️ 適正範囲内';
-                advice = `現在のリアルタイム体重は「一般適正範囲内」に位置しています。`;
-            } else {
-                statusClass = 'badge-box-review';
-                statusText = '⚠️ 要調整ゾーン';
-                advice = `現在、リアルタイム体重が適正の境界線を越えています。`;
+            // --- 短期トレンド判定 ---
+            let orbitText = "保ち合い";
+            if (validWeightLogs.length >= 5) {
+                const recent5 = validWeightLogs.slice(-5);
+                const diff5 = recent5[4].weight - recent5[0].weight;
+                if (diff5 < -0.4) orbitText = "下落基調";
+                if (diff5 > 0.4) orbitText = "上昇基調";
             }
 
-            advice += ` 【現在のスコア: ${totalScore}点】`;
-            if (totalScore >= 90) {
-                advice += ` 驚異的なコントロールです！高頻度なローソク足形成と、中長期トレンド（MA）の完全な巡航維持が両立されています。`;
-            } else if (totalScore >= 70) {
-                advice += ` 優れた運用状態です。現在の計測頻度を維持しつつ、7日移動平均線（MA7）が安定して適正〜優良ゾーンに乗ってくることで、さらに上のステージへ進めます。`;
+            // --- マクロ・ミクロ位置判定と文章パーツ設定 ---
+            let positionText = "適正範囲内";
+            let statusClass = 'badge-box-fair';
+            let commentText = "";
+
+            if (currentBMI < 18.5) {
+                positionText = "低体重";
+                statusClass = 'badge-box-review';
+                commentText = `国内成人の約1割が属する低体重域に位置。チャートは${orbitText}を示しており、理想中心線（BMI22）を下回る水準での推移が続いています。`;
+            } else if (currentBMI >= 18.5 && currentBMI < 21.0) {
+                positionText = "適正(下限接近)";
+                statusClass = 'badge-box-fair';
+                commentText = `成人人口の約65%を占める主要レンジ内ですが、下限寄りにプロット。現在は${orbitText}を形成し、中心線への収束力を測る局面です。`;
+            } else if (currentBMI >= 21.0 && currentBMI <= 23.0) {
+                positionText = "理想中心(優良)";
+                statusClass = 'badge-box-prime';
+                commentText = `主要レンジ内で最も均衡が取れたコアゾーン（BMI22付近）に定着。ローソク足は${orbitText}を描き、極めて安定した相場環境を維持しています。`;
+            } else if (currentBMI > 23.0 && currentBMI <= 25.0) {
+                positionText = "適正(上限接近)";
+                statusClass = 'badge-box-fair';
+                commentText = `主要レンジ内ですが上限寄りにプロット。チャートは${orbitText}を形成しており、中心線（BMI22）への回帰・収束を待つ状態です。`;
             } else {
-                advice += ` 体重の増減を恐れず、まずは1日3〜4回のマルチタイム計測を重ねてローソク足に「ヒゲ」を描き、アクティビティスコアを積み上げましょう。`;
+                positionText = "要調整";
+                statusClass = 'badge-box-review';
+                commentText = `国内成人の約25%が属する過剰積載域にプロット。現在は${orbitText}を示しており、上位足における抵抗線のブレイク状況を注視する局面です。`;
             }
 
             badgeBox.className = `status-badge-box ${statusClass}`;
-            badgeBox.innerText = statusText;
-            reportBox.innerText = advice;
+            badgeBox.innerText = positionText;
 
+            // 最終確認: テキストを流し込み（全角140文字以内確定）
+            reportBox.innerText = commentText;
+
+            // スコアゲージの反映
             const activityPct = (score_activity / 50) * 100;
             const conditionPct = (score_condition / 50) * 100;
 
-            let activityHint = `過去7日間で1日3回スタンプ。3回/日を増やすと加点されます。`;
+            let activityHint = `過去7日間のログ頻度に基づく算出。高頻度であるほどデータ密度が上がります。`;
             if (hasBonus) {
-                activityHint = `🔥 【週30回以上ボーナス獲得！】 素晴らしいログ密度です。`;
+                activityHint = `🔥 【週30回以上ボーナス加点獲得】 極めて高密度なヘルスデータが維持されています。`;
             } else if (totalLogsPast7Days > 0) {
-                activityHint = `過去7日間の総記録回数: <strong>${totalLogsPast7Days}回</strong>（あと ${30 - totalLogsPast7Days}回 で +8点 ボーナス）`;
+                activityHint = `過去7日間の総打刻回数: <strong>${totalLogsPast7Days}回</strong>（あと ${30 - totalLogsPast7Days}回 で +8点 ボーナス）`;
             }
 
-            let conditionHint = `直近7日間の移動平均線（MA7）を適正〜優良ゾーンに安定させると得点が伸びます。`;
+            let conditionHint = `直近7日間の移動平均（MA7）が適正〜優良ゾーンにプロットされているかを判定。`;
             if (hasMa30Bonus) {
-                conditionHint = `💎 【長期維持ボーナス獲得！】 MA30も優良範囲をキープしています。`;
+                conditionHint = `💎 【長期維持ボーナス獲得】 MA30も優良範囲をキープしています。`;
             } else if (score_condition >= 40) {
-                conditionHint = `MA7は完璧です。過去7日間のMA30もすべて優良範囲に入ると長期維持ボーナス（+10点）が入ります。`;
+                conditionHint = `MA7は優良。過去7日間のMA30もすべて優良範囲に入ると長期維持ボーナス（+10点）が付与されます。`;
             }
 
             breakdownBox.innerHTML = `
                 <div class="breakdown-item">
                     <div class="breakdown-meta">
-                        <span class="breakdown-label">① 記録アクティビティ（ログ頻度・努力）</span>
+                        <span class="breakdown-label">① データ密度（ログ・アクティビティ）</span>
                         <span class="breakdown-points">${score_activity} / 50 点</span>
                     </div>
                     <div class="breakdown-bar-bg">
@@ -1450,7 +1451,7 @@
             breakdownBox.style.display = "flex";
         }
 
-        /* --- ローデータ全体からローソク足および移動平均を構築するベース関数 --- */
+        /* --- ローデータから各タイムフレームのローソク足および移動平均を構築する関数 --- */
         function getAllTimeframeCandlestickData(timeframe) {
             const validWeightLogs = logs.filter(l => l.weight !== null && l.weight !== undefined);
             const groups = {};
@@ -1527,15 +1528,12 @@
             return { candlestick: candlestickSeries, ma7: ma7Series, ma30: ma30Series };
         }
 
-        /* --- 【今回のメイン修正】直近30本のみにスライスして取得する関数 --- */
+        /* --- 直近30本のみにスライスして取得する関数 --- */
         function getRecent30CandlestickData(timeframe) {
             const fullData = getAllTimeframeCandlestickData(timeframe);
-            
-            // 直近30本分に切り出す（データが30本未満の場合はすべて反映されます）
             const sliceCount = 30;
             const slicedCandlestick = fullData.candlestick.slice(-sliceCount);
             
-            // 移動平均線もローソク足の期間と一致するタイムスタンプのものだけを抽出
             let slicedMa7 = [];
             let slicedMa30 = [];
             
@@ -1554,7 +1552,6 @@
 
         function initChart() {
             const defaultTimeframe = document.getElementById('range-selector').value;
-            // 直近30本分のデータのみを取得
             const dataObj = getRecent30CandlestickData(defaultTimeframe);
             updatePeriodExtremeValues(dataObj.candlestick);
 
@@ -1570,8 +1567,8 @@
                     id: 'weight_chart',
                     background: 'transparent',
                     toolbar: { show: false },
-                    zoom: { enabled: false },      // 拡大縮小機能をオフ
-                    scrolling: { enabled: false }, // スライスによる強制制限のためスクロールもオフ
+                    zoom: { enabled: false },      
+                    scrolling: { enabled: false }, 
                     events: {
                         mouseMove: function(event, chartContext, config) { updateBoardLabels(config); },
                         dataPointMouseEnter: function(event, chartContext, config) { updateBoardLabels(config); },
@@ -1679,7 +1676,6 @@
             if (!chart) return;
 
             const timeframe = document.getElementById('range-selector').value;
-            // セレクター変更時も直近30本分のみを取得して反映
             const dataObj = getRecent30CandlestickData(timeframe);
 
             updatePeriodExtremeValues(dataObj.candlestick);
