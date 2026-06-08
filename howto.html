@@ -107,17 +107,48 @@
             font-weight: 700;
         }
 
+        /* --- 1カラム・スコア配点用コンポーネント --- */
+        .score-list-container {
+            margin: 16px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .score-item-box {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .score-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+        }
+        .score-item-title {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .score-item-points {
+            font-family: var(--font-mono);
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ffb703;
+            text-shadow: 0 0 8px rgba(255, 183, 3, 0.15);
+            white-space: nowrap;
+        }
+        .score-item-body {
+            font-size: 0.85rem;
+        }
+
         /* --- 特殊な装飾パーツ --- */
         .highlight-box {
             background: rgba(41, 98, 255, 0.05);
             border: 1px solid rgba(41, 98, 255, 0.3);
-            border-radius: 8px;
-            padding: 14px;
-            margin: 14px 0;
-        }
-        .danger-box {
-            background: rgba(242, 54, 69, 0.04);
-            border: 1px solid rgba(242, 54, 69, 0.25);
             border-radius: 8px;
             padding: 14px;
             margin: 14px 0;
@@ -128,41 +159,10 @@
             padding: 2px 6px;
             border-radius: 4px;
             font-weight: bold;
+            width: fit-content;
         }
         .badge-blue { color: #4facfe; background: rgba(41, 98, 255, 0.15); border: 1px solid rgba(41, 98, 255, 0.4); }
         .badge-green { color: var(--color-negative); background: rgba(8, 209, 88, 0.1); border: 1px solid rgba(8, 209, 88, 0.3); }
-        
-        /* --- テーブルスタイル --- */
-        .table-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            margin: 16px 0;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 0.85rem;
-            background-color: var(--bg-input);
-        }
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        th {
-            background-color: rgba(30, 34, 45, 0.8);
-            color: var(--text-bright);
-            font-weight: 700;
-        }
-        td {
-            color: var(--text-main);
-            vertical-align: top;
-        }
-        tr:last-child td {
-            border-bottom: none;
-        }
 
         /* --- ナビゲーション --- */
         .nav-container {
@@ -239,57 +239,53 @@
         <h2>🏆 100点満点の「健康スコア」に挑戦</h2>
         <p>レポートエリアにある「SCORE」は、あなたの健康管理への取り組みと成果をリアルタイムに100点満点で採点するシステムです。透明性の高い以下の評価ロジックに基づき、ゲーム感覚で日々の打刻モチベーションを維持できます。</p>
 
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 30%;">評価項目</th>
-                        <th style="width: 15%;">配点</th>
-                        <th style="width: 55%;">採点基準 ＆ ボーナス条件</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <strong>① 記録アクティビティ</strong><br>
-                            <span class="badge badge-blue">行動評価</span>
-                        </td>
-                        <td style="text-align: center;"><strong>50点</strong></td>
-                        <td>
-                            過去7日間のうち、毎日の<strong>「記録回数（メモのみ含む）」</strong>に応じて段階的に加点されます：
-                            <ul style="margin: 6px 0 6px 14px; font-size: 0.8rem;">
-                                <li>1回目の記録がある日数 × 2点（最大14点）</li>
-                                <li>2回目の記録がある日数 × 2点（最大14点）</li>
-                                <li>3回目の記録がある日数 × 2点（最大14点）</li>
-                            </ul>
-                            <strong>🔥【週30回以上ボーナス】</strong><br>
-                            過去7日間の総記録回数が<strong>30回以上</strong>に達すると、一気にデータ密度が高まったとみなされ、さらに <strong>＋8点</strong> のボーナス加点が付与されます。
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong>② コンディション</strong><br>
-                            <span class="badge badge-green">環境評価</span>
-                        </td>
-                        <td style="text-align: center;"><strong>50点</strong></td>
-                        <td>
-                            目先の1点データではなく、中長期トレンド（移動平均線）が理想の範囲をキープできているかを評価します：
-                            <ul style="margin: 6px 0 6px 14px; font-size: 0.8rem;">
-                                <li>過去7日間の <strong>MA7（7日移動平均）</strong> がすべて一般適正範囲内（BMI 18.5〜25.0）を維持 ＝ <strong>30点</strong></li>
-                                <li>過去7日間の <strong>MA7（7日移動平均）</strong> がすべて理想の優良範囲内（BMI 21.0〜23.0）を維持 ＝ <strong>40点</strong></li>
-                            </ul>
-                            <strong>💎【長期維持ボーナス】</strong><br>
-                            過去7日間の <strong>MA30（30日移動平均）</strong> もすべて優良範囲（BMI 21.0〜23.0）をキープし続けている場合、さらに <strong>＋10点</strong> のボーナス加点が付与されます。
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="score-list-container">
+            
+            <div class="score-item-box">
+                <div class="score-item-header">
+                    <div class="score-item-title">
+                        <strong>① 記録アクティビティ</strong>
+                        <span class="badge badge-blue">行動評価</span>
+                    </div>
+                    <div class="score-item-points">最大 50点</div>
+                </div>
+                <div class="score-item-body">
+                    <p>過去7日間のうち、毎日の<strong>「記録回数（メモのみ含む）」</strong>に応じて段階的に加点されます：</p>
+                    <ul style="margin-bottom: 10px; padding-left: 4px;">
+                        <li>1回目の記録がある日数 × 2点（最大14点）</li>
+                        <li>2回目の記録がある日数 × 2点（最大14点）</li>
+                        <li>3回目の記録がある日数 × 2点（最大14点）</li>
+                    </ul>
+                    <p><strong>🔥【週30回以上ボーナス】</strong><br>
+                    過去7日間の総記録回数が<strong>30回以上</strong>に達すると、一気にデータ密度が高まったとみなされ、さらに <strong>＋8点</strong> のボーナス加点が付与されます。</p>
+                </div>
+            </div>
+
+            <div class="score-item-box">
+                <div class="score-item-header">
+                    <div class="score-item-title">
+                        <strong>② コンディション</strong>
+                        <span class="badge badge-green">環境評価</span>
+                    </div>
+                    <div class="score-item-points">最大 50点</div>
+                </div>
+                <div class="score-item-body">
+                    <p>目先の1点データではなく、中長期トレンド（移動平均線）が理想の範囲をキープできているかを評価します：</p>
+                    <ul style="margin-bottom: 10px; padding-left: 4px;">
+                        <li>過去7日間の <strong>MA7（7日移動平均）</strong> がすべて一般適正範囲内（BMI 18.5〜25.0）を維持 ＝ <strong>30点</strong></li>
+                        <li>過去7日間の <strong>MA7（7日移動平均）</strong> がすべて理想の優良範囲内（BMI 21.0〜23.0）を維持 ＝ <strong>40点</strong></li>
+                    </ul>
+                    <p><strong>💎【長期維持ボーナス】</strong><br>
+                    過去7日間の <strong>MA30（30日移動平均）</strong> もすべて優良範囲（BMI 21.0〜23.0）をキープし続けている場合、さらに <strong>＋10点</strong> のボーナス加点が付与されます。</p>
+                </div>
+            </div>
+
         </div>
 
         <div class="highlight-box" style="border-left: 4px solid var(--color-negative); background: rgba(8, 209, 88, 0.02);">
             <strong>💡 ネガティブ・レコーディング（現実直視）の推奨</strong><br>
             一時的な暴飲暴食やイベントなどで体重が急増したときも、<strong>このアプリのスコアが暴落することは絶対にありません。</strong><br><br>
-            むしろ「増えてしまった」と気づいた時こそ、1日に複数回細かく現実を記録を残すことで、<strong>「① 記録アクティビティ点」がフルに加算</strong>されます。また、数日間一時的に数値が跳ね上がった程度では「移動平均線（MA）」の大局トレンドは崩れない仕組みになっています。安心してありのままの現実をログに刻み込んでください。
+            むしろ「増えてしまった」と気づいた時こそ、1日に複数回細かく現実の記録を残すことで、<strong>「① 記録アクティビティ点」がフルに加算</strong>されます。また、数日間一時的に数値が跳ね上がった程度では「移動平均線（MA）」の大局トレンドは崩れない仕組みになっています。安心してありのままの現実をログに刻み込んでください。
         </div>
     </div>
 

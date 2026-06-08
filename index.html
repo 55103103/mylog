@@ -6,7 +6,7 @@
     <title>MyLog Healthcare</title>
     
     <link rel="icon" type="image/png" href="icon.png">
-    <link rel="apple-touch-icon" href="icon.png">
+    <link class="apple-touch-icon" href="icon.png">
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0b0e14">
@@ -241,7 +241,28 @@
             color: var(--theme-blue);
         }
 
-        /* --- 板情報 --- */
+        /* --- チャートコントロール --- */
+        .chart-controls {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 8px;
+        }
+        .range-select {
+            background-color: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            width: auto;
+        }
+
+        .chart-wrapper {
+            margin: 0 -4px;
+            margin-bottom: 14px;
+        }
+
+        /* --- 板情報 (四本値) --- */
         .board-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -276,32 +297,11 @@
             font-size: 0.85rem;
         }
 
-        /* --- チャートコントロール --- */
-        .chart-controls {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 8px;
-        }
-        .range-select {
-            background-color: var(--bg-input);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            width: auto;
-        }
-
-        .chart-wrapper {
-            margin: 0 -4px;
-        }
-
         /* --- グラフ下インジケーター --- */
         .chart-bottom-indicators {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 8px;
-            margin-top: 12px;
             padding: 10px 12px;
             background-color: rgba(30, 34, 45, 0.4);
             border: 1px solid var(--border-color);
@@ -686,7 +686,7 @@
                 <input type="datetime-local" id="input-date" required>
             </div>
             <div class="form-group">
-                <label for="input-weight" class="label-weight">Weight ※空白可</label>
+                <label for="input-weight" class="label-weight">Weight</label>
                 <div class="weight-input-container">
                     <input type="number" id="input-weight" step="0.1" placeholder="例: 65.3 または 653">
                     <span class="weight-unit">kg</span>
@@ -700,53 +700,22 @@
     </div>
 
     <div class="card">
-        <h2>Dashboard <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal; margin-left: auto;">(kg / BMI)</span></h2>
+        <h2>Dashboard</h2>
         
         <div class="latest-summary-container">
             <div class="summary-block">
-                <div class="summary-title">直近の体重 (前回比)</div>
+                <div class="summary-title">Weight</div>
                 <div class="summary-values">
                     <span id="summary-weight" class="summary-main-weight">--</span>
                     <span id="summary-diff" class="summary-diff diff-zero">--</span>
                 </div>
             </div>
             <div class="summary-block right-align">
-                <div class="summary-title">現在のBMI</div>
+                <div class="summary-title">BMI</div>
                 <div id="summary-bmi" class="summary-bmi-val">--</div>
             </div>
         </div>
         
-        <div class="board-grid">
-            <div class="board-cell full-width">
-                <span class="board-label">表示中の日付/期間</span>
-                <span id="board-date" class="board-value date">--</span>
-            </div>
-            <div class="board-cell">
-                <span class="board-label">始値 (最初)</span>
-                <span id="board-open" class="board-value">--</span>
-            </div>
-            <div class="board-cell">
-                <span class="board-label">終値 (最後)</span>
-                <span id="board-close" class="board-value">--</span>
-            </div>
-            <div class="board-cell">
-                <span class="board-label">最安値</span>
-                <span id="board-low" class="board-value">--</span>
-            </div>
-            <div class="board-cell">
-                <span class="board-label">最高値</span>
-                <span id="board-high" class="board-value">--</span>
-            </div>
-            <div class="board-cell">
-                <span class="board-label">期間内最安</span>
-                <span id="board-period-low" class="board-value">--</span>
-            </div>
-            <div class="board-cell">
-                <span class="board-label">期間内最高</span>
-                <span id="board-period-high" class="board-value">--</span>
-            </div>
-        </div>
-
         <div class="chart-controls">
             <select id="range-selector" class="range-select" onchange="updateChart()">
                 <option value="D" selected>日足 (Daily)</option>
@@ -758,6 +727,37 @@
 
         <div class="chart-wrapper">
             <div id="main-chart"></div>
+        </div>
+
+        <div class="board-grid">
+            <div class="board-cell full-width">
+                <span class="board-label">表示中の日付/期間</span>
+                <span id="board-date" class="board-value date">--</span>
+            </div>
+            <div class="board-cell">
+                <span class="board-label">始値 (最初)</span>
+                <span id="board-open" class="board-value">--</span>
+            </div>
+            <div class="board-cell">
+                <span class="board-label">最高値</span>
+                <span id="board-high" class="board-value">--</span>
+            </div>
+            <div class="board-cell">
+                <span class="board-label">最安値</span>
+                <span id="board-low" class="board-value">--</span>
+            </div>
+            <div class="board-cell">
+                <span class="board-label">終値 (最後)</span>
+                <span id="board-close" class="board-value">--</span>
+            </div>
+            <div class="board-cell">
+                <span class="board-label">期間内最高</span>
+                <span id="board-period-high" class="board-value">--</span>
+            </div>
+            <div class="board-cell">
+                <span class="board-label">期間内最安</span>
+                <span id="board-period-low" class="board-value">--</span>
+            </div>
         </div>
 
         <div class="chart-bottom-indicators">
@@ -802,7 +802,7 @@
     <div class="card">
         <h2>Log History</h2>
         <div id="history-container" class="history-list"></div>
-        <div class="hint-text">※ 日時部分を長押し（またはクリック長押し）で削除できます</div>
+        <div class="hint-text">※ 日時部分を長押しで削除できます</div>
     </div>
 
     <div class="card">
@@ -1096,7 +1096,7 @@
             container.innerHTML = '';
 
             if (logs.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);; font-size:0.9rem;">データがありません</div>';
+                container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.9rem;">データがありません</div>';
                 return;
             }
 
@@ -1251,7 +1251,6 @@
             reader.readAsText(file);
         }
 
-        /* --- 【修正】見出しなし・140文字以内・純粋テキスト評価ロジック --- */
         function generateReport() {
             const badgeBox = document.getElementById('status-badge-box');
             const scoreDisplay = document.getElementById('score-display');
@@ -1280,7 +1279,6 @@
             const hSquare = hMeter * hMeter;
             const currentBMI = currentWeight / hSquare;
 
-            // ① データ密度の計算 (Max 50)
             const logCountPerDay = {};
             let totalLogsPast7Days = 0;
 
@@ -1313,7 +1311,6 @@
             }
             if (score_activity > 50) score_activity = 50; 
 
-            // ② コンディションの計算
             const dailyDataObj = getAllTimeframeCandlestickData('D');
             const ma7List = dailyDataObj.ma7;
             const ma30List = dailyDataObj.ma30;
@@ -1366,7 +1363,6 @@
             const totalScore = score_activity + score_condition;
             scoreDisplay.innerText = totalScore;
 
-            // --- 短期トレンド判定 ---
             let orbitText = "保ち合い";
             if (validWeightLogs.length >= 5) {
                 const recent5 = validWeightLogs.slice(-5);
@@ -1375,7 +1371,6 @@
                 if (diff5 > 0.4) orbitText = "上昇基調";
             }
 
-            // --- マクロ・ミクロ位置判定と文章パーツ設定 ---
             let positionText = "適正範囲内";
             let statusClass = 'badge-box-fair';
             let commentText = "";
@@ -1405,10 +1400,8 @@
             badgeBox.className = `status-badge-box ${statusClass}`;
             badgeBox.innerText = positionText;
 
-            // 最終確認: テキストを流し込み（全角140文字以内確定）
             reportBox.innerText = commentText;
 
-            // スコアゲージの反映
             const activityPct = (score_activity / 50) * 100;
             const conditionPct = (score_condition / 50) * 100;
 
@@ -1451,7 +1444,6 @@
             breakdownBox.style.display = "flex";
         }
 
-        /* --- ローデータから各タイムフレームのローソク足および移動平均を構築する関数 --- */
         function getAllTimeframeCandlestickData(timeframe) {
             const validWeightLogs = logs.filter(l => l.weight !== null && l.weight !== undefined);
             const groups = {};
@@ -1528,7 +1520,6 @@
             return { candlestick: candlestickSeries, ma7: ma7Series, ma30: ma30Series };
         }
 
-        /* --- 直近30本のみにスライスして取得する関数 --- */
         function getRecent30CandlestickData(timeframe) {
             const fullData = getAllTimeframeCandlestickData(timeframe);
             const sliceCount = 30;
@@ -1618,6 +1609,7 @@
             });
         }
 
+        /* チャートアノテーションのテキストラベル(text)を削除し、背景の帯・線のみに修正 */
         function updateChartAnnotations() {
             if (!chart) return;
             chart.updateOptions({
@@ -1629,42 +1621,35 @@
                             strokeDashArray: 0,
                             borderWidth: 2,
                             label: {
-                                borderColor: '#2962ff',
-                                style: { color: '#fff', background: '#2962ff', fontFamily: 'Noto Sans JP', fontSize: '10px' },
-                                text: `理想中心 (${computedRanges.center.toFixed(1)}kg)`,
-                                position: 'left',
-                                textAnchor: 'start',
-                                offsetX: 5
+                                borderColor: 'transparent',
+                                style: { color: 'transparent', background: 'transparent' },
+                                text: ''
                             }
                         },
                         {
                             y: computedRanges.goodMin,
                             y2: computedRanges.goodMax,
+                            borderColor: '#08d158',
+                            borderWidth: 1,
                             fillColor: '#08d158',
-                            opacity: 0.06,
+                            opacity: 0.15, 
                             label: {
                                 borderColor: 'transparent',
-                                style: { color: '#08d158', background: 'transparent', fontFamily: 'Noto Sans JP', fontSize: '10px', fontWeight: 'bold' },
-                                text: '■ 優良範囲 (BMI 21-23)',
-                                position: 'left',
-                                textAnchor: 'start',
-                                offsetX: 5,
-                                offsetY: -10
+                                style: { color: 'transparent', background: 'transparent' },
+                                text: ''
                             }
                         },
                         {
                             y: computedRanges.normalMin,
                             y2: computedRanges.normalMax,
+                            borderColor: '#2962ff',
+                            borderWidth: 1,
                             fillColor: '#2962ff',
-                            opacity: 0.03,
+                            opacity: 0.08, 
                             label: {
                                 borderColor: 'transparent',
-                                style: { color: '#7495ff', background: 'transparent', fontFamily: 'Noto Sans JP', fontSize: '10px' },
-                                text: '■ 適正範囲 (BMI 18.5-25)',
-                                position: 'left',
-                                textAnchor: 'start',
-                                offsetX: 5,
-                                offsetY: 10
+                                style: { color: 'transparent', background: 'transparent' },
+                                text: ''
                             }
                         }
                     ]
@@ -1681,7 +1666,7 @@
             updatePeriodExtremeValues(dataObj.candlestick);
 
             const finalMa7 = (timeframe === 'D') ? dataObj.ma7 : [];
-            const finalMa30 = (timeframe === 'D') ? dataObj.ma30 : [];
+            const finalMa30 = (timeframe === 'D' ? 'D' : []) ? dataObj.ma30 : [];
 
             chart.updateSeries([
                 { name: (timeframe === 'D' ? '日足' : timeframe === 'W' ? '週足' : timeframe === 'M' ? '月足' : '年足'), type: 'candlestick', data: dataObj.candlestick },
