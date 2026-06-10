@@ -30,10 +30,30 @@
             --text-muted: #848e9c;
             --theme-blue: #2962ff;
             --theme-blue-hover: #1e4bd6;
+            --theme-gold: #c5a059;
+            --theme-gold-hover: #b08d4b;
             --color-positive: #f23645; 
             --color-negative: #08d158; 
             --font-main: 'Noto Sans JP', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
+            
+            /* 動的に切り替わる用（デフォルトはブルー） */
+            --accent-color: var(--theme-blue);
+            --accent-color-hover: var(--theme-blue-hover);
+            --title-color: var(--text-bright);
+        }
+
+        /* MA7クリア時のテーマ（案A＋案B：アクセントをゴールド化） */
+        body.theme-gold-ma7 {
+            --accent-color: var(--theme-gold);
+            --accent-color-hover: var(--theme-gold-hover);
+            --title-color: var(--theme-gold);
+        }
+
+        /* MA30クリア時のテーマ（カードの枠線をゴールド化） */
+        body.theme-gold-ma30 .card {
+            border-color: rgba(197, 160, 89, 0.4);
+            box-shadow: 0 4px 16px rgba(197, 160, 89, 0.08);
         }
 
         * {
@@ -57,13 +77,14 @@
         h2 {
             font-size: 1.1rem;
             color: var(--text-bright);
-            border-left: 4px solid var(--theme-blue);
+            border-left: 4px solid var(--accent-color);
             padding-left: 8px;
             margin-bottom: 16px;
             font-weight: 700;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: border-color 0.3s ease;
         }
 
         .card {
@@ -73,6 +94,7 @@
             padding: 16px;
             margin-bottom: 16px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: border-color 0.4s ease, box-shadow 0.4s ease;
         }
 
         /* --- ナビゲーション --- */
@@ -85,9 +107,10 @@
         .brand-title {
             font-size: 1.25rem;
             font-weight: 700;
-            color: var(--text-bright);
+            color: var(--title-color);
             font-family: var(--font-mono);
             letter-spacing: -0.5px;
+            transition: color 0.3s ease;
         }
         .btn-help {
             background-color: var(--bg-input);
@@ -121,7 +144,7 @@
             margin-bottom: 6px;
         }
 
-        input, select {
+        input, select, textarea {
             width: 100%;
             background-color: var(--bg-input);
             border: 1px solid var(--border-color); 
@@ -132,31 +155,17 @@
             font-family: var(--font-main);
             transition: all 0.2s ease;
         }
-        input:focus, select:focus {
+        input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: var(--theme-blue);
-            box-shadow: 0 0 0 4px rgba(41, 98, 255, 0.25);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(41, 98, 255, 0.15);
         }
         input[type="datetime-local"] {
             font-family: var(--font-mono);
         }
         
-        textarea#input-memo {
-            width: 100%;
-            background-color: transparent;
-            border: none;
-            border-bottom: 1px solid var(--border-color); 
-            color: var(--text-bright);
-            padding: 8px 0;
-            border-radius: 0;
-            font-size: 1rem;
-            font-family: var(--font-main);
+        textarea {
             resize: none;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        textarea#input-memo:focus {
-            border-bottom-color: var(--theme-blue);
         }
 
         .weight-input-container {
@@ -172,7 +181,7 @@
         }
         .btn-submit {
             width: 100%;
-            background-color: var(--theme-blue);
+            background-color: var(--accent-color);
             color: #fff;
             border: none;
             padding: 12px;
@@ -180,11 +189,11 @@
             font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-color 0.3s ease;
             margin-top: 4px;
         }
         .btn-submit:hover {
-            background-color: var(--theme-blue-hover);
+            background-color: var(--accent-color-hover);
         }
 
         /* --- サマリー表示エリア --- */
@@ -238,7 +247,8 @@
             font-family: var(--font-mono);
             font-size: 1.4rem;
             font-weight: 700;
-            color: var(--theme-blue);
+            color: var(--accent-color);
+            transition: color 0.3s ease;
         }
 
         /* --- チャートコントロール --- */
@@ -282,7 +292,7 @@
         }
         .board-cell.full-width {
             grid-column: span 2;
-        }
+            }
         .board-label {
             font-size: 0.8rem;
             color: var(--text-muted);
@@ -340,7 +350,7 @@
             display: inline-block;
         }
         .ind-high { background-color: #ff6b76; }
-        .ind-center { background-color: var(--theme-blue); }
+        .ind-center { background-color: var(--accent-color); transition: background-color 0.3s ease; }
         .ind-low { background-color: #08d158; }
 
         /* --- Reportウィンドウ演出パーツ --- */
@@ -362,9 +372,9 @@
             letter-spacing: 0.5px;
         }
         .badge-box-prime {
-            background-color: rgba(41, 98, 255, 0.12);
-            border: 1px solid rgba(41, 98, 255, 0.5);
-            color: #4facfe;
+            background-color: rgba(197, 160, 89, 0.12);
+            border: 1px solid rgba(197, 160, 89, 0.5);
+            color: #ebd094;
         }
         .badge-box-fair {
             background-color: rgba(8, 209, 88, 0.08);
@@ -375,6 +385,11 @@
             background-color: rgba(242, 54, 69, 0.08);
             border: 1px solid rgba(242, 54, 69, 0.4);
             color: var(--color-positive);
+        }
+        .badge-box-volatility {
+            background-color: rgba(255, 111, 0, 0.12);
+            border: 1px solid rgba(255, 111, 0, 0.5);
+            color: #ff9100;
         }
         .badge-box-loading {
             background-color: rgba(132, 142, 156, 0.1);
@@ -429,7 +444,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-        }
+            }
         .breakdown-item {
             display: flex;
             flex-direction: column;
@@ -440,7 +455,7 @@
             justify-content: space-between;
             font-size: 0.8rem;
             margin-bottom: 2px;
-        }
+            }
         .breakdown-label {
             color: var(--text-main);
             font-weight: 500;
@@ -460,7 +475,7 @@
         }
         .breakdown-bar-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--theme-blue), #4facfe);
+            background: linear-gradient(90deg, var(--accent-color), #ebd094);
             width: 0%;
             transition: width 0.4s ease;
             border-radius: 3px;
@@ -474,11 +489,18 @@
 
         /* --- 履歴リスト --- */
         .history-list {
-            max-height: 420px;
-            overflow-y: auto;
             margin: 0 -16px;
             padding: 0 16px;
+            max-height: none;
+            overflow-y: visible;
         }
+        
+        /* 全表示モード時のスクロール設定 */
+        .history-list.scroll-enabled {
+            max-height: 420px;
+            overflow-y: auto;
+        }
+
         .history-item {
             display: flex;
             flex-direction: column;
@@ -492,6 +514,32 @@
         .history-item:last-child { border-bottom: none; }
         .history-item:active { background-color: var(--bg-input); }
         
+        /* 右上に配置する「表示切替」ボタンのスタイル */
+        .btn-toggle-view {
+            background-color: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-toggle-view:hover {
+            border-color: var(--border-focus);
+            color: var(--text-bright);
+        }
+        /* 全表示（アクティブ）時のスタイル変化 */
+        .btn-toggle-view.active {
+            border-color: var(--accent-color);
+            color: var(--text-bright);
+            background-color: rgba(41, 98, 255, 0.1);
+        }
+        body.theme-gold-ma7 .btn-toggle-view.active {
+            background-color: rgba(197, 160, 89, 0.1);
+        }
+
         .history-meta {
             display: flex;
             justify-content: space-between;
@@ -543,7 +591,8 @@
             font-family: var(--font-mono);
             font-weight: 700;
             font-size: 1.2rem;
-            color: var(--theme-blue);
+            color: var(--accent-color);
+            transition: color 0.3s ease;
         }
         .range-box {
             background-color: var(--bg-input);
@@ -579,17 +628,17 @@
         .btn-profile-save {
             background-color: var(--bg-input);
             color: var(--text-bright);
-            border: 1px solid var(--theme-blue);
+            border: 1px solid var(--accent-color);
             padding: 10px;
             border-radius: 8px;
             font-size: 0.9rem;
             font-weight: 500;
             cursor: pointer;
             width: 100%;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
             margin-top: 4px;
         }
-        .btn-profile-save:hover { background-color: var(--theme-blue); }
+        .btn-profile-save:hover { background-color: var(--accent-color); }
 
         /* --- バックアップUI --- */
         .backup-flex {
@@ -670,6 +719,9 @@
             white-space: nowrap;
         }
         .toast.show { opacity: 1; transform: scale(1); }
+        body.theme-gold-ma7 .toast {
+            background-color: rgba(197, 160, 89, 0.95);
+        }
     </style>
 </head>
 <body>
@@ -693,7 +745,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <textarea id="input-memo" rows="1" placeholder="Memo (食事、運動、メモなど)"></textarea>
+                <textarea id="input-memo" rows="2" placeholder="Memo（食事、運動、メモなど）"></textarea>
             </div>
             <button type="submit" class="btn-submit">Save Log</button>
         </form>
@@ -739,16 +791,16 @@
                 <span id="board-open" class="board-value">--</span>
             </div>
             <div class="board-cell">
-                <span class="board-label">最高値</span>
-                <span id="board-high" class="board-value">--</span>
+                <span class="board-label">終値 (最後)</span>
+                <span id="board-close" class="board-value">--</span>
             </div>
             <div class="board-cell">
                 <span class="board-label">最安値</span>
                 <span id="board-low" class="board-value">--</span>
             </div>
             <div class="board-cell">
-                <span class="board-label">終値 (最後)</span>
-                <span id="board-close" class="board-value">--</span>
+                <span class="board-label">最高値</span>
+                <span id="board-high" class="board-value">--</span>
             </div>
             <div class="board-cell">
                 <span class="board-label">期間内最高</span>
@@ -800,8 +852,12 @@
     </div>
 
     <div class="card">
-        <h2>Log History</h2>
+        <h2>
+            Log History
+            <button id="btn-toggle-history" class="btn-toggle-view" onclick="toggleHistoryView()">表示切替</button>
+        </h2>
         <div id="history-container" class="history-list"></div>
+        
         <div class="hint-text">※ 日時部分を長押しで削除できます</div>
     </div>
 
@@ -867,6 +923,8 @@
         let logs = [];
         let chart = null;
         let profile = { height: 170.0 };
+        
+        let isHistoryScrollEnabled = false;
 
         let computedRanges = {
             center: 22,
@@ -1091,16 +1149,45 @@
             }, 3000);
         }
 
+        function toggleHistoryView() {
+            isHistoryScrollEnabled = !isHistoryScrollEnabled;
+            
+            const container = document.getElementById('history-container');
+            const toggleBtn = document.getElementById('btn-toggle-history');
+            
+            if (isHistoryScrollEnabled) {
+                container.classList.add('scroll-enabled');
+                toggleBtn.classList.add('active');
+            } else {
+                container.classList.remove('scroll-enabled');
+                toggleBtn.classList.remove('active');
+            }
+            
+            renderHistory();
+        }
+
         function renderHistory() {
             const container = document.getElementById('history-container');
+            const toggleBtn = document.getElementById('btn-toggle-history');
             container.innerHTML = '';
 
             if (logs.length === 0) {
                 container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.9rem;">データがありません</div>';
+                if (toggleBtn) toggleBtn.style.display = 'none';
                 return;
             }
 
-            const reversedLogs = [...logs].reverse();
+            if (logs.length > 5) {
+                if (toggleBtn) toggleBtn.style.display = 'inline-block';
+            } else {
+                if (toggleBtn) toggleBtn.style.display = 'none';
+            }
+
+            let reversedLogs = [...logs].reverse();
+
+            if (!isHistoryScrollEnabled && reversedLogs.length > 5) {
+                reversedLogs = reversedLogs.slice(0, 5);
+            }
 
             reversedLogs.forEach(log => {
                 const item = document.createElement('div');
@@ -1173,6 +1260,12 @@
                     localStorage.setItem('weight_logs', JSON.stringify(logs));
                     showToast("すべてのデータをクリアしました");
                     
+                    isHistoryScrollEnabled = false;
+                    const container = document.getElementById('history-container');
+                    container.classList.remove('scroll-enabled');
+                    const toggleBtn = document.getElementById('btn-toggle-history');
+                    if (toggleBtn) toggleBtn.classList.remove('active');
+                    
                     updateSummaryIndicator();
                     renderHistory();
                     
@@ -1232,6 +1325,11 @@
                         
                         showToast("バックアップデータを復元しました");
                         
+                        isHistoryScrollEnabled = false;
+                        document.getElementById('history-container').classList.remove('scroll-enabled');
+                        const toggleBtn = document.getElementById('btn-toggle-history');
+                        if (toggleBtn) toggleBtn.classList.remove('active');
+                        
                         updateSummaryIndicator();
                         renderHistory();
                         
@@ -1265,6 +1363,8 @@
                 scoreDisplay.innerText = "0";
                 reportBox.innerText = "データが未登録です。ログを記録するとテクニカル分析が開始されます。";
                 breakdownBox.style.display = "none";
+                
+                document.body.classList.remove('theme-gold-ma7', 'theme-gold-ma30');
                 return;
             }
 
@@ -1299,13 +1399,12 @@
 
             Object.keys(logCountPerDay).forEach(dateStr => {
                 const count = logCountPerDay[dateStr];
-                if (count >= 1) score_activity += 2; 
-                if (count >= 2) score_activity += 2; 
-                if (count >= 3) score_activity += 2; 
+                if (count >= 1) score_activity += 3; 
+                if (count >= 2) score_activity += 3; 
             });
 
             let hasBonus = false;
-            if (totalLogsPast7Days >= 30) {
+            if (totalLogsPast7Days >= 21) {
                 score_activity += 8;
                 hasBonus = true;
             }
@@ -1360,8 +1459,47 @@
                 hasMa30Bonus = true;
             }
 
+            // 移動平均による画面カラーの動的変更（トグル処理）
+            if (ma7CheckedDays >= 7 && ma7PerfectGood) {
+                document.body.classList.add('theme-gold-ma7');
+            } else {
+                document.body.classList.remove('theme-gold-ma7');
+            }
+
+            if (ma30CheckedDays >= 7 && ma30PerfectGood) {
+                document.body.classList.add('theme-gold-ma30');
+            } else {
+                document.body.classList.remove('theme-gold-ma30');
+            }
+
+            if (chart) {
+                updateChartAnnotations();
+            }
+
             const totalScore = score_activity + score_condition;
             scoreDisplay.innerText = totalScore;
+
+            // --- 【新仕様】ボラティリティ判定ロジック（48時間以内に2%以上の変動） ---
+            let volatilityHigh = false;
+            let maxVolDiffPct = 0; 
+            const latestTime = new Date(latest.date).getTime();
+            const fortyEightHours = 48 * 60 * 60 * 1000;
+
+            // 48時間以内にある直近以前の過去ログを探す
+            const pastLogsIn48h = validWeightLogs.filter(l => {
+                const logTime = new Date(l.date).getTime();
+                return l.id !== latest.id && (latestTime - logTime) >= 0 && (latestTime - logTime) <= fortyEightHours;
+            });
+
+            if (pastLogsIn48h.length > 0) {
+                // 最も時間の近いログを基準とする
+                const basePastLog = pastLogsIn48h[pastLogsIn48h.length - 1];
+                const diffPct = ((currentWeight - basePastLog.weight) / basePastLog.weight) * 100;
+                if (Math.abs(diffPct) >= 2.0) {
+                    volatilityHigh = true;
+                    maxVolDiffPct = diffPct;
+                }
+            }
 
             let orbitText = "保ち合い";
             if (validWeightLogs.length >= 5) {
@@ -1397,9 +1535,21 @@
                 commentText = `国内成人の約25%が属する過剰積載域にプロット。現在は${orbitText}を示しており、上位足における抵抗線のブレイク状況を注視する局面です。`;
             }
 
+            // ボラティリティ異常時はバッジとコメントを最優先割り込み（スコアは変更なし）
+            if (volatilityHigh) {
+                statusClass = 'badge-box-volatility';
+                positionText = "⚠️ ボラティリティ高";
+                
+                const formattedPct = maxVolDiffPct > 0 ? `+${maxVolDiffPct.toFixed(1)}` : `${maxVolDiffPct.toFixed(1)}`;
+                if (maxVolDiffPct < 0) {
+                    commentText = `48時間以内の急激な下方乖離（${formattedPct}%）を検知。構造的な企業価値（体組成）の毀損ではなく、一時的な資産の流動化（水分減少）に伴う帳簿上のノイズの可能性が濃厚です。指標の信頼性が一時的に低下しているため、突発的な値動きに惑わされず、定時打刻によるデータ蓄積を継続すべきフェーズです。`;
+                } else {
+                    commentText = `48時間以内の想定レンジを上抜ける急騰（${formattedPct}%）を観測。本質的なアセットの増価ではなく、一時的な内部留保（水分貯留）の膨張による見かけ上のスパイクと判断されます。数日以内に適正レーティングへ収束する蓋然性が高ため、一過性のオーバーヒートを静観し、監査体制を維持してください。`;
+                }
+            }
+
             badgeBox.className = `status-badge-box ${statusClass}`;
             badgeBox.innerText = positionText;
-
             reportBox.innerText = commentText;
 
             const activityPct = (score_activity / 50) * 100;
@@ -1407,9 +1557,9 @@
 
             let activityHint = `過去7日間のログ頻度に基づく算出。高頻度であるほどデータ密度が上がります。`;
             if (hasBonus) {
-                activityHint = `🔥 【週30回以上ボーナス加点獲得】 極めて高密度なヘルスデータが維持されています。`;
+                activityHint = `🔥 【週21回以上ボーナス加点獲得】 極めて高密度なヘルスデータが維持されています。`;
             } else if (totalLogsPast7Days > 0) {
-                activityHint = `過去7日間の総打刻回数: <strong>${totalLogsPast7Days}回</strong>（あと ${30 - totalLogsPast7Days}回 で +8点 ボーナス）`;
+                activityHint = `過去7日間の総打刻回数: <strong>${totalLogsPast7Days}回</strong>（あと ${21 - totalLogsPast7Days}回 で +8点 ボーナス）`;
             }
 
             let conditionHint = `直近7日間の移動平均（MA7）が適正〜優良ゾーンにプロットされているかを判定。`;
@@ -1422,7 +1572,7 @@
             breakdownBox.innerHTML = `
                 <div class="breakdown-item">
                     <div class="breakdown-meta">
-                        <span class="breakdown-label">① データ密度（ログ・アクティビティ）</span>
+                        <span class="breakdown-label">①データ密度（ログ・アクティビティ）</span>
                         <span class="breakdown-points">${score_activity} / 50 点</span>
                     </div>
                     <div class="breakdown-bar-bg">
@@ -1609,15 +1759,19 @@
             });
         }
 
-        /* チャートアノテーションのテキストラベル(text)を削除し、背景の帯・線のみに修正 */
         function updateChartAnnotations() {
             if (!chart) return;
+            
+            const isGold = document.body.classList.contains('theme-gold-ma7');
+            const centerLineColor = isGold ? '#c5a059' : '#2962ff';
+            const rangeBgColor = isGold ? '#c5a059' : '#2962ff';
+
             chart.updateOptions({
                 annotations: {
                     yaxis: [
                         {
                             y: computedRanges.center,
-                            borderColor: '#2962ff',
+                            borderColor: centerLineColor,
                             strokeDashArray: 0,
                             borderWidth: 2,
                             label: {
@@ -1642,9 +1796,9 @@
                         {
                             y: computedRanges.normalMin,
                             y2: computedRanges.normalMax,
-                            borderColor: '#2962ff',
+                            borderColor: rangeBgColor,
                             borderWidth: 1,
-                            fillColor: '#2962ff',
+                            fillColor: rangeBgColor,
                             opacity: 0.08, 
                             label: {
                                 borderColor: 'transparent',
