@@ -43,17 +43,39 @@
             --title-color: var(--text-bright);
         }
 
-        /* MA7クリア時のテーマ（案A＋案B：アクセントをゴールド化） */
-        body.theme-gold-ma7 {
-            --accent-color: var(--theme-gold);
-            --accent-color-hover: var(--theme-gold-hover);
-            --title-color: var(--theme-gold);
+        /* --- スコア連動テーマシステム --- */
+        /* 0〜29点：緑テーマ */
+        body.theme-green {
+            --accent-color: #08d158;
+            --accent-color-hover: #06b34a;
         }
-
-        /* MA30クリア時のテーマ（カードの枠線をゴールド化） */
-        body.theme-gold-ma30 .card {
+        /* 30〜59点：青テーマ（デフォルト） */
+        body.theme-blue {
+            --accent-color: #007aff;
+            --accent-color-hover: #0062cc;
+        }
+        /* 60〜79点：金テーマ */
+        body.theme-gold {
+            --accent-color: #c5a059;
+            --accent-color-hover: #b08d4b;
+            --title-color: #c5a059;
+        }
+        body.theme-gold .toast, body.theme-gold-max .toast {
+            background: rgba(197, 160, 89, 0.95);
+        }
+        body.theme-gold .btn-toggle-view.active, body.theme-gold-max .btn-toggle-view.active {
+            background: rgba(197, 160, 89, 0.2);
+            border-color: #c5a059;
+        }
+        /* 80〜100点：金テーマ ＋ カード枠線の拡張 */
+        body.theme-gold-max {
+            --accent-color: #c5a059;
+            --accent-color-hover: #b08d4b;
+            --title-color: #c5a059;
+        }
+        body.theme-gold-max .card {
             border-color: rgba(197, 160, 89, 0.4);
-            box-shadow: 0 4px 16px rgba(197, 160, 89, 0.08);
+            box-shadow: 0 4px 20px rgba(197, 160, 89, 0.08);
         }
 
         * {
@@ -292,7 +314,7 @@
         }
         .board-cell.full-width {
             grid-column: span 2;
-            }
+        }
         .board-label {
             font-size: 0.8rem;
             color: var(--text-muted);
@@ -444,7 +466,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            }
+        }
         .breakdown-item {
             display: flex;
             flex-direction: column;
@@ -455,7 +477,7 @@
             justify-content: space-between;
             font-size: 0.8rem;
             margin-bottom: 2px;
-            }
+        }
         .breakdown-label {
             color: var(--text-main);
             font-weight: 500;
@@ -535,9 +557,6 @@
             border-color: var(--accent-color);
             color: var(--text-bright);
             background-color: rgba(41, 98, 255, 0.1);
-        }
-        body.theme-gold-ma7 .btn-toggle-view.active {
-            background-color: rgba(197, 160, 89, 0.1);
         }
 
         .history-meta {
@@ -719,9 +738,6 @@
             white-space: nowrap;
         }
         .toast.show { opacity: 1; transform: scale(1); }
-        body.theme-gold-ma7 .toast {
-            background-color: rgba(197, 160, 89, 0.95);
-        }
     </style>
 </head>
 <body>
@@ -740,7 +756,7 @@
             <div class="form-group">
                 <label for="input-weight" class="label-weight">Weight</label>
                 <div class="weight-input-container">
-                    <input type="number" id="input-weight" step="0.1" placeholder="例: 65.3 または 653">
+                    <input type="number" id="input-weight" step="0.1" placeholder="例: 65.3">
                     <span class="weight-unit">kg</span>
                 </div>
             </div>
@@ -923,7 +939,6 @@
         let logs = [];
         let chart = null;
         let profile = { height: 170.0 };
-        
         let isHistoryScrollEnabled = false;
 
         let computedRanges = {
@@ -1047,7 +1062,6 @@
         function updateSummaryIndicator() {
             const weightEl = document.getElementById('summary-weight');
             const diffEl = document.getElementById('summary-diff');
-
             const validWeightLogs = logs.filter(l => l.weight !== null && l.weight !== undefined && !isNaN(l.weight));
 
             if (validWeightLogs.length === 0) {
@@ -1364,7 +1378,7 @@
                 reportBox.innerText = "データが未登録です。ログを記録するとテクニカル分析が開始されます。";
                 breakdownBox.style.display = "none";
                 
-                document.body.classList.remove('theme-gold-ma7', 'theme-gold-ma30');
+                document.body.className = ''; // クラスリセット
                 return;
             }
 
@@ -1459,40 +1473,28 @@
                 hasMa30Bonus = true;
             }
 
-            // 移動平均による画面カラーの動的変更（トグル処理）
-            if (ma7CheckedDays >= 7 && ma7PerfectGood) {
-                document.body.classList.add('theme-gold-ma7');
-            } else {
-                document.body.classList.remove('theme-gold-ma7');
-            }
+            const totalScore = score_activity + score_condition;
+            scoreDisplay.innerText = totalScore;
 
-            if (ma30CheckedDays >= 7 && ma30PerfectGood) {
-                document.body.classList.add('theme-gold-ma30');
-            } else {
-                document.body.classList.remove('theme-gold-ma30');
-            }
+            // 確定した総合スコアに連動して画面カラーを更新
+            updateThemeByScore(totalScore);
 
             if (chart) {
                 updateChartAnnotations();
             }
 
-            const totalScore = score_activity + score_condition;
-            scoreDisplay.innerText = totalScore;
-
-            // --- 【新仕様】ボラティリティ判定ロジック（48時間以内に2%以上の変動） ---
+            // --- ボラティリティ判定ロジック ---
             let volatilityHigh = false;
             let maxVolDiffPct = 0; 
             const latestTime = new Date(latest.date).getTime();
             const fortyEightHours = 48 * 60 * 60 * 1000;
 
-            // 48時間以内にある直近以前の過去ログを探す
             const pastLogsIn48h = validWeightLogs.filter(l => {
                 const logTime = new Date(l.date).getTime();
                 return l.id !== latest.id && (latestTime - logTime) >= 0 && (latestTime - logTime) <= fortyEightHours;
             });
 
             if (pastLogsIn48h.length > 0) {
-                // 最も時間の近いログを基準とする
                 const basePastLog = pastLogsIn48h[pastLogsIn48h.length - 1];
                 const diffPct = ((currentWeight - basePastLog.weight) / basePastLog.weight) * 100;
                 if (Math.abs(diffPct) >= 2.0) {
@@ -1535,7 +1537,6 @@
                 commentText = `国内成人の約25%が属する過剰積載域にプロット。現在は${orbitText}を示しており、上位足における抵抗線のブレイク状況を注視する局面です。`;
             }
 
-            // ボラティリティ異常時はバッジとコメントを最優先割り込み（スコアは変更なし）
             if (volatilityHigh) {
                 statusClass = 'badge-box-volatility';
                 positionText = "⚠️ ボラティリティ高";
@@ -1762,9 +1763,10 @@
         function updateChartAnnotations() {
             if (!chart) return;
             
-            const isGold = document.body.classList.contains('theme-gold-ma7');
-            const centerLineColor = isGold ? '#c5a059' : '#2962ff';
-            const rangeBgColor = isGold ? '#c5a059' : '#2962ff';
+            const body = document.body;
+            const isGoldTheme = body.classList.contains('theme-gold') || body.classList.contains('theme-gold-max');
+            const centerLineColor = isGoldTheme ? '#c5a059' : '#2962ff';
+            const rangeBgColor = isGoldTheme ? '#c5a059' : '#2962ff';
 
             chart.updateOptions({
                 annotations: {
@@ -1820,13 +1822,15 @@
             updatePeriodExtremeValues(dataObj.candlestick);
 
             const finalMa7 = (timeframe === 'D') ? dataObj.ma7 : [];
-            const finalMa30 = (timeframe === 'D' ? 'D' : []) ? dataObj.ma30 : [];
+            const finalMa30 = (timeframe === 'D') ? dataObj.ma30 : [];
 
-            chart.updateSeries([
-                { name: (timeframe === 'D' ? '日足' : timeframe === 'W' ? '週足' : timeframe === 'M' ? '月足' : '年足'), type: 'candlestick', data: dataObj.candlestick },
-                { name: '7日移動平均', type: 'line', data: finalMa7 },
-                { name: '30日移動平均', type: 'line', data: finalMa30 }
-            ]);
+            chart.updateOptions({
+                series: [
+                    { name: (timeframe === 'D' ? '日足' : timeframe === 'W' ? '週足' : timeframe === 'M' ? '月足' : '年足'), type: 'candlestick', data: dataObj.candlestick },
+                    { name: '7日移動平均', type: 'line', data: finalMa7 },
+                    { name: '30日移動平均', type: 'line', data: finalMa30 }
+                ]
+            });
 
             updateChartAnnotations();
             updateBMIDisplay();
@@ -1908,6 +1912,21 @@
             document.getElementById('board-high').innerText = latestCandle.y[1].toFixed(1);
             document.getElementById('board-low').innerText = latestCandle.y[2].toFixed(1);
             document.getElementById('board-close').innerText = latestCandle.y[3].toFixed(1);
+        }
+
+        function updateThemeByScore(score) {
+            const body = document.body;
+            body.classList.remove('theme-green', 'theme-blue', 'theme-gold', 'theme-gold-max');
+
+            if (score >= 0 && score <= 29) {
+                body.classList.add('theme-green');
+            } else if (score >= 30 && score <= 59) {
+                body.classList.add('theme-blue');
+            } else if (score >= 60 && score <= 79) {
+                body.classList.add('theme-gold');
+            } else if (score >= 80 && score <= 100) {
+                body.classList.add('theme-gold-max');
+            }
         }
     </script>
 </body>

@@ -3,23 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MyLog Healthcare - HOW TO</title>
+    <title>How to Use - MyLog Healthcare</title>
     
     <link rel="icon" type="image/png" href="icon.png">
-    <link rel="apple-touch-icon" href="icon.png">
+    <link class="apple-touch-icon" href="icon.png">
+    
+    <meta name="theme-color" content="#0b0e14">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- デザインシステム（index.htmlと完全同期） --- */
+        /* --- index.html と統一されたデザインシステム --- */
         :root {
             --bg-body: #0b0e14;
             --bg-card: #131722;
             --bg-input: #1e222d;
             --border-color: #3a3f50; 
-            --border-focus: #52586c;
             --text-main: #c5c7d0;
             --text-bright: #ffffff;
             --text-muted: #848e9c;
@@ -35,7 +38,6 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -46,133 +48,21 @@
             max-width: 800px;
             margin: 0 auto;
             padding-bottom: 60px;
-            line-height: 1.6;
         }
 
-        /* --- タイポグラフィ --- */
-        h1 {
-            font-size: 1.4rem;
-            color: var(--text-bright);
-            font-family: var(--font-mono);
-            margin-bottom: 4px;
-            letter-spacing: -0.5px;
-        }
-        .subtitle {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 24px;
-        }
-        h2 {
-            font-size: 1.1rem;
-            color: var(--text-bright);
-            border-left: 4px solid var(--theme-blue);
-            padding-left: 8px;
-            margin-bottom: 16px;
-            font-weight: 700;
-        }
-        h3 {
-            font-size: 0.95rem;
-            color: var(--text-bright);
-            margin: 14px 0 6px 0;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .card {
-            background-color: var(--bg-card);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        p {
-            font-size: 0.9rem;
-            margin-bottom: 12px;
-            color: var(--text-main);
-        }
-
-        ul, ol {
-            margin-left: 20px;
-            margin-bottom: 14px;
-            font-size: 0.9rem;
-        }
-        li {
-            margin-bottom: 6px;
-        }
-
-        strong {
-            color: var(--text-bright);
-            font-weight: 700;
-        }
-
-        /* --- 1カラム・スコア配点用コンポーネント --- */
-        .score-list-container {
-            margin: 16px 0;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .score-item-box {
-            background-color: var(--bg-input);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 16px;
-        }
-        .score-item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-            margin-bottom: 12px;
-        }
-        .score-item-title {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .score-item-points {
-            font-family: var(--font-mono);
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #ffb703;
-            text-shadow: 0 0 8px rgba(255, 183, 3, 0.15);
-            white-space: nowrap;
-        }
-        .score-item-body {
-            font-size: 0.85rem;
-        }
-
-        /* --- 特殊な装飾パーツ --- */
-        .highlight-box {
-            background: rgba(41, 98, 255, 0.05);
-            border: 1px solid rgba(41, 98, 255, 0.3);
-            border-radius: 8px;
-            padding: 14px;
-            margin: 14px 0;
-        }
-        .badge {
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: bold;
-            width: fit-content;
-        }
-        .badge-blue { color: #4facfe; background: rgba(41, 98, 255, 0.15); border: 1px solid rgba(41, 98, 255, 0.4); }
-        .badge-green { color: var(--color-negative); background: rgba(8, 209, 88, 0.1); border: 1px solid rgba(8, 209, 88, 0.3); }
-        .badge-gold { color: #ebd094; background: rgba(197, 160, 89, 0.15); border: 1px solid rgba(197, 160, 89, 0.4); }
-        .badge-vol { color: #ff9100; background: rgba(255, 111, 0, 0.12); border: 1px solid rgba(255, 111, 0, 0.4); }
-
-        /* --- ナビゲーション --- */
+        /* --- ヘッダー・ナビゲーション --- */
         .nav-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 12px;
+        }
+        .brand-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-bright);
+            font-family: var(--font-mono);
+            letter-spacing: -0.5px;
         }
         .btn-back {
             background-color: var(--bg-input);
@@ -186,131 +76,244 @@
             transition: all 0.2s;
         }
         .btn-back:hover {
-            border-color: var(--border-focus);
+            border-color: var(--theme-blue);
             color: var(--text-bright);
+        }
+
+        /* --- コンポーネントスタイル --- */
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            font-size: 1.15rem;
+            color: var(--text-bright);
+            border-left: 4px solid var(--theme-blue);
+            padding-left: 8px;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        h3 {
+            font-size: 1rem;
+            color: var(--text-bright);
+            margin: 16px 0 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        p {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            color: var(--text-main);
+        }
+
+        ul, ol {
+            padding-left: 20px;
+            margin-bottom: 14px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        li {
+            margin-bottom: 6px;
+        }
+
+        /* --- 特殊バッジ & コード表現 --- */
+        .badge {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 4px;
+            display: inline-block;
+        }
+        .badge-blue { background-color: rgba(41, 98, 255, 0.15); color: #007aff; border: 1px solid rgba(41, 98, 255, 0.3); }
+        .badge-green { background-color: rgba(8, 209, 88, 0.1.5); color: var(--color-negative); border: 1px solid rgba(8, 209, 88, 0.3); }
+        .badge-gold { background-color: rgba(197, 160, 89, 0.15); color: var(--theme-gold); border: 1px solid rgba(197, 160, 89, 0.3); }
+        
+        .code-inline {
+            font-family: var(--font-mono);
+            background-color: var(--bg-input);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #ffb703;
+            font-size: 0.85rem;
+        }
+
+        .system-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            font-size: 0.85rem;
+        }
+        .system-table th, .system-table td {
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            text-align: left;
+        }
+        .system-table th {
+            background-color: var(--bg-input);
+            color: var(--text-bright);
+        }
+
+        .highlight-box {
+            background-color: rgba(255, 183, 3, 0.05);
+            border: 1px dashed rgba(255, 183, 3, 0.3);
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
     <div class="nav-container">
-        <div>
-            <h1>MyLog Healthcare</h1>
-            <div class="subtitle">ユーザーマニュアル ＆ 活用ガイド</div>
-        </div>
-        <a href="index.html" class="btn-back">⬅ アプリに戻る</a>
+        <div class="brand-title">MyLog Healthcare</div>
+        <a href="index.html" class="btn-back">🔙 アプリに戻る</a>
     </div>
 
     <div class="card">
-        <h2>🎯 体重を「相場」としてハックする</h2>
-        <p>「MyLog Healthcare」は、毎日の体重の増減に感情的に一喜一憂するのをやめるためのアプリケーションです。あなたの体重推移を株価や為替のような<strong>「相場チャート（ローソク足）」</strong>として客観的に捉え、冷静にハック・管理します。</p>
-        <p>一時的な数値に振り回されず、ありのままのリアルなデータを蓄積していくことで、AIによる洗練されたテクニカル分析や、ゲーム感覚で挑戦できる「健康スコア（SCORE）」が、あなたの長期的で無理のないボディコントロールを強力にサポートします。</p>
+        <h2>概要</h2>
+        <p>
+            <strong>MyLog Healthcare</strong> は、外部のサーバーやAPIに一切依存せず、ブラウザのローカルストレージ（<code class="code-inline">localStorage</code>）のみで全ての計算・データ保持を完結させるスタンドアロン型の高度ヘルスケア管理アプリケーションです。
+        </p>
+        <p>
+            金融商品の投資相場チャートに見立てた「ローソク足テクニカル分析」の手法を自身の体重管理に応用し、客観的かつプロフェッショナルな視点で日々のコンディションを監査・採点することができます。
+        </p>
     </div>
 
     <div class="card">
-        <h2>💡 はじめの4ステップ</h2>
+        <h2>1. ログ入力・自動補正機能</h2>
         
-        <h3>1️⃣ まずはあなたの「基準線」を引こう（プロフィール設定）</h3>
-        <p>アプリを起動したら、まずは最下部にある「Profile」エリアで<strong>あなたの身長</strong>を入力し、「設定を保存」を押してください。</p>
+        <h3>入力の自動初期化</h3>
+        <p>ページを読み込んだ際、およびログの保存が成功した際には、常にユーザーの正確なローカルタイムゾーンを考慮した「現在の正確な日時」が自動入力されます。</p>
+
+        <h3>体重値の3桁（整数）自動補正ロジック</h3>
+        <p>スマートな入力体験のため、以下の小数点の打ち忘れ自動補正ロジックを搭載しています。</p>
         <ul>
-            <li>身長から、医学的に最も病気になりにくいとされる<strong>「理想中心（BMI 22）」</strong>の体重が自動計算され、メインチャート上に<strong>青い基準線</strong>として一本のトレンドラインが引かれます。</li>
+            <li>入力された体重値が <code class="code-inline">100</code> 以上の場合（例: 653 と入力）、自動的に小数点の打ち忘れと判定します。</li>
+            <li>値を自動的に <code class="code-inline">10</code> で除算し、小数点第1位に丸めた数値（例: <code class="code-inline">65.3</code>）に変換して記録します。</li>
+            <li>補正が実行された場合は、画面中央にトースト通知で自動補正結果をフィードバックします。</li>
         </ul>
+
+        <h3>バリデーション</h3>
+        <p>体重値、メモが完全に空欄のままでの送信は「データが空です」として拒否されます（体重のみ、またはメモのみの登録は可能です）。過去の日時で登録された場合も、タイムスタンプ順に自動で昇順ソートされて保存されます。</p>
+    </div>
+
+    <div class="card">
+        <h2>2. ダッシュボード・板情報システム</h2>
+        
+        <h3>ApexChartsによる高度複合描画</h3>
+        <p>
+            選択された時間足（日足・週足・月足・年足）に基づいて「始値・高値・安値・終値」を算出するローソク足をプロットします。日足（D）選択時のみ、追従性の高い<strong>7日移動平均線（MA7）</strong>および<strong>30日移動平均線（MA30）</strong>が重ねて描写されます。
+        </p>
+
+        <h3>板情報（四本値）の動的インターフェース</h3>
+        <ul>
+            <li><strong>デフォルト状態</strong>: チャートの下部には、常に「最新の期間（足）」の四本値データが固定表示されます。</li>
+            <li><strong>リアルタイム連動</strong>: チャート上の過去のローソク足にマウスを重ねる（またはタップする）と、その位置の四本値・日付情報へリアルタイムに表示が書き換わります。</li>
+            <li><strong>最新足への100%自動復帰</strong>: マウスがチャート外に外れる、またはタッチが離れると、自動的に最新のデータ表示へと確実に復帰（<code class="code-inline">resetBoardToLatest</code>）する安全な設計となっています。</li>
+        </ul>
+
+        <h3>アノテーション（目標帯レイヤー）</h3>
+        <p>プロフィールに設定された身長に基づき、以下の3つのレイヤーがチャート内に常時動的生成されます。</p>
+        <ul>
+            <li><strong>理想中心線</strong>: BMI 22に相当する体重値を示す基準線。</li>
+            <li><strong>優良範囲（コアゾーン）</strong>: BMI 21.0 〜 23.0 を示す透明度15%の緑の帯。</li>
+            <li><strong>一般適正範囲</strong>: BMI 18.5 〜 25.0 を示す透明度8%のテーマカラー依存の帯。</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>3. 総合スコア ＆ レポートアルゴリズム</h2>
+        <p>Reportエリアでは、あなたの「データ密度（50点）」と「コンディション（50点）」を加算した、最大100点満点の総合評価スコアが算出されます。</p>
+
+        <h3>① データ密度（ログ・アクティビティ）：最大50点</h3>
+        <p>直近7日間の各日付における打刻頻度を監査します。</p>
+        <ul>
+            <li>1日につき、1回目の記録で <code class="code-inline">+3点</code>、2回目の記録でさらに <code class="code-inline">+3点</code> 加算（1日最大6点）。</li>
+            <li><strong>高密度ボーナス</strong>: 過去7日間の総記録回数が <strong>21回以上</strong>（1日平均3回以上）の場合、一律 <code class="code-inline">+8点</code> のボーナスが加算されます（最大50点キャップ）。</li>
+        </ul>
+
+        <h3>② コンディション（トレンド維持）：最大50点</h3>
+        <p>直近7データポイント分の移動平均線が、適正ゾーンをキープできているかを判定します。</p>
+        <ul>
+            <li><strong>MA7 優良維持（40点）</strong>: 直近7件のMA7がすべてBMI 21.0〜23.0のコアゾーン内にある場合。</li>
+            <li><strong>MA7 適正維持（30点）</strong>: 上記を満たさないが、直近7件のMA7がすべてBMI 18.5〜25.0の一般適正内にある場合。</li>
+            <li><strong>圏外または期間不足（10点）</strong>: いずれの条件も満たさない、またはデータ数が足りない場合。</li>
+            <li><strong>長期維持ボーナス</strong>: 過去7件のMA30もすべてBMI 21.0〜23.0内にある場合、さらに <code class="code-inline">+10点</code> が加算されます。</li>
+        </ul>
+
+        <h3>⚡ 48時間ボラティリティ（急激な変動）検知・割り込み仕様</h3>
+        <p>
+            最新ログから<strong>過去48時間以内</strong>に記録された直近のデータと比較し、体重変動率（％）の絶対値が <strong>`2.0%` 以上</strong> を記録した場合、システムは「ボラティリティ高」の異常状態を検知します。
+        </p>
         <div class="highlight-box">
-            <strong>⚠️【最重要マインドセット】</strong><br>
-            この青い支持線に到達することだけがゴールではありません。本当に大切なのは、その上下に広がる<strong>「優良範囲（BMI 21〜23）」のゾーン内で、体重を無理なく維持・継続させること</strong>です。
-        </div>
-
-        <h3>2️⃣ ありのままのリアルをログに入力しよう</h3>
-        <p>準備ができたら、日々の数値を「Log Input」から記録していきましょう。</p>
-        <ul>
-            <li><strong>増減を知ることが最優先：</strong> 「良い記録（減った数値）」だけを残しようとする必要は一切ありません。大切なのは、1日の中での体重の自然な増減幅（バイオリズム）を把握し、ゆるやかに目的地へ向かうことです。</li>
-            <li><strong>ドットなし入力に対応：</strong> 「65.3」のほかに、ドットを省略して「653」と入力しても、アプリが自動で「65.3kg」に補正します。片手での素早い打刻が可能です。</li>
-            <li><strong>メモだけの記録も有効：</strong> 体重を測れなかった日でも、「食べ過ぎた」「ランニング30分」など、メモだけでログを残すことができ、データ密度を維持できます。</li>
-            <li><strong>ログの削除：</strong> 入力を間違えた場合は、一番下の「Log History」の日付部分を<strong>長押し</strong>（PCはクリック長押し）することで削除できます。</li>
-        </ul>
-
-        <h3>3️⃣ チャートとAIレポートで「大局」を客観視しよう</h3>
-        <p>データが蓄積されると、ダッシュボードは本格的なヘルス・トレーディングビューへと進化します。</p>
-        <ul>
-            <li><strong>ローソク足チャート：</strong> 体重の推移が1本のローソク（始値・高値・安値・終値）に凝縮されます。チャート上をホバー（タップ）すると、その期間の四本値（板情報）がリアルタイム表示されます。日足・週足・月足・年足に切り替えて、目先の増減ではない「大局的なトレンド」を見極めましょう。</li>
-            <li><strong>2本の移動平均線（MA）：</strong> 日足表示の際、チャート上に<strong>赤（7日線）</strong>と<strong>緑（30日線）</strong>の波形が現れます。これは日々の水分量などのノイズを滑らかに排除した、「あなたの本当の体重トレンド」を示しています。</li>
-            <li><strong>AI Report（概況レポート）：</strong> 現在のあなたの相場環境を、無駄な装飾や食事指導をすべて排除した、徹底的に客観的で洗練されたIRレポート調の140文字テキストで端的に評価します。</li>
-        </ul>
-
-        <div class="highlight-box" style="border-left: 4px solid #ff9100; background: rgba(255, 111, 0, 0.02);">
-            <strong>🚨【ボラティリティ（高変動率）アラートについて】</strong><br>
-            短期間（48時間以内）に <strong>±2.0% 以上</strong>の急激な価格変動を検知した場合、システムは一時的な流動性ノイズとしてアラートを発動し、最優先で <span class="badge badge-vol">⚠️ ボラティリティ高</span> バッジを割り込み表示します。<br>
-            このアラートは突発的なオーバーヒートを客観分析するためのものであり、<strong>健康スコアが減点されることは一切ありません。</strong> 安心して測定を継続してください。
+            <p><strong>【最優先割り込み仕様】</strong></p>
+            <p>ボラティリティ異常を検知すると、通常のBMIステータス判定（低体重や優良など）を完全にオーバーライドし、ステータスバッジを強制的に<strong>「⚠️ ボラティリティ高」</strong>に固定します。</p>
+            <p>レポートコメントも「水分増減等による一過性の帳簿上のノイズ・スパイクであるため、静観し定時打刻を継続すべき」というプロ文脈のテクニカル分析テキストへ強制的に差し替わります。</p>
         </div>
     </div>
 
     <div class="card">
-        <h2>🏆 100点満点の「健康スコア」に挑戦</h2>
-        <p>レポートエリアにある「SCORE」は、あなたの健康管理への取り組みと成果をリアルタイムに100点満点で採点するシステムです。透明性の高い以下の評価ロジックに基づき、ゲーム感覚で日々の打刻モチベーションを維持できます。</p>
-
-        <div class="score-list-container">
-            
-            <div class="score-item-box">
-                <div class="score-item-header">
-                    <div class="score-item-title">
-                        <strong>① 記録アクティビティ</strong>
-                        <span class="badge badge-blue">行動評価</span>
-                    </div>
-                    <div class="score-item-points">最大 50点</div>
-                </div>
-                <div class="score-item-body">
-                    <p>過去7日間のうち、毎日の<strong>「記録回数（メモのみ含む）」</strong>に応じて段階的に加点されます：</p>
-                    <ul style="margin-bottom: 10px; padding-left: 4px;">
-                        <li>1回目の記録がある日数 × 3点（最大21点）</li>
-                        <li>2回目の記録がある日数 × 3点（最大21点）</li>
-                    </ul>
-                    <p><strong>🔥【週21回以上ボーナス】</strong><br>
-                    過去7日間の総記録回数（メモ含む）が<strong>21回以上</strong>に達すると、一気にデータ密度が極めて高い優良アセットとみなされ、さらに <strong>＋8点</strong> のボーナス加点が付与されます。</p>
-                </div>
-            </div>
-
-            <div class="score-item-box">
-                <div class="score-item-header">
-                    <div class="score-item-title">
-                        <strong>② コンディション</strong>
-                        <span class="badge badge-green">環境評価</span>
-                    </div>
-                    <div class="score-item-points">最大 50点</div>
-                </div>
-                <div class="score-item-body">
-                    <p>目先の1点データではなく、中長期トレンド（移動平均線）が理想の範囲をキープできているかを評価します：</p>
-                    <ul style="margin-bottom: 10px; padding-left: 4px;">
-                        <li>過去7日間の <strong>MA7（7日移動平均）</strong> がすべて一般適正範囲内（BMI 18.5〜25.0）を維持 ＝ <strong>30点</strong></li>
-                        <li>過去7日間の <strong>MA7（7日移動平均）</strong> がすべて理想の優良範囲内（BMI 21.0〜23.0）を維持 ＝ <strong>40点</strong></li>
-                    </ul>
-                    <p><strong>💎【長期維持ボーナス】</strong><br>
-                    過去7日間の <strong>MA30（30日移動平均）</strong> もすべて優良範囲（BMI 21.0〜23.0）をキープし続けている場合、さらに <strong>＋10点</strong> のボーナス加点が付与されます。</p>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="highlight-box" style="border-left: 4px solid var(--theme-gold); background: rgba(197, 160, 89, 0.03);">
-            <strong>✨【プレミアム・トグル：画面カラーの動的変更】</strong><br>
-            移動平均線の安定度（レーティング）に応じて、アプリのシステムテーマが自動で切り替わります：
-            <ul style="margin-top: 8px; margin-bottom: 0; padding-left: 14px;">
-                <li><strong>アクセントの変更：</strong> 過去7日間の「MA7」がすべて理想範囲（BMI 21-23）に定着すると、テーマカラーが自動的に <span class="badge badge-gold">ゴールド</span> へと変化し、アセットが安定巡航速度に入ったことを告げます。</li>
-                <li><strong>カード枠線の拡張：</strong> さらに「MA30」も同範囲を完全にクリアすると、ダッシュボード内の各カード枠線までゴールド仕様へと拡張され、最上位の健全状態であることが視覚的に証明されます。</li>
-            </ul>
-        </div>
-
-        <div class="highlight-box" style="border-left: 4px solid var(--color-negative); background: rgba(8, 209, 88, 0.02);">
-            <strong>💡 ネガティブ・レコーディングの推奨</strong><br>
-            「体重が増えてしまった」と気づいた時こそ、1日に複数回細かく現実の記録を残すことで、「① 記録アクティビティ点」がフルに加算されます。また、数日間一時的に数値が跳ね上がった程度では「移動平均線（MA）」の大局トレンドは崩れない仕組みになっています。安心してありのままの現実をログに刻み込んでください。
-        </div>
+        <h2>4. 総合スコア連動テーマシステム</h2>
+        <p>算出された総合スコアに基づき、アプリケーションのテーマカラーがリアルタイムかつ動的に、以下の4段階に切り替わります。</p>
+        
+        <table class="system-table">
+            <thead>
+                <tr>
+                    <th>総合スコア</th>
+                    <th>発動テーマ</th>
+                    <th>画面演出の挙動</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>0 〜 29 点</strong></td>
+                    <td>緑テーマ <span class="badge badge-green">theme-green</span></td>
+                    <td>アクセントカラーおよび各種インジケーターがグリーンへ変化します。</td>
+                </tr>
+                <tr>
+                    <td><strong>30 〜 59 点</strong></td>
+                    <td>青テーマ <span class="badge badge-blue">theme-blue</span></td>
+                    <td>標準の洗練されたサイバーブルーの配色になります。</td>
+                </tr>
+                <tr>
+                    <td><strong>60 〜 79 点</strong></td>
+                    <td>金テーマ <span class="badge badge-gold">theme-gold</span></td>
+                    <td>アクセントカラー・ブランドタイトル・トースト背景が気品あるゴールド（#c5a059）へと昇格します。</td>
+                </tr>
+                <tr>
+                    <td><strong>80 〜 100 点</strong></td>
+                    <td>最高金テーマ <span class="badge badge-gold">theme-gold-max</span></td>
+                    <td>ゴールドの配色に加え、すべてのカード（.card）の枠線がゴールドの透過色（40%）へと変化し、極めて微細なボックスシャドウが空間を演出します。</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
     <div class="card">
-        <h2>📦 安心のローカルデータ管理</h2>
-        <p>MyLog Healthcare はプライバシーを最優先するため、データをご自身のブラウザ（Local Storage）にのみ保存します。サーバーへ送信されることはありません。</p>
+        <h2>5. 履歴管理・バックアップ・セキュリティ</h2>
+        
+        <h3>Log History の表示切替（トグル）</h3>
+        <p>デフォルト状態では、画面をすっきりさせるために最新の履歴 <strong>5件のみ</strong> が表示されます。履歴が5件を超えると「表示切替」ボタンが出現し、これをアクティブにするとコンテナにスクロールバーが有効化され、過去すべてのログを全件閲覧できるようになります。</p>
+
+        <h3>安全な「長押し（Long Press）」削除仕様</h3>
+        <p>誤操作による記録データの消失を防ぐため、履歴項目は単なるクリックでは削除できません。<strong>日時部分を800ミリ秒以上長押し（ロングタップ）</strong> することで、初めて削除確認の確認ダイアログ（<code class="code-inline">confirm</code>）が起動する安全構造となっています。途中で指やマウスを離した場合はタイマーがクリアされます。</p>
+
+        <h3>データバックアップ</h3>
         <ul>
-            <li><strong>JSONエクスポート：</strong> 記録したすべてのデータを、バックアップファイル（.json）として手元に書き出すことができます。定期的な保存を推奨します。</li>
-            <li><strong>JSONインポート：</strong> スマホの機種変更時やブラウザの移行時, エクスポートしておいたファイルを読み込ませることで、いつでもこれまでの全履歴を完全に復元できます。</li>
+            <li><strong>JSONエクスポート</strong>: 記録された全ログ配列をJSONファイル（<code class="code-inline">mylog_backup_YYYYMMDD.json</code>）としてローカルに即時ダウンロードします。</li>
+            <li><strong>JSONインポート</strong>: ファイルからログを読み込む際、データ構造の厳格なバリデーション（配列形式であるか、必須プロパティに欠落がないか）を検査し、安全に上書き復元を行います。</li>
         </ul>
     </div>
 
