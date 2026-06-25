@@ -33,30 +33,26 @@
             --theme-gold: #c5a059;
             --theme-gold-hover: #b08d4b;
             --color-positive: #f23645; 
-            --color-negative: #08d158; 
+            --color-negative: #007aff; 
             --font-main: 'Noto Sans JP', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
             
-            /* 動的に切り替わる用（デフォルトはグリーン） */
             --accent-color: #08d158;
             --accent-color-hover: #06b34a;
             --title-color: var(--text-bright);
         }
 
         /* --- スコア連動テーマシステム --- */
-        /* 0〜59点：緑テーマ */
         body.theme-green {
             --accent-color: #08d158;
             --accent-color-hover: #06b34a;
         }
         
-        /* 60〜79点：青テーマ */
         body.theme-blue {
             --accent-color: #007aff;
             --accent-color-hover: #0062cc;
         }
         
-        /* 80〜99点：金テーマ */
         body.theme-gold {
             --accent-color: #c5a059;
             --accent-color-hover: #b08d4b;
@@ -70,7 +66,6 @@
             border-color: #c5a059;
         }
 
-        /* 100点：レインボーテーマ（アニメーション付きグラデーション枠線） */
         body.theme-rainbow {
             --accent-color: #ff9f43;
             --accent-color-hover: #ff7f00;
@@ -133,7 +128,7 @@
             color: var(--text-bright);
             border-left: 4px solid var(--accent-color);
             padding-left: 8px;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             font-weight: 700;
             display: flex;
             justify-content: space-between;
@@ -165,7 +160,7 @@
             font-family: var(--font-mono);
             letter-spacing: -0.5px;
             transition: color 0.3s ease;
-            cursor: pointer; /* タッチ可能であることを明示 */
+            cursor: pointer;
             user-select: none;
         }
         .btn-help {
@@ -184,20 +179,12 @@
             color: var(--text-bright);
         }
 
-        /* --- 入力フォーム --- */
+        /* --- 入力フォーム（省スペース化調整） --- */
         .recording-card {
-            padding: 16px; 
+            padding: 12px 14px; /* パディングを少し縮小 */
         }
         .form-group {
-            margin-bottom: 12px; 
-        }
-        
-        .label-weight {
-            display: block;
-            font-size: 1rem; 
-            color: var(--text-bright) !important; 
-            font-weight: 500;
-            margin-bottom: 6px;
+            margin-bottom: 10px; /* 入力項目間の余白を12pxから10pxに縮小 */
         }
 
         input, select, textarea {
@@ -240,13 +227,13 @@
             background-color: var(--accent-color);
             color: #fff;
             border: none;
-            padding: 12px;
+            padding: 11px;
             border-radius: 8px;
             font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            margin-top: 4px;
+            margin-top: 2px;
         }
         .btn-submit:hover {
             background-color: var(--accent-color-hover);
@@ -295,8 +282,8 @@
             padding: 2px 6px;
             border-radius: 4px;
         }
-        .diff-plus { color: var(--color-positive); background-color: rgba(242, 54, 69, 0.1); }
-        .diff-minus { color: var(--color-negative); background-color: rgba(8, 209, 88, 0.1); }
+        .diff-plus { color: #f23645; background-color: rgba(242, 54, 69, 0.1); }
+        .diff-minus { color: #007aff; background-color: rgba(0, 122, 255, 0.1); }
         .diff-zero { color: var(--text-muted); background-color: rgba(132, 142, 156, 0.1); }
 
         .summary-bmi-val {
@@ -407,7 +394,7 @@
         }
         .ind-high { background-color: #ff6b76; }
         .ind-center { background-color: var(--accent-color); transition: background-color 0.3s ease; }
-        .ind-low { background-color: #08d158; }
+        .ind-low { background-color: #007aff; }
 
         /* --- Reportウィンドウ演出パーツ --- */
         .report-header {
@@ -433,8 +420,8 @@
             color: #ebd094;
         }
         .badge-box-fair {
-            background-color: rgba(8, 209, 88, 0.08);
-            border: 1px solid rgba(8, 209, 88, 0.4);
+            background-color: rgba(0, 122, 255, 0.08);
+            border: 1px solid rgba(0, 122, 255, 0.4);
             color: var(--color-negative);
         }
         .badge-box-review {
@@ -492,7 +479,7 @@
             color: var(--text-main);
         }
 
-        /* --- Reportウィンドウ内訳用のスタイル --- */
+        /* --- Reportウィンドウ内訳 --- */
         .score-breakdown {
             margin-top: 16px;
             padding-top: 14px;
@@ -551,7 +538,6 @@
             overflow-y: visible;
         }
         
-        /* 全表示モード時のスクロール設定 */
         .history-list.scroll-enabled {
             max-height: 420px;
             overflow-y: auto;
@@ -570,7 +556,6 @@
         .history-item:last-child { border-bottom: none; }
         .history-item:active { background-color: var(--bg-input); }
         
-        /* 右上に配置する「表示切替」ボタンのスタイル */
         .btn-toggle-view {
             background-color: var(--bg-input);
             color: var(--text-main);
@@ -586,7 +571,6 @@
             border-color: var(--border-focus);
             color: var(--text-bright);
         }
-        /* 全表示（アクティブ）時のスタイル変化 */
         .btn-toggle-view.active {
             border-color: var(--accent-color);
             color: var(--text-bright);
@@ -731,7 +715,7 @@
         }
         .btn-danger-reset {
             background-color: rgba(242, 54, 69, 0.1);
-            color: var(--color-positive);
+            color: #f23645;
             border: 1px solid rgba(242, 54, 69, 0.4);
             padding: 10px 20px;
             border-radius: 6px;
@@ -741,9 +725,9 @@
             transition: all 0.2s;
         }
         .btn-danger-reset:hover {
-            background-color: var(--color-positive);
+            background-color: #f23645;
             color: #fff;
-            border-color: var(--color-positive);
+            border-color: #f23645;
         }
 
         /* --- トースト通知 --- */
@@ -777,7 +761,6 @@
 <body>
 
     <div class="nav-container">
-        <!-- タッチでリロード（更新）を実行 -->
         <div class="brand-title" onclick="window.location.reload();">MyLog Healthcare</div>
         <a href="howto.html" class="btn-help">📖 HOW TO</a>
     </div>
@@ -789,14 +772,13 @@
                 <input type="datetime-local" id="input-date" required>
             </div>
             <div class="form-group">
-                <label for="input-weight" class="label-weight">Weight</label>
                 <div class="weight-input-container">
-                    <input type="number" id="input-weight" step="0.1" placeholder="例: 65.3">
+                    <input type="number" id="input-weight" step="0.1" placeholder="Weight 例: 65.3 or 653">
                     <span class="weight-unit">kg</span>
                 </div>
             </div>
             <div class="form-group">
-                <textarea id="input-memo" rows="2" placeholder="Memo（食事、運動、メモなど）"></textarea>
+                <textarea id="input-memo" rows="1" placeholder="Memo（食事、運動、メモなど）"></textarea>
             </div>
             <button type="submit" class="btn-submit">Save Log</button>
         </form>
@@ -1429,7 +1411,6 @@
             const hSquare = hMeter * hMeter;
             const currentBMI = currentWeight / hSquare;
 
-            // 新ルール: 当日を含めない昨日以前の7日間に対して採点
             const logCountPerDay = {};
             for (let i = 1; i <= 7; i++) {
                 const d = new Date();
@@ -1445,14 +1426,12 @@
                 }
             });
 
-            // 1回記録日: +4点, 2回以上記録日: +8点
             Object.keys(logCountPerDay).forEach(dateStr => {
                 const count = logCountPerDay[dateStr];
                 if (count === 1) score_activity += 4; 
                 if (count >= 2) score_activity += 8; 
             });
 
-            // ボーナスは廃止され、上限50点に丸められます
             if (score_activity > 50) score_activity = 50; 
 
             const dailyDataObj = getAllTimeframeCandlestickData('DALL');
@@ -1507,14 +1486,12 @@
             const totalScore = score_activity + score_condition;
             scoreDisplay.innerText = totalScore;
 
-            // スコア連動テーマ（0-59緑, 60-79青, 80-99金, 100虹）を反映
             updateThemeByScore(totalScore);
 
             if (chart) {
                 updateChartAnnotations();
             }
 
-            // --- ボラティリティ判定ロジック ---
             let volatilityHigh = false;
             let maxVolDiffPct = 0; 
             const latestTime = new Date(latest.date).getTime();
@@ -1697,7 +1674,6 @@
             return { candlestick: candlestickSeries, ma7: ma7Series, ma30: ma30Series };
         }
 
-        // 直近30日のデータ抽出ロジック（ベースデータは全期間保持してスライス）
         function getRecent30CandlestickData(timeframe) {
             const fullData = getAllTimeframeCandlestickData(timeframe);
             
@@ -1723,7 +1699,6 @@
             const dataObj = getRecent30CandlestickData(defaultTimeframe);
             updatePeriodExtremeValues(dataObj.candlestick);
 
-            // タイムフレームがD30の場合は、X軸の描画最小・最大値を明示的に絞り込む
             let minX = undefined;
             let maxX = undefined;
             if (defaultTimeframe === 'D30' && dataObj.candlestick.length > 0) {
@@ -1754,11 +1729,17 @@
                     }
                 },
                 theme: { mode: 'dark' },
-                stroke: { width: [1, 2, 2], curve: 'smooth' },
-                colors: ['#2962ff', '#ff9f43', '#08d158'], // 7日移動平均のカラーを赤から「オレンジ(#ff9f43)」に変更
+                stroke: { 
+                    width: [1, 3, 3], 
+                    curve: 'smooth' 
+                },
+                colors: ['#2962ff', '#ff9f43', '#08d158'], 
                 plotOptions: {
                     candlestick: {
-                        colors: { upward: '#f23645', downward: '#08d158' },
+                        colors: { 
+                            upward: '#f23645', 
+                            downward: '#007aff' 
+                        },
                         wick: { useFilledColors: true }
                     }
                 },
@@ -1787,6 +1768,8 @@
                     borderColor: '#2a2e39',
                     padding: { left: 0, right: 8 }
                 },
+                markers: { size: 0 }, 
+                dataLabels: { enabled: false },
                 annotations: { yaxis: [] }
             };
 
@@ -1801,7 +1784,7 @@
             if (!chart) return;
             
             const body = document.body;
-            const isGoldTheme = body.classList.contains('theme-gold') || body.classList.contains('theme-gold-max');
+            const isGoldTheme = body.classList.contains('theme-gold') || body.classList.contains('theme-rainbow');
             const centerLineColor = isGoldTheme ? '#c5a059' : '#2962ff';
             const rangeBgColor = isGoldTheme ? '#c5a059' : '#2962ff';
 
@@ -1862,7 +1845,6 @@
             const finalMa7 = isDaily ? dataObj.ma7 : [];
             const finalMa30 = isDaily ? dataObj.ma30 : [];
 
-            // 選択中の期間に応じてX軸表示の最小・最大を制御（30日分に正しくズームイン）
             let minX = undefined;
             let maxX = undefined;
             if (timeframe === 'D30' && dataObj.candlestick.length > 0) {
@@ -1965,7 +1947,6 @@
             document.getElementById('board-close').innerText = latestCandle.y[3].toFixed(1);
         }
 
-        // 新しいスコア連動ルール（0-59緑, 60-79青, 80-99金, 100虹）に基づきテーマを切り替え
         function updateThemeByScore(score) {
             const body = document.body;
             body.classList.remove('theme-green', 'theme-blue', 'theme-gold', 'theme-rainbow');
