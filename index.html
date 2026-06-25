@@ -37,45 +37,77 @@
             --font-main: 'Noto Sans JP', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
             
-            /* 動的に切り替わる用（デフォルトはブルー） */
-            --accent-color: var(--theme-blue);
-            --accent-color-hover: var(--theme-blue-hover);
+            /* 動的に切り替わる用（デフォルトはグリーン） */
+            --accent-color: #08d158;
+            --accent-color-hover: #06b34a;
             --title-color: var(--text-bright);
         }
 
         /* --- スコア連動テーマシステム --- */
-        /* 0〜29点：緑テーマ */
+        /* 0〜59点：緑テーマ */
         body.theme-green {
             --accent-color: #08d158;
             --accent-color-hover: #06b34a;
         }
-        /* 30〜59点：青テーマ（デフォルト） */
+        
+        /* 60〜79点：青テーマ */
         body.theme-blue {
             --accent-color: #007aff;
             --accent-color-hover: #0062cc;
         }
-        /* 60〜79点：金テーマ */
+        
+        /* 80〜99点：金テーマ */
         body.theme-gold {
             --accent-color: #c5a059;
             --accent-color-hover: #b08d4b;
             --title-color: #c5a059;
         }
-        body.theme-gold .toast, body.theme-gold-max .toast {
+        body.theme-gold .toast {
             background: rgba(197, 160, 89, 0.95);
         }
-        body.theme-gold .btn-toggle-view.active, body.theme-gold-max .btn-toggle-view.active {
+        body.theme-gold .btn-toggle-view.active {
             background: rgba(197, 160, 89, 0.2);
             border-color: #c5a059;
         }
-        /* 80〜100点：金テーマ ＋ カード枠線の拡張 */
-        body.theme-gold-max {
-            --accent-color: #c5a059;
-            --accent-color-hover: #b08d4b;
-            --title-color: #c5a059;
+
+        /* 100点：レインボーテーマ（アニメーション付きグラデーション枠線） */
+        body.theme-rainbow {
+            --accent-color: #ff9f43;
+            --accent-color-hover: #ff7f00;
         }
-        body.theme-gold-max .card {
-            border-color: rgba(197, 160, 89, 0.4);
-            box-shadow: 0 4px 20px rgba(197, 160, 89, 0.08);
+        body.theme-rainbow .brand-title {
+            background: linear-gradient(90deg, #ff3366, #ff9933, #33cc66, #3399ff, #9933ff, #ff3366);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rainbow-text 3s linear infinite;
+        }
+        body.theme-rainbow .score-value {
+            background: linear-gradient(90deg, #ff3366, #ff9933, #33cc66, #3399ff, #9933ff, #ff3366);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rainbow-text 3s linear infinite;
+            text-shadow: none !important;
+        }
+        body.theme-rainbow .card {
+            position: relative;
+            border: 1px solid transparent;
+            background-image: linear-gradient(var(--bg-card), var(--bg-card)), linear-gradient(135deg, #ff3366, #ff9933, #33cc66, #3399ff, #9933ff);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            box-shadow: 0 4px 20px rgba(255, 159, 67, 0.1);
+        }
+        body.theme-rainbow .breakdown-bar-fill {
+            background: linear-gradient(90deg, #ff3366, #ff9933, #33cc66, #3399ff);
+        }
+        body.theme-rainbow .toast {
+            background: linear-gradient(90deg, #ff3366, #ff9933);
+        }
+
+        @keyframes rainbow-text {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
         }
 
         * {
@@ -133,6 +165,8 @@
             font-family: var(--font-mono);
             letter-spacing: -0.5px;
             transition: color 0.3s ease;
+            cursor: pointer; /* タッチ可能であることを明示 */
+            user-select: none;
         }
         .btn-help {
             background-color: var(--bg-input);
@@ -743,7 +777,8 @@
 <body>
 
     <div class="nav-container">
-        <div class="brand-title">MyLog Healthcare</div>
+        <!-- タッチでリロード（更新）を実行 -->
+        <div class="brand-title" onclick="window.location.reload();">MyLog Healthcare</div>
         <a href="howto.html" class="btn-help">📖 HOW TO</a>
     </div>
 
@@ -786,7 +821,8 @@
         
         <div class="chart-controls">
             <select id="range-selector" class="range-select" onchange="updateChart()">
-                <option value="D" selected>日足 (Daily)</option>
+                <option value="D30" selected>日足 (直近30日)</option>
+                <option value="DALL">日足 (全期間)</option>
                 <option value="W">週足 (Weekly)</option>
                 <option value="M">月足 (Monthly)</option>
                 <option value="Y">年足 (Yearly)</option>
@@ -1378,7 +1414,7 @@
                 reportBox.innerText = "データが未登録です。ログを記録するとテクニカル分析が開始されます。";
                 breakdownBox.style.display = "none";
                 
-                document.body.className = ''; // クラスリセット
+                document.body.className = ''; 
                 return;
             }
 
@@ -1393,10 +1429,9 @@
             const hSquare = hMeter * hMeter;
             const currentBMI = currentWeight / hSquare;
 
+            // 新ルール: 当日を含めない昨日以前の7日間に対して採点
             const logCountPerDay = {};
-            let totalLogsPast7Days = 0;
-
-            for (let i = 0; i < 7; i++) {
+            for (let i = 1; i <= 7; i++) {
                 const d = new Date();
                 d.setDate(today.getDate() - i);
                 const dateStr = d.toISOString().split('T')[0];
@@ -1407,24 +1442,20 @@
                 const logDateStr = l.date.split('T')[0];
                 if (logCountPerDay.hasOwnProperty(logDateStr)) {
                     logCountPerDay[logDateStr]++;
-                    totalLogsPast7Days++;
                 }
             });
 
+            // 1回記録日: +4点, 2回以上記録日: +8点
             Object.keys(logCountPerDay).forEach(dateStr => {
                 const count = logCountPerDay[dateStr];
-                if (count >= 1) score_activity += 3; 
-                if (count >= 2) score_activity += 3; 
+                if (count === 1) score_activity += 4; 
+                if (count >= 2) score_activity += 8; 
             });
 
-            let hasBonus = false;
-            if (totalLogsPast7Days >= 21) {
-                score_activity += 8;
-                hasBonus = true;
-            }
+            // ボーナスは廃止され、上限50点に丸められます
             if (score_activity > 50) score_activity = 50; 
 
-            const dailyDataObj = getAllTimeframeCandlestickData('D');
+            const dailyDataObj = getAllTimeframeCandlestickData('DALL');
             const ma7List = dailyDataObj.ma7;
             const ma30List = dailyDataObj.ma30;
 
@@ -1476,7 +1507,7 @@
             const totalScore = score_activity + score_condition;
             scoreDisplay.innerText = totalScore;
 
-            // 確定した総合スコアに連動して画面カラーを更新
+            // スコア連動テーマ（0-59緑, 60-79青, 80-99金, 100虹）を反映
             updateThemeByScore(totalScore);
 
             if (chart) {
@@ -1556,12 +1587,7 @@
             const activityPct = (score_activity / 50) * 100;
             const conditionPct = (score_condition / 50) * 100;
 
-            let activityHint = `過去7日間のログ頻度に基づく算出。高頻度であるほどデータ密度が上がります。`;
-            if (hasBonus) {
-                activityHint = `🔥 【週21回以上ボーナス加点獲得】 極めて高密度なヘルスデータが維持されています。`;
-            } else if (totalLogsPast7Days > 0) {
-                activityHint = `過去7日間の総打刻回数: <strong>${totalLogsPast7Days}回</strong>（あと ${21 - totalLogsPast7Days}回 で +8点 ボーナス）`;
-            }
+            let activityHint = `昨日以前の7日間の打刻実績（1日1回+4点 / 2回以上+8点）。ほぼ毎日朝晩の入力で満点（50点）に到達し、継続しやすい仕組みに設計されています。`;
 
             let conditionHint = `直近7日間の移動平均（MA7）が適正〜優良ゾーンにプロットされているかを判定。`;
             if (hasMa30Bonus) {
@@ -1611,7 +1637,7 @@
                 const logDate = new Date(log.date);
                 let key = "";
 
-                if (timeframe === 'D') {
+                if (timeframe === 'D30' || timeframe === 'DALL') {
                     key = log.date.split('T')[0];
                 } else if (timeframe === 'W') {
                     key = getMondayBasedWeekStr(logDate);
@@ -1639,7 +1665,7 @@
                 const low = Math.min(...periodLogs.map(l => l.weight));
 
                 let timestamp = 0;
-                if (timeframe === 'D' || timeframe === 'W') {
+                if (timeframe === 'D30' || timeframe === 'DALL' || timeframe === 'W') {
                     timestamp = new Date(keyStr).getTime();
                 } else if (timeframe === 'M') {
                     timestamp = new Date(`${keyStr}-01`).getTime();
@@ -1653,7 +1679,7 @@
 
             const ma7Series = [];
             const ma30Series = [];
-            if (timeframe === 'D') {
+            if (timeframe === 'D30' || timeframe === 'DALL') {
                 for (let i = 0; i < rawCloseData.length; i++) {
                     if (i >= 6) {
                         let sum = 0;
@@ -1671,31 +1697,40 @@
             return { candlestick: candlestickSeries, ma7: ma7Series, ma30: ma30Series };
         }
 
+        // 直近30日のデータ抽出ロジック（ベースデータは全期間保持してスライス）
         function getRecent30CandlestickData(timeframe) {
             const fullData = getAllTimeframeCandlestickData(timeframe);
-            const sliceCount = 30;
-            const slicedCandlestick = fullData.candlestick.slice(-sliceCount);
             
-            let slicedMa7 = [];
-            let slicedMa30 = [];
-            
-            if (slicedCandlestick.length > 0) {
-                const minTimestamp = slicedCandlestick[0].x;
-                slicedMa7 = fullData.ma7.filter(d => d.x >= minTimestamp);
-                slicedMa30 = fullData.ma30.filter(d => d.x >= minTimestamp);
+            if (timeframe === 'D30') {
+                const sliceCount = 30;
+                const slicedCandlestick = fullData.candlestick.slice(-sliceCount);
+                let slicedMa7 = [];
+                let slicedMa30 = [];
+                
+                if (slicedCandlestick.length > 0) {
+                    const minTimestamp = slicedCandlestick[0].x;
+                    slicedMa7 = fullData.ma7.filter(d => d.x >= minTimestamp);
+                    slicedMa30 = fullData.ma30.filter(d => d.x >= minTimestamp);
+                }
+                return { candlestick: slicedCandlestick, ma7: slicedMa7, ma30: slicedMa30 };
             }
 
-            return {
-                candlestick: slicedCandlestick,
-                ma7: slicedMa7,
-                ma30: slicedMa30
-            };
+            return fullData;
         }
 
         function initChart() {
             const defaultTimeframe = document.getElementById('range-selector').value;
             const dataObj = getRecent30CandlestickData(defaultTimeframe);
             updatePeriodExtremeValues(dataObj.candlestick);
+
+            // タイムフレームがD30の場合は、X軸の描画最小・最大値を明示的に絞り込む
+            let minX = undefined;
+            let maxX = undefined;
+            if (defaultTimeframe === 'D30' && dataObj.candlestick.length > 0) {
+                const latestX = dataObj.candlestick[dataObj.candlestick.length - 1].x;
+                minX = latestX - (30 * 24 * 60 * 60 * 1000); 
+                maxX = latestX + (0.5 * 24 * 60 * 60 * 1000); 
+            }
 
             const options = {
                 series: [
@@ -1720,7 +1755,7 @@
                 },
                 theme: { mode: 'dark' },
                 stroke: { width: [1, 2, 2], curve: 'smooth' },
-                colors: ['#2962ff', '#e91e63', '#08d158'],
+                colors: ['#2962ff', '#ff9f43', '#08d158'], // 7日移動平均のカラーを赤から「オレンジ(#ff9f43)」に変更
                 plotOptions: {
                     candlestick: {
                         colors: { upward: '#f23645', downward: '#08d158' },
@@ -1729,6 +1764,8 @@
                 },
                 xaxis: {
                     type: 'datetime',
+                    min: minX,
+                    max: maxX,
                     labels: {
                         style: { colors: '#848e9c', fontFamily: 'JetBrains Mono' },
                         datetimeFormatter: { year: 'yyyy年', month: 'yyyy/MM', day: 'MM/dd' }
@@ -1821,12 +1858,26 @@
 
             updatePeriodExtremeValues(dataObj.candlestick);
 
-            const finalMa7 = (timeframe === 'D') ? dataObj.ma7 : [];
-            const finalMa30 = (timeframe === 'D') ? dataObj.ma30 : [];
+            const isDaily = (timeframe === 'D30' || timeframe === 'DALL');
+            const finalMa7 = isDaily ? dataObj.ma7 : [];
+            const finalMa30 = isDaily ? dataObj.ma30 : [];
+
+            // 選択中の期間に応じてX軸表示の最小・最大を制御（30日分に正しくズームイン）
+            let minX = undefined;
+            let maxX = undefined;
+            if (timeframe === 'D30' && dataObj.candlestick.length > 0) {
+                const latestX = dataObj.candlestick[dataObj.candlestick.length - 1].x;
+                minX = latestX - (30 * 24 * 60 * 60 * 1000);
+                maxX = latestX + (0.5 * 24 * 60 * 60 * 1000);
+            }
 
             chart.updateOptions({
+                xaxis: {
+                    min: minX,
+                    max: maxX
+                },
                 series: [
-                    { name: (timeframe === 'D' ? '日足' : timeframe === 'W' ? '週足' : timeframe === 'M' ? '月足' : '年足'), type: 'candlestick', data: dataObj.candlestick },
+                    { name: (timeframe.startsWith('D') ? '日足' : timeframe === 'W' ? '週足' : timeframe === 'M' ? '月足' : '年足'), type: 'candlestick', data: dataObj.candlestick },
                     { name: '7日移動平均', type: 'line', data: finalMa7 },
                     { name: '30日移動平均', type: 'line', data: finalMa30 }
                 ]
@@ -1856,7 +1907,7 @@
             const m = String(dateObj.getMonth() + 1).padStart(2, '0');
             const d = String(dateObj.getDate()).padStart(2, '0');
 
-            if (tf === 'D') {
+            if (tf.startsWith('D')) {
                 return `${y}/${m}/${d}`;
             } else if (tf === 'W') {
                 const sundayObj = new Date(timestamp);
@@ -1914,18 +1965,19 @@
             document.getElementById('board-close').innerText = latestCandle.y[3].toFixed(1);
         }
 
+        // 新しいスコア連動ルール（0-59緑, 60-79青, 80-99金, 100虹）に基づきテーマを切り替え
         function updateThemeByScore(score) {
             const body = document.body;
-            body.classList.remove('theme-green', 'theme-blue', 'theme-gold', 'theme-gold-max');
+            body.classList.remove('theme-green', 'theme-blue', 'theme-gold', 'theme-rainbow');
 
-            if (score >= 0 && score <= 29) {
+            if (score >= 0 && score <= 59) {
                 body.classList.add('theme-green');
-            } else if (score >= 30 && score <= 59) {
-                body.classList.add('theme-blue');
             } else if (score >= 60 && score <= 79) {
+                body.classList.add('theme-blue');
+            } else if (score >= 80 && score <= 99) {
                 body.classList.add('theme-gold');
-            } else if (score >= 80 && score <= 100) {
-                body.classList.add('theme-gold-max');
+            } else if (score === 100) {
+                body.classList.add('theme-rainbow');
             }
         }
     </script>
