@@ -85,13 +85,8 @@
             animation: rainbow-text 3s linear infinite;
             text-shadow: none !important;
         }
-        body.theme-rainbow .card {
-            position: relative;
-            border: 1px solid transparent;
-            background-image: linear-gradient(var(--bg-card), var(--bg-card)), linear-gradient(135deg, #ff3366, #ff9933, #33cc66, #3399ff, #9933ff);
-            background-origin: border-box;
-            background-clip: padding-box, border-box;
-            box-shadow: 0 4px 20px rgba(255, 159, 67, 0.1);
+        body.theme-rainbow .tab-button.active {
+            color: #ff9f43;
         }
         body.theme-rainbow .breakdown-bar-fill {
             background: linear-gradient(90deg, #ff3366, #ff9933, #33cc66, #3399ff);
@@ -136,14 +131,11 @@
             transition: border-color 0.3s ease;
         }
 
-        .card {
+        /* インナーウィンドウ用のカードスタイル */
+        .inner-window {
             background-color: var(--bg-card);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            transition: border-color 0.4s ease, box-shadow 0.4s ease;
+            padding: 16px 0;
+            margin-bottom: 24px;
         }
 
         /* --- ナビゲーション --- */
@@ -151,7 +143,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
         .brand-title {
             font-size: 1.25rem;
@@ -179,12 +171,52 @@
             color: var(--text-bright);
         }
 
-        /* --- 入力フォーム（省スペース化調整） --- */
-        .recording-card {
-            padding: 12px 14px; /* パディングを少し縮小 */
+        /* --- タブレイアウトシステム --- */
+        .tab-navigation {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 16px;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            overflow: hidden;
         }
+        .tab-button {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 12px 6px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-button:hover {
+            color: var(--text-bright);
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+        .tab-button.active {
+            color: var(--accent-color);
+            border-bottom: 3px solid var(--accent-color);
+            background-color: rgba(255, 255, 255, 0.04);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* --- 入力フォーム --- */
         .form-group {
-            margin-bottom: 10px; /* 入力項目間の余白を12pxから10pxに縮小 */
+            margin-bottom: 14px;
+        }
+        .form-group.two-line-input {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
 
         input, select, textarea {
@@ -207,6 +239,14 @@
             font-family: var(--font-mono);
         }
         
+        /* 体重入力ボックスの特大化フォント設定 */
+        input.large-weight-field {
+            font-size: 1.5rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            padding: 12px;
+        }
+        
         textarea {
             resize: none;
         }
@@ -216,24 +256,27 @@
         }
         .weight-unit {
             position: absolute;
-            right: 12px;
+            right: 14px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-muted);
             font-family: var(--font-mono);
+            font-size: 1.2rem;
+            font-weight: 700;
+            pointer-events: none;
         }
         .btn-submit {
             width: 100%;
             background-color: var(--accent-color);
             color: #fff;
             border: none;
-            padding: 11px;
+            padding: 12px;
             border-radius: 8px;
             font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            margin-top: 2px;
+            margin-top: 4px;
         }
         .btn-submit:hover {
             background-color: var(--accent-color-hover);
@@ -326,14 +369,14 @@
             overflow: hidden;
             margin-bottom: 14px;
         }
-        .board-cell {
+        .board-grid-cell {
             background-color: var(--bg-input);
             padding: 9px 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .board-cell.full-width {
+        .board-grid-cell.full-width {
             grid-column: span 2;
         }
         .board-label {
@@ -350,58 +393,12 @@
             font-size: 0.85rem;
         }
 
-        /* --- グラフ下インジケーター --- */
-        .chart-bottom-indicators {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            padding: 10px 12px;
-            background-color: rgba(30, 34, 45, 0.4);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-        }
-        @media(min-width: 540px) {
-            .chart-bottom-indicators { grid-template-columns: repeat(3, 1fr); }
-        }
-        .indicator-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.75rem;
-            font-family: var(--font-mono);
-        }
-        @media(min-width: 540px) {
-            .indicator-item.full-mobile { grid-column: span 1; }
-        }
-        @media(max-width: 539px) {
-            .indicator-item.full-mobile { grid-column: span 2; }
-        }
-        .indicator-label {
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .indicator-value {
-            font-weight: 700;
-            color: var(--text-bright);
-        }
-        .ind-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 2px;
-            display: inline-block;
-        }
-        .ind-high { background-color: #ff6b76; }
-        .ind-center { background-color: var(--accent-color); transition: background-color 0.3s ease; }
-        .ind-low { background-color: #007aff; }
-
         /* --- Reportウィンドウ演出パーツ --- */
         .report-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 0;
             gap: 12px;
         }
         
@@ -473,15 +470,9 @@
             margin-left: 2px;
         }
 
-        .report-text {
-            font-size: 0.9rem;
-            line-height: 1.6;
-            color: var(--text-main);
-        }
-
         /* --- Reportウィンドウ内訳 --- */
         .score-breakdown {
-            margin-top: 16px;
+            margin-top: 14px;
             padding-top: 14px;
             border-top: 1px dashed var(--border-color);
             display: flex;
@@ -532,8 +523,7 @@
 
         /* --- 履歴リスト --- */
         .history-list {
-            margin: 0 -16px;
-            padding: 0 16px;
+            padding: 4px 0;
             max-height: none;
             overflow-y: visible;
         }
@@ -541,6 +531,7 @@
         .history-list.scroll-enabled {
             max-height: 420px;
             overflow-y: auto;
+            padding-right: 4px;
         }
 
         .history-item {
@@ -614,22 +605,6 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
-        }
-        .bmi-display-box {
-            background-color: var(--bg-input);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .bmi-value {
-            font-family: var(--font-mono);
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: var(--accent-color);
-            transition: color 0.3s ease;
         }
         .range-box {
             background-color: var(--bg-input);
@@ -708,7 +683,7 @@
         }
 
         .system-danger-zone {
-            margin-top: 24px;
+            margin-top: 12px;
             padding-top: 16px;
             border-top: 1px dashed var(--border-color);
             text-align: center;
@@ -756,6 +731,18 @@
             white-space: nowrap;
         }
         .toast.show { opacity: 1; transform: scale(1); }
+        
+        .report-text {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-bright);
+            white-space: pre-wrap;
+            margin-top: 14px;
+        }
     </style>
 </head>
 <body>
@@ -765,207 +752,194 @@
         <a href="howto.html" class="btn-help">📖 HOW TO</a>
     </div>
 
-    <div class="card recording-card">
-        <h2>Log Input</h2>
-        <form id="log-form" onsubmit="saveLog(event)">
-            <div class="form-group">
-                <input type="datetime-local" id="input-date" required>
-            </div>
-            <div class="form-group">
-                <div class="weight-input-container">
-                    <input type="number" id="input-weight" step="0.1" placeholder="Weight 例: 65.3 or 653">
-                    <span class="weight-unit">kg</span>
-                </div>
-            </div>
-            <div class="form-group">
-                <textarea id="input-memo" rows="1" placeholder="Memo（食事、運動、メモなど）"></textarea>
-            </div>
-            <button type="submit" class="btn-submit">Save Log</button>
-        </form>
+    <div class="tab-navigation">
+        <button class="tab-button active" onclick="switchTab('tab-record')">✍️ Input</button>
+        <button class="tab-button" onclick="switchTab('tab-chart')">📊 Chart</button>
+        <button class="tab-button" onclick="switchTab('tab-report')">📋 Log</button>
+        <button class="tab-button" onclick="switchTab('tab-manage')">⚙️ Setting</button>
     </div>
 
-    <div class="card">
-        <h2>Dashboard</h2>
-        
-        <div class="latest-summary-container">
-            <div class="summary-block">
-                <div class="summary-title">Weight</div>
-                <div class="summary-values">
-                    <span id="summary-weight" class="summary-main-weight">--</span>
-                    <span id="summary-diff" class="summary-diff diff-zero">--</span>
+    <div id="tab-record" class="tab-content active">
+        <div class="inner-window">
+            <form id="weight-form" onsubmit="saveLog(event)">
+                <div class="form-group">
+                    <input type="datetime-local" id="input-date" required>
                 </div>
-            </div>
-            <div class="summary-block right-align">
-                <div class="summary-title">BMI</div>
-                <div id="summary-bmi" class="summary-bmi-val">--</div>
-            </div>
-        </div>
-        
-        <div class="chart-controls">
-            <select id="range-selector" class="range-select" onchange="updateChart()">
-                <option value="D30" selected>日足 (直近30日)</option>
-                <option value="DALL">日足 (全期間)</option>
-                <option value="W">週足 (Weekly)</option>
-                <option value="M">月足 (Monthly)</option>
-                <option value="Y">年足 (Yearly)</option>
-            </select>
+                <div class="form-group two-line-input">
+                    <div class="weight-input-container">
+                        <input type="number" id="input-weight" step="0.1" placeholder="Weight 例: 59.2 or 592" min="10" max="300" class="large-weight-field">
+                        <span class="weight-unit">kg</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <textarea id="input-memo" rows="5" placeholder="Memo (食事、運動、メモなど)"></textarea>
+                </div>
+                <button type="submit" class="btn-submit">ログを保存</button>
+            </form>
         </div>
 
-        <div class="chart-wrapper">
-            <div id="main-chart"></div>
-        </div>
+        <div class="inner-window">
+            <h2>プロフィール & 目標設定</h2>
+            <div class="profile-layout" style="margin-top: 12px;">
+                <div class="range-box">
+                    <div class="range-title">📏 身長設定</div>
+                    <div class="form-group" style="display:flex; gap:10px; align-items:center; margin-bottom:0;">
+                        <input type="number" id="profile-height" step="0.1" value="170.0" style="flex:1;">
+                        <span style="color:var(--text-bright); font-weight:bold;">cm</span>
+                    </div>
+                </div>
 
-        <div class="board-grid">
-            <div class="board-cell full-width">
-                <span class="board-label">表示中の日付/期間</span>
-                <span id="board-date" class="board-value date">--</span>
-            </div>
-            <div class="board-cell">
-                <span class="board-label">始値 (最初)</span>
-                <span id="board-open" class="board-value">--</span>
-            </div>
-            <div class="board-cell">
-                <span class="board-label">終値 (最後)</span>
-                <span id="board-close" class="board-value">--</span>
-            </div>
-            <div class="board-cell">
-                <span class="board-label">最安値</span>
-                <span id="board-low" class="board-value">--</span>
-            </div>
-            <div class="board-cell">
-                <span class="board-label">最高値</span>
-                <span id="board-high" class="board-value">--</span>
-            </div>
-            <div class="board-cell">
-                <span class="board-label">期間内最高</span>
-                <span id="board-period-high" class="board-value">--</span>
-            </div>
-            <div class="board-cell">
-                <span class="board-label">期間内最安</span>
-                <span id="board-period-low" class="board-value">--</span>
-            </div>
-        </div>
+                <div class="range-box">
+                    <div class="range-title">🎯 目標体重設定</div>
+                    <div class="form-group" style="display:flex; gap:10px; align-items:center; margin-bottom:0;">
+                        <input type="number" id="profile-target-weight" step="0.1" value="63.5" style="flex:1;">
+                        <span style="color:var(--text-bright); font-weight:bold;">kg</span>
+                    </div>
+                </div>
 
-        <div class="chart-bottom-indicators">
-            <div class="indicator-item">
-                <span class="indicator-label"><span class="ind-dot ind-high"></span>適正上限 (BMI 25)</span>
-                <span id="board-target-high" class="indicator-value">--</span>
-            </div>
-            <div class="indicator-item">
-                <span class="indicator-label"><span class="ind-dot ind-center"></span>理想中心 (BMI 22)</span>
-                <span id="board-target-center" class="indicator-value">--</span>
-            </div>
-            <div class="indicator-item full-mobile">
-                <span class="indicator-label"><span class="ind-dot ind-low"></span>適正下限 (BMI 18.5)</span>
-                <span id="board-target-low" class="indicator-value">--</span>
+                <button class="btn-profile-save" onclick="saveProfile()">保存して再計算</button>
             </div>
         </div>
     </div>
 
-    <div class="card">
-        <h2>Report</h2>
-        
-        <div class="report-header">
-            <div id="status-badge-box" class="status-badge-box badge-box-loading">
-                Analyzing...
-            </div>
-            <div class="score-container">
-                <span class="score-label">SCORE</span>
-                <div class="score-num-wrap">
-                    <span id="score-display" class="score-value">--</span>
-                    <span class="score-max">/100</span>
+    <div id="tab-chart" class="tab-content">
+        <div class="inner-window">
+            <h2>テクニカル・ヘルスレポート</h2>
+            <div class="report-header" style="margin-top: 12px;">
+                <div id="status-badge-box" class="status-badge-box badge-box-loading">分析中...</div>
+                <div class="score-container">
+                    <span class="score-label">HEALTH SCORE</span>
+                    <div class="score-num-wrap">
+                        <span id="score-display" class="score-value">--</span>
+                        <span class="score-max">/100</span>
+                    </div>
                 </div>
+            </div>
+            <div id="report-box" class="report-text">ローディング中...</div>
+            <div id="report-breakdown" class="score-breakdown">
             </div>
         </div>
-        
-        <div id="report-box" class="report-text">
-            データを入力すると、客観的なテクニカル分析がここに表示されます。
-        </div>
 
-        <div id="report-breakdown" class="score-breakdown" style="display: none;"></div>
-    </div>
-
-    <div class="card">
-        <h2>
-            Log History
-            <button id="btn-toggle-history" class="btn-toggle-view" onclick="toggleHistoryView()">表示切替</button>
-        </h2>
-        <div id="history-container" class="history-list"></div>
-        
-        <div class="hint-text">※ 日時部分を長押しで削除できます</div>
-    </div>
-
-    <div class="card">
-        <h2>Profile</h2>
-        <div class="profile-layout">
-            <div class="form-group">
-                <label for="profile-height">身長 (cm)</label>
-                <input type="number" id="profile-height" step="0.1" value="170.0">
-                <button type="button" class="btn-profile-save" onclick="saveProfile()">設定を保存</button>
-            </div>
-            
-            <div class="bmi-display-box">
-                <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">現在の算出BMI</span>
-                <span id="current-bmi-value" class="bmi-value">--</span>
+        <div class="inner-window">
+            <div class="latest-summary-container">
+                <div class="summary-block">
+                    <span class="summary-title">最新確定値</span>
+                    <div class="summary-values">
+                        <span id="summary-weight" class="summary-main-weight">--</span>
+                        <span id="summary-diff" class="summary-diff diff-zero">--</span>
+                    </div>
+                </div>
+                <div class="summary-block right-align">
+                    <span class="summary-title">BMI</span>
+                    <div id="summary-bmi" class="summary-bmi-val">--</div>
+                </div>
             </div>
 
-            <div class="range-box">
-                <div class="range-title">算出された適正範囲 (BMI基準)</div>
-                
-                <div class="range-block">
-                    <span class="range-label">理想の中心値 (BMI 22):</span>
-                    <span id="range-bmi-220" class="range-val">-- kg</span>
+            <div class="chart-controls">
+                <select id="range-selector" class="range-select" onchange="updateChart()">
+                    <option value="D30" selected>日足 (直近30日)</option>
+                    <option value="DALL">日足 (全期間)</option>
+                    <option value="W">週足 (Weekly)</option>
+                    <option value="M">月足 (Monthly)</option>
+                    <option value="Y">年足 (Yearly)</option>
+                </select>
+            </div>
+
+            <div class="chart-wrapper">
+                <div id="main-chart"></div>
+            </div>
+
+            <div class="board-grid">
+                <div class="board-grid-cell full-width">
+                    <span class="board-label">表示中の日付/期間</span>
+                    <span id="board-date" class="board-value date">--</span>
                 </div>
-                
-                <div class="range-block">
-                    <span class="range-label">優良範囲 (BMI 21 - 23):</span>
-                    <span id="range-bmi-good" class="range-val">-- kg</span>
+                <div class="board-grid-cell">
+                    <span class="board-label">始値 (最初)</span>
+                    <span id="board-open" class="board-value">--</span>
                 </div>
-                
-                <div class="range-block">
-                    <span class="range-label">一般適正範囲 (BMI 18.5 - 25):</span>
-                    <span id="range-bmi-normal" class="range-val">-- kg</span>
+                <div class="board-grid-cell">
+                    <span class="board-label">終値 (最後)</span>
+                    <span id="board-close" class="board-value">--</span>
+                </div>
+                <div class="board-grid-cell">
+                    <span class="board-label">最安値</span>
+                    <span id="board-low" class="board-value">--</span>
+                </div>
+                <div class="board-grid-cell">
+                    <span class="board-label">最高値</span>
+                    <span id="board-high" class="board-value">--</span>
+                </div>
+                <div class="board-grid-cell">
+                    <span class="board-label">期間内最高</span>
+                    <span id="board-period-high" class="board-value">--</span>
+                </div>
+                <div class="board-grid-cell">
+                    <span class="board-label">期間内最安</span>
+                    <span id="board-period-low" class="board-value">--</span>
+                </div>
+            </div>
+
+            <div class="inner-window" style="border-top: 1px dashed var(--border-color); padding-top: 20px;">
+                <div class="range-box">
+                    <div class="range-title">🎯 あなたの適正体重範囲</div>
+                    <div class="range-block">
+                        <span class="range-label">🟢 理想値（BMI 22.0）</span>
+                        <span id="range-center" class="range-val">-- kg</span>
+                    </div>
+                    <div class="range-block">
+                        <span class="range-label">💛 優良範囲（BMI 21.0-23.0）</span>
+                        <span id="range-good-zone" class="range-val">-- kg</span>
+                    </div>
+                    <div class="range-block">
+                        <span class="range-label">🔵 一般適正範囲（BMI 18.5-25.0）</span>
+                        <span id="range-normal-zone" class="range-val">-- kg</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="card">
-        <h2>Data Backup</h2>
-        <div class="backup-flex">
-            <button class="btn-backup" onclick="exportDataJSON()">📤 JSONエクスポート</button>
-            <button class="btn-backup" onclick="document.getElementById('file-input').click()">📥 JSONインポート</button>
-            <input type="file" id="file-input" accept=".json" onchange="importDataJSON(event)">
+    <div id="tab-report" class="tab-content">
+        <div class="inner-window">
+            <h2 style="margin-bottom: 12px;">
+                タイムライン履歴
+                <button id="btn-toggle-history" class="btn-toggle-view" onclick="toggleHistoryScroll()">スクロール化</button>
+            </h2>
+            <div id="history-container" class="history-list">
+            </div>
+            <div class="hint-text">※日付を長押し（右クリック）で対象ログを削除可能</div>
         </div>
     </div>
 
-    <div class="system-danger-zone">
-        <button class="btn-danger-reset" onclick="resetAllData()">🗑️ すべてのデータをリセット</button>
+    <div id="tab-manage" class="tab-content">
+        <div class="inner-window">
+            <h2>システム管理 & バックアップ</h2>
+            <div class="profile-layout" style="margin-top: 12px;">
+                <div class="range-box">
+                    <div class="range-title">💾 データのバックアップ</div>
+                    <div class="backup-flex">
+                        <button class="btn-backup" onclick="exportData()">📤 エクスポート</button>
+                        <button class="btn-backup" onclick="document.getElementById('file-input').click()">📥 インポート</button>
+                    </div>
+                    <input type="file" id="file-input" onchange="importData(event)" accept=".json">
+                </div>
+                <div class="system-danger-zone">
+                    <button class="btn-danger-reset" onclick="resetAllData()">⚠️ 全データを初期化する</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="toast-container"></div>
 
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('ServiceWorker 登録成功', reg.scope))
-                    .catch(err => console.log('ServiceWorker 登録失敗', err));
-            });
-        }
-
+        // グローバルデータ
         let logs = [];
         let chart = null;
-        let profile = { height: 170.0 };
         let isHistoryScrollEnabled = false;
-
-        let computedRanges = {
-            center: 22,
-            goodMin: 21,
-            goodMax: 23,
-            normalMin: 18.5,
-            normalMax: 25
-        };
+        let profile = { height: 170.0, targetWeight: 63.5, targetBmi: 22, normalMin: 18.5, normalMax: 25 };
+        let computedRanges = {};
 
         window.addEventListener('DOMContentLoaded', () => {
             initDateTime();
@@ -975,7 +949,43 @@
             renderHistory();
             initChart();
             generateReport();
+            
+            // 体重入力のリアルタイム小数点自動補正リスナー
+            const weightInput = document.getElementById('input-weight');
+            if (weightInput) {
+                weightInput.addEventListener('blur', function() {
+                    let val = parseFloat(this.value);
+                    if (!isNaN(val) && val >= 300) {
+                        let corrected = parseFloat((val / 10).toFixed(1));
+                        this.value = corrected;
+                        showToast(`数値を ${corrected} kg に自動補正しました`);
+                    }
+                });
+            }
         });
+
+        // タブ切り替えロジック
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+
+            const tabButtons = document.querySelectorAll('.tab-navigation .tab-button');
+            if (tabId === 'tab-record') tabButtons[0].classList.add('active');
+            if (tabId === 'tab-chart') tabButtons[1].classList.add('active');
+            if (tabId === 'tab-report') tabButtons[2].classList.add('active');
+            if (tabId === 'tab-manage') tabButtons[3].classList.add('active');
+
+            if (tabId === 'tab-chart' && chart) {
+                setTimeout(() => {
+                    chart.windowResizeHandler();
+                }, 50);
+            }
+        }
 
         function initDateTime() {
             const now = new Date();
@@ -1014,134 +1024,115 @@
             if (storedProfile) {
                 profile = JSON.parse(storedProfile);
                 document.getElementById('profile-height').value = profile.height;
+                if(profile.targetWeight) {
+                    document.getElementById('profile-target-weight').value = profile.targetWeight;
+                }
             }
         }
 
         function saveProfile() {
             const heightInput = document.getElementById('profile-height').value;
-            profile.height = parseFloat(heightInput) || 170.0;
-            localStorage.setItem('weight_profile', JSON.stringify(profile));
+            const targetWeightInput = document.getElementById('profile-target-weight').value;
             
-            showToast("身長を保存しました");
+            profile.height = parseFloat(heightInput) || 170.0;
+            profile.targetWeight = parseFloat(targetWeightInput) || 63.5;
+            
+            localStorage.setItem('weight_profile', JSON.stringify(profile));
+            showToast("設定を保存しました");
+            
             calculateRanges();
             generateReport();
             if (chart) {
-                updateChart(); 
+                updateChart();
             }
         }
 
         function calculateRanges() {
             const hMeter = profile.height / 100;
             const hSquare = hMeter * hMeter;
-
+            
             const r185 = (hSquare * 18.5).toFixed(1);
             const r210 = (hSquare * 21.0).toFixed(1);
             const r220 = (hSquare * 22.0).toFixed(1);
             const r230 = (hSquare * 23.0).toFixed(1);
             const r250 = (hSquare * 25.0).toFixed(1);
 
-            document.getElementById('range-bmi-220').innerText = `${r220} kg`;
-            document.getElementById('range-bmi-good').innerText = `${r210} - ${r230} kg`;
-            document.getElementById('range-bmi-normal').innerText = `${r185} - ${r250} kg`;
+            computedRanges = {
+                center: parseFloat(r220),
+                goodMin: parseFloat(r210),
+                goodMax: parseFloat(r230),
+                normalMin: parseFloat(r185),
+                normalMax: parseFloat(r250)
+            };
 
-            document.getElementById('board-target-high').innerText = `${r250}kg`;
-            document.getElementById('board-target-center').innerText = `${r220}kg`;
-            document.getElementById('board-target-low').innerText = `${r185}kg`;
-
-            computedRanges.center = hSquare * 22.0;
-            computedRanges.goodMin = hSquare * 21.0;
-            computedRanges.goodMax = hSquare * 23.0;
-            computedRanges.normalMin = hSquare * 18.5;
-            computedRanges.normalMax = hSquare * 25.0;
-
-            updateBMIDisplay();
-        }
-
-        function updateBMIDisplay() {
-            const bmiValueEl = document.getElementById('current-bmi-value');
-            const summaryBmiEl = document.getElementById('summary-bmi');
-            const validWeightLogs = logs.filter(l => l.weight !== null && l.weight !== undefined && !isNaN(l.weight));
-            
-            if (validWeightLogs.length === 0) {
-                bmiValueEl.innerText = "--";
-                summaryBmiEl.innerText = "--";
-                return;
-            }
-
-            const latestWeight = validWeightLogs[validWeightLogs.length - 1].weight;
-            const hMeter = profile.height / 100;
-            const currentBMI = latestWeight / (hMeter * hMeter);
-            
-            const bmiString = currentBMI.toFixed(1);
-            bmiValueEl.innerText = bmiString;
-            summaryBmiEl.innerText = bmiString;
+            document.getElementById('range-center').innerText = `${r220} kg`;
+            document.getElementById('range-good-zone').innerText = `${r210} ～ ${r230} kg`;
+            document.getElementById('range-normal-zone').innerText = `${r185} ～ ${r250} kg`;
         }
 
         function updateSummaryIndicator() {
             const weightEl = document.getElementById('summary-weight');
             const diffEl = document.getElementById('summary-diff');
-            const validWeightLogs = logs.filter(l => l.weight !== null && l.weight !== undefined && !isNaN(l.weight));
+            const bmiEl = document.getElementById('summary-bmi');
 
+            const validWeightLogs = logs.filter(l => l.weight !== null && l.weight !== undefined && !isNaN(l.weight));
+            
             if (validWeightLogs.length === 0) {
                 weightEl.innerText = "--";
                 diffEl.innerText = "--";
                 diffEl.className = "summary-diff diff-zero";
+                bmiEl.innerText = "--";
                 return;
             }
 
             const latestLog = validWeightLogs[validWeightLogs.length - 1];
             weightEl.innerText = latestLog.weight.toFixed(1);
 
+            const hMeter = profile.height / 100;
+            const bmiVal = (latestLog.weight / (hMeter * hMeter)).toFixed(1);
+            bmiEl.innerText = bmiVal;
+
             if (validWeightLogs.length >= 2) {
                 const prevLog = validWeightLogs[validWeightLogs.length - 2];
                 const diff = latestLog.weight - prevLog.weight;
-                const formattedDiff = diff > 0 ? `+${diff.toFixed(1)}` : diff.toFixed(1);
-
-                diffEl.innerText = formattedDiff;
-
                 if (diff > 0) {
+                    diffEl.innerText = `+${diff.toFixed(1)} kg`;
                     diffEl.className = "summary-diff diff-plus";
                 } else if (diff < 0) {
+                    diffEl.innerText = `${diff.toFixed(1)} kg`;
                     diffEl.className = "summary-diff diff-minus";
                 } else {
+                    diffEl.innerText = "±0.0 kg";
                     diffEl.className = "summary-diff diff-zero";
                 }
             } else {
-                diffEl.innerText = "First";
+                diffEl.innerText = "前比なし";
                 diffEl.className = "summary-diff diff-zero";
             }
-
-            updateBMIDisplay();
         }
 
         function saveLog(e) {
             e.preventDefault();
-            const dateVal = document.getElementById('input-date').value;
-            const weightInputRaw = document.getElementById('input-weight').value;
-            const memoVal = document.getElementById('input-memo').value;
+            const dateInput = document.getElementById('input-date').value;
+            const weightInput = document.getElementById('input-weight');
+            const memoInput = document.getElementById('input-memo');
 
-            if (!dateVal) return;
+            let weightVal = parseFloat(weightInput.value);
 
-            let weightVal = null;
-            if (weightInputRaw !== '') {
-                weightVal = parseFloat(weightInputRaw);
-                if (weightVal >= 100) {
-                    const converted = parseFloat((weightVal / 10).toFixed(1));
-                    showToast(`自動補正: ${weightVal} → ${converted}`);
-                    weightVal = converted;
-                }
+            if (!isNaN(weightVal) && weightVal >= 300) {
+                weightVal = parseFloat((weightVal / 10).toFixed(1));
             }
 
-            if (weightVal === null && memoVal.trim() === '') {
-                showToast("データが空です");
+            if (isNaN(weightVal)) {
+                showToast("有効な体重を入力してください");
                 return;
             }
 
             const newLog = {
                 id: Date.now(),
-                date: dateVal,
-                weight: weightVal, 
-                memo: memoVal
+                date: dateInput,
+                weight: weightVal,
+                memo: memoInput.value.trim()
             };
 
             logs.push(newLog);
@@ -1149,96 +1140,64 @@
             localStorage.setItem('weight_logs', JSON.stringify(logs));
 
             showToast("ログを保存しました");
-            document.getElementById('input-weight').value = '';
-            document.getElementById('input-memo').value = '';
-            initDateTime();
+            weightInput.value = "";
+            memoInput.value = "";
 
             updateSummaryIndicator();
             renderHistory();
-            updateChart();
             generateReport();
-        }
-
-        function showToast(message) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerText = message;
-            
-            toast.addEventListener('click', () => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 250);
-            });
-
-            container.appendChild(toast);
-            setTimeout(() => toast.classList.add('show'), 10);
-
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.classList.remove('show');
-                    setTimeout(() => toast.remove(), 250);
-                }
-            }, 3000);
-        }
-
-        function toggleHistoryView() {
-            isHistoryScrollEnabled = !isHistoryScrollEnabled;
-            
-            const container = document.getElementById('history-container');
-            const toggleBtn = document.getElementById('btn-toggle-history');
-            
-            if (isHistoryScrollEnabled) {
-                container.classList.add('scroll-enabled');
-                toggleBtn.classList.add('active');
-            } else {
-                container.classList.remove('scroll-enabled');
-                toggleBtn.classList.remove('active');
+            if (chart) {
+                updateChart();
             }
-            
-            renderHistory();
+            initDateTime();
         }
 
         function renderHistory() {
             const container = document.getElementById('history-container');
-            const toggleBtn = document.getElementById('btn-toggle-history');
-            container.innerHTML = '';
+            container.innerHTML = "";
 
             if (logs.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.9rem;">データがありません</div>';
-                if (toggleBtn) toggleBtn.style.display = 'none';
+                container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);">データがありません</div>';
                 return;
             }
 
-            if (logs.length > 5) {
-                if (toggleBtn) toggleBtn.style.display = 'inline-block';
-            } else {
-                if (toggleBtn) toggleBtn.style.display = 'none';
-            }
-
-            let reversedLogs = [...logs].reverse();
-
-            if (!isHistoryScrollEnabled && reversedLogs.length > 5) {
-                reversedLogs = reversedLogs.slice(0, 5);
-            }
+            const reversedLogs = [...logs].reverse();
 
             reversedLogs.forEach(log => {
                 const item = document.createElement('div');
-                item.className = 'history-item';
+                item.className = "history-item";
 
-                const formattedDate = log.date.replace('T', ' ');
+                let pressTimer;
+                const startPress = () => {
+                    pressTimer = setTimeout(() => {
+                        confirmDelete(log.id);
+                    }, 800);
+                };
+                const cancelPress = () => {
+                    clearTimeout(pressTimer);
+                };
+
+                item.addEventListener('mousedown', startPress);
+                item.addEventListener('touchstart', startPress, {passive: true});
+                item.addEventListener('mouseup', cancelPress);
+                item.addEventListener('mouseleave', cancelPress);
+                item.addEventListener('touchend', cancelPress);
+                item.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    confirmDelete(log.id);
+                });
 
                 const meta = document.createElement('div');
-                meta.className = 'history-meta';
+                meta.className = "history-meta";
 
+                const dateStr = log.date.replace('T', ' ');
                 const dateEl = document.createElement('span');
-                dateEl.className = 'history-date';
-                dateEl.innerHTML = `📅 ${formattedDate}`;
-                
-                setupLongPress(dateEl, log.id);
+                dateEl.className = "history-date";
+                dateEl.innerText = dateStr;
 
                 const weightEl = document.createElement('span');
-                weightEl.className = 'history-weight';
-                weightEl.innerText = (log.weight !== null && log.weight !== undefined) ? log.weight.toFixed(1) : '';
+                weightEl.className = "history-weight";
+                weightEl.innerText = `${log.weight.toFixed(1)} kg`;
 
                 meta.appendChild(dateEl);
                 meta.appendChild(weightEl);
@@ -1246,7 +1205,7 @@
 
                 if (log.memo) {
                     const memoEl = document.createElement('div');
-                    memoEl.className = 'history-memo';
+                    memoEl.className = "history-memo";
                     memoEl.innerText = log.memo;
                     item.appendChild(memoEl);
                 }
@@ -1255,680 +1214,242 @@
             });
         }
 
-        function setupLongPress(element, id) {
-            let pressTimer;
-            const startPress = (e) => { pressTimer = setTimeout(() => { deleteLogConfirm(id); }, 800); };
-            const cancelPress = () => { clearTimeout(pressTimer); };
-
-            element.addEventListener('mousedown', startPress);
-            element.addEventListener('mouseup', cancelPress);
-            element.addEventListener('mouseleave', cancelPress);
-            element.addEventListener('touchstart', startPress, { passive: true });
-            element.addEventListener('touchend', cancelPress, { passive: true });
-            element.addEventListener('touchcancel', cancelPress, { passive: true });
-        }
-
-        function deleteLogConfirm(id) {
-            const logItem = logs.find(l => l.id === id);
-            if (!logItem) return;
-
-            const displayWeight = logItem.weight ? `${logItem.weight}` : "メモのみ";
-            if (confirm(`【確認】\n${logItem.date.replace('T', ' ')} のログ(${displayWeight}) を削除しますか？`)) {
+        function confirmDelete(id) {
+            if (confirm("このログを削除しますか？")) {
                 logs = logs.filter(l => l.id !== id);
                 localStorage.setItem('weight_logs', JSON.stringify(logs));
-                showToast("データが削除されました");
-                
+                showToast("ログを削除しました");
                 updateSummaryIndicator();
                 renderHistory();
-                updateChart();
                 generateReport();
-            }
-        }
-
-        function resetAllData() {
-            if (confirm("【警告】\nすべてのサンプルデータおよび記録ログを完全に消去しますか？この操作は戻せません。")) {
-                if (confirm("本当に本当によろしいですか？（すべての履歴が空になります）")) {
-                    logs = [];
-                    localStorage.setItem('weight_logs', JSON.stringify(logs));
-                    showToast("すべてのデータをクリアしました");
-                    
-                    isHistoryScrollEnabled = false;
-                    const container = document.getElementById('history-container');
-                    container.classList.remove('scroll-enabled');
-                    const toggleBtn = document.getElementById('btn-toggle-history');
-                    if (toggleBtn) toggleBtn.classList.remove('active');
-                    
-                    updateSummaryIndicator();
-                    renderHistory();
-                    
-                    if (chart) {
-                        chart.destroy();
-                        chart = null;
-                    }
-                    initChart();
-                    generateReport();
+                if (chart) {
+                    updateChart();
                 }
             }
         }
 
-        function exportDataJSON() {
-            if (logs.length === 0) {
-                showToast("エクスポートするデータがありません");
-                return;
-            }
-            
-            const dataStr = JSON.stringify(logs, null, 2);
-            const blob = new Blob([dataStr], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            
-            const now = new Date();
-            const dateStr = now.toISOString().slice(0,10).replace(/-/g, '');
-            
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.href = url;
-            downloadAnchor.download = `mylog_backup_${dateStr}.json`;
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            document.body.removeChild(downloadAnchor);
-            URL.revokeObjectURL(url);
-            
-            showToast("JSONファイルをエクスポートしました");
-        }
+        function toggleHistoryScroll() {
+            const container = document.getElementById('history-container');
+            const btn = document.getElementById('btn-toggle-history');
+            isHistoryScrollEnabled = !isHistoryScrollEnabled;
 
-        function importDataJSON(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const parsedData = JSON.parse(e.target.result);
-                    if (!Array.isArray(parsedData)) {
-                        throw new Error("データが配列形式ではありません。");
-                    }
-                    if (parsedData.length > 0 && (!parsedData[0].hasOwnProperty('date') || !parsedData[0].hasOwnProperty('weight'))) {
-                        throw new Error("ログデータの形式が正しくありません。");
-                    }
-
-                    if (confirm(`【バックアップ復元】\nファイルから ${parsedData.length} 件のログを読み込みました。\n現在のブラウザのデータは上書きされますが、よろしいですか？`)) {
-                        logs = parsedData;
-                        logs.sort((a, b) => new Date(a.date) - new Date(b.date));
-                        localStorage.setItem('weight_logs', JSON.stringify(logs));
-                        
-                        showToast("バックアップデータを復元しました");
-                        
-                        isHistoryScrollEnabled = false;
-                        document.getElementById('history-container').classList.remove('scroll-enabled');
-                        const toggleBtn = document.getElementById('btn-toggle-history');
-                        if (toggleBtn) toggleBtn.classList.remove('active');
-                        
-                        updateSummaryIndicator();
-                        renderHistory();
-                        
-                        if (chart) {
-                            chart.destroy();
-                            chart = null;
-                        }
-                        initChart();
-                        generateReport();
-                    }
-                } catch (error) {
-                    alert(`【エラー】インポートに失敗しました。\n原因: ${error.message}`);
-                } finally {
-                    document.getElementById('file-input').value = "";
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function generateReport() {
-            const badgeBox = document.getElementById('status-badge-box');
-            const scoreDisplay = document.getElementById('score-display');
-            const reportBox = document.getElementById('report-box');
-            const breakdownBox = document.getElementById('report-breakdown');
-            
-            const validWeightLogs = logs.filter(l => l.weight !== null && l.weight !== undefined);
-
-            if (validWeightLogs.length === 0) {
-                badgeBox.className = "status-badge-box badge-box-review";
-                badgeBox.innerText = "⚠️ データ不足";
-                scoreDisplay.innerText = "0";
-                reportBox.innerText = "データが未登録です。ログを記録するとテクニカル分析が開始されます。";
-                breakdownBox.style.display = "none";
-                
-                document.body.className = ''; 
-                return;
-            }
-
-            const latest = validWeightLogs[validWeightLogs.length - 1];
-            const currentWeight = latest.weight;
-
-            let score_activity = 0;   
-            let score_condition = 0;  
-
-            const today = new Date();
-            const hMeter = profile.height / 100;
-            const hSquare = hMeter * hMeter;
-            const currentBMI = currentWeight / hSquare;
-
-            const logCountPerDay = {};
-            for (let i = 1; i <= 7; i++) {
-                const d = new Date();
-                d.setDate(today.getDate() - i);
-                const dateStr = d.toISOString().split('T')[0];
-                logCountPerDay[dateStr] = 0;
-            }
-
-            logs.forEach(l => {
-                const logDateStr = l.date.split('T')[0];
-                if (logCountPerDay.hasOwnProperty(logDateStr)) {
-                    logCountPerDay[logDateStr]++;
-                }
-            });
-
-            Object.keys(logCountPerDay).forEach(dateStr => {
-                const count = logCountPerDay[dateStr];
-                if (count === 1) score_activity += 4; 
-                if (count >= 2) score_activity += 8; 
-            });
-
-            if (score_activity > 50) score_activity = 50; 
-
-            const dailyDataObj = getAllTimeframeCandlestickData('DALL');
-            const ma7List = dailyDataObj.ma7;
-            const ma30List = dailyDataObj.ma30;
-
-            let ma7PerfectGood = true;   
-            let ma7PerfectNormal = true; 
-            let ma30PerfectGood = true;  
-            
-            let ma7CheckedDays = 0;
-            let ma30CheckedDays = 0;
-
-            for (let i = 0; i < 7; i++) {
-                const targetIdx = ma7List.length - 1 - i;
-                if (targetIdx >= 0) {
-                    ma7CheckedDays++;
-                    const ma7Val = ma7List[targetIdx].y;
-                    const bmi = ma7Val / hSquare;
-                    if (bmi < 21.0 || bmi > 23.0) ma7PerfectGood = false;
-                    if (bmi < 18.5 || bmi > 25.0) ma7PerfectNormal = false;
-                } else {
-                    ma7PerfectGood = false;
-                    ma7PerfectNormal = false;
-                }
-
-                const targetIdx30 = ma30List.length - 1 - i;
-                if (targetIdx30 >= 0) {
-                    ma30CheckedDays++;
-                    const ma30Val = ma30List[targetIdx30].y;
-                    const bmi30 = ma30Val / hSquare;
-                    if (bmi30 < 21.0 || bmi30 > 23.0) ma30PerfectGood = false;
-                } else {
-                    ma30PerfectGood = false;
-                }
-            }
-
-            if (ma7CheckedDays >= 7 && ma7PerfectGood) {
-                score_condition = 40;     
-            } else if (ma7CheckedDays >= 7 && ma7PerfectNormal) {
-                score_condition = 30;     
+            if (isHistoryScrollEnabled) {
+                container.classList.add('scroll-enabled');
+                btn.classList.add('active');
+                btn.innerText = "全表示";
             } else {
-                score_condition = 10;     
+                container.classList.remove('scroll-enabled');
+                btn.classList.remove('active');
+                btn.innerText = "スクロール化";
             }
-
-            let hasMa30Bonus = false;
-            if (ma30CheckedDays >= 7 && ma30PerfectGood) {
-                score_condition += 10;
-                hasMa30Bonus = true;
-            }
-
-            const totalScore = score_activity + score_condition;
-            scoreDisplay.innerText = totalScore;
-
-            updateThemeByScore(totalScore);
-
-            if (chart) {
-                updateChartAnnotations();
-            }
-
-            let volatilityHigh = false;
-            let maxVolDiffPct = 0; 
-            const latestTime = new Date(latest.date).getTime();
-            const fortyEightHours = 48 * 60 * 60 * 1000;
-
-            const pastLogsIn48h = validWeightLogs.filter(l => {
-                const logTime = new Date(l.date).getTime();
-                return l.id !== latest.id && (latestTime - logTime) >= 0 && (latestTime - logTime) <= fortyEightHours;
-            });
-
-            if (pastLogsIn48h.length > 0) {
-                const basePastLog = pastLogsIn48h[pastLogsIn48h.length - 1];
-                const diffPct = ((currentWeight - basePastLog.weight) / basePastLog.weight) * 100;
-                if (Math.abs(diffPct) >= 2.0) {
-                    volatilityHigh = true;
-                    maxVolDiffPct = diffPct;
-                }
-            }
-
-            let orbitText = "保ち合い";
-            if (validWeightLogs.length >= 5) {
-                const recent5 = validWeightLogs.slice(-5);
-                const diff5 = recent5[4].weight - recent5[0].weight;
-                if (diff5 < -0.4) orbitText = "下落基調";
-                if (diff5 > 0.4) orbitText = "上昇基調";
-            }
-
-            let positionText = "適正範囲内";
-            let statusClass = 'badge-box-fair';
-            let commentText = "";
-
-            if (currentBMI < 18.5) {
-                positionText = "低体重";
-                statusClass = 'badge-box-review';
-                commentText = `国内成人の約1割が属する低体重域に位置。チャートは${orbitText}を示しており、理想中心線（BMI22）を下回る水準での推移が続いています。`;
-            } else if (currentBMI >= 18.5 && currentBMI < 21.0) {
-                positionText = "適正(下限接近)";
-                statusClass = 'badge-box-fair';
-                commentText = `成人人口の約65%を占める主要レンジ内ですが、下限寄りにプロット。現在は${orbitText}を形成し、中心線への収束力を測る局面です。`;
-            } else if (currentBMI >= 21.0 && currentBMI <= 23.0) {
-                positionText = "理想中心(優良)";
-                statusClass = 'badge-box-prime';
-                commentText = `主要レンジ内で最も均衡が取れたコアゾーン（BMI22付近）に定着。ローソク足は${orbitText}を描き、極めて安定した相場環境を維持しています。`;
-            } else if (currentBMI > 23.0 && currentBMI <= 25.0) {
-                positionText = "適正(上限接近)";
-                statusClass = 'badge-box-fair';
-                commentText = `主要レンジ内ですが上限寄りにプロット。チャートは${orbitText}を形成しており、中心線（BMI22）への回帰・収束を待つ状態です。`;
-            } else {
-                positionText = "要調整";
-                statusClass = 'badge-box-review';
-                commentText = `国内成人の約25%が属する過剰積載域にプロット。現在は${orbitText}を示しており、上位足における抵抗線のブレイク状況を注視する局面です。`;
-            }
-
-            if (volatilityHigh) {
-                statusClass = 'badge-box-volatility';
-                positionText = "⚠️ ボラティリティ高";
-                
-                const formattedPct = maxVolDiffPct > 0 ? `+${maxVolDiffPct.toFixed(1)}` : `${maxVolDiffPct.toFixed(1)}`;
-                if (maxVolDiffPct < 0) {
-                    commentText = `48時間以内の急激な下方乖離（${formattedPct}%）を検知。構造的な企業価値（体組成）の毀損ではなく、一時的な資産の流動化（水分減少）に伴う帳簿上のノイズの可能性が濃厚です。指標の信頼性が一時的に低下しているため、突発的な値動きに惑わされず、定時打刻によるデータ蓄積を継続すべきフェーズです。`;
-                } else {
-                    commentText = `48時間以内の想定レンジを上抜ける急騰（${formattedPct}%）を観測。本質的なアセットの増価ではなく、一時的な内部留保（水分貯留）の膨張による見かけ上のスパイクと判断されます。数日以内に適正レーティングへ収束する蓋然性が高ため、一過性のオーバーヒートを静観し、監査体制を維持してください。`;
-                }
-            }
-
-            badgeBox.className = `status-badge-box ${statusClass}`;
-            badgeBox.innerText = positionText;
-            reportBox.innerText = commentText;
-
-            const activityPct = (score_activity / 50) * 100;
-            const conditionPct = (score_condition / 50) * 100;
-
-            let activityHint = `昨日以前の7日間の打刻実績（1日1回+4点 / 2回以上+8点）。ほぼ毎日朝晩の入力で満点（50点）に到達し、継続しやすい仕組みに設計されています。`;
-
-            let conditionHint = `直近7日間の移動平均（MA7）が適正〜優良ゾーンにプロットされているかを判定。`;
-            if (hasMa30Bonus) {
-                conditionHint = `💎 【長期維持ボーナス獲得】 MA30も優良範囲をキープしています。`;
-            } else if (score_condition >= 40) {
-                conditionHint = `MA7は優良。過去7日間のMA30もすべて優良範囲に入ると長期維持ボーナス（+10点）が付与されます。`;
-            }
-
-            breakdownBox.innerHTML = `
-                <div class="breakdown-item">
-                    <div class="breakdown-meta">
-                        <span class="breakdown-label">①データ密度（ログ・アクティビティ）</span>
-                        <span class="breakdown-points">${score_activity} / 50 点</span>
-                    </div>
-                    <div class="breakdown-bar-bg">
-                        <div class="breakdown-bar-fill" style="width: ${activityPct}%;"></div>
-                    </div>
-                    <div class="breakdown-hint">${activityHint}</div>
-                </div>
-                <div class="breakdown-item">
-                    <div class="breakdown-meta">
-                        <span class="breakdown-label">② コンディション（移動平均・トレンド維持）</span>
-                        <span class="breakdown-points">${score_condition} / 50 点</span>
-                    </div>
-                    <div class="breakdown-bar-bg">
-                        <div class="breakdown-bar-fill" style="width: ${conditionPct}%;"></div>
-                    </div>
-                    <div class="breakdown-hint">${conditionHint}</div>
-                </div>
-            `;
-            breakdownBox.style.display = "flex";
         }
 
-        function getAllTimeframeCandlestickData(timeframe) {
-            const validWeightLogs = logs.filter(l => l.weight !== null && l.weight !== undefined);
+        function getFilteredCandles(timeframe) {
+            if (logs.length === 0) return [];
+            
             const groups = {};
 
-            function getMondayBasedWeekStr(dateObj) {
-                const d = new Date(dateObj);
-                const day = d.getDay();
-                const diff = d.getDate() - day + (day === 0 ? -6 : 1); 
-                const monday = new Date(d.setDate(diff));
-                return monday.toISOString().split('T')[0];
-            }
-
-            validWeightLogs.forEach(log => {
-                const logDate = new Date(log.date);
+            logs.forEach(log => {
+                const d = new Date(log.date);
                 let key = "";
 
-                if (timeframe === 'D30' || timeframe === 'DALL') {
-                    key = log.date.split('T')[0];
+                if (timeframe.startsWith('D')) {
+                    key = log.date.slice(0, 10);
                 } else if (timeframe === 'W') {
-                    key = getMondayBasedWeekStr(logDate);
+                    const day = d.getDay();
+                    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+                    const monday = new Date(d.setDate(diff));
+                    key = monday.toISOString().slice(0, 10);
                 } else if (timeframe === 'M') {
-                    key = `${logDate.getFullYear()}-${String(logDate.getMonth() + 1).padStart(2, '0')}`;
+                    key = log.date.slice(0, 7);
                 } else if (timeframe === 'Y') {
-                    key = `${logDate.getFullYear()}`;
+                    key = log.date.slice(0, 4);
                 }
-                
+
                 if (!groups[key]) groups[key] = [];
-                groups[key].push(log);
+                groups[key].push(log.weight);
             });
 
-            const sortedKeys = Object.keys(groups).sort();
-            const candlestickSeries = [];
-            const rawCloseData = [];
+            let sortedKeys = Object.keys(groups).sort();
 
-            sortedKeys.forEach(keyStr => {
-                const periodLogs = groups[keyStr];
-                periodLogs.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-                const open = periodLogs[0].weight;
-                const close = periodLogs[periodLogs.length - 1].weight;
-                const high = Math.max(...periodLogs.map(l => l.weight));
-                const low = Math.min(...periodLogs.map(l => l.weight));
-
-                let timestamp = 0;
-                if (timeframe === 'D30' || timeframe === 'DALL' || timeframe === 'W') {
-                    timestamp = new Date(keyStr).getTime();
-                } else if (timeframe === 'M') {
-                    timestamp = new Date(`${keyStr}-01`).getTime();
-                } else if (timeframe === 'Y') {
-                    timestamp = new Date(`${keyStr}-01-01`).getTime();
-                }
-
-                candlestickSeries.push({ x: timestamp, y: [open, high, low, close] });
-                rawCloseData.push({ x: timestamp, close: close });
-            });
-
-            const ma7Series = [];
-            const ma30Series = [];
-            if (timeframe === 'D30' || timeframe === 'DALL') {
-                for (let i = 0; i < rawCloseData.length; i++) {
-                    if (i >= 6) {
-                        let sum = 0;
-                        for (let j = 0; j < 7; j++) sum += rawCloseData[i - j].close;
-                        ma7Series.push({ x: rawCloseData[i].x, y: parseFloat((sum / 7).toFixed(2)) });
-                    }
-                    if (i >= 29) {
-                        let sum = 0;
-                        for (let j = 0; j < 30; j++) sum += rawCloseData[i - j].close;
-                        ma30Series.push({ x: rawCloseData[i].x, y: parseFloat((sum / 30).toFixed(2)) });
-                    }
-                }
+            if (timeframe === 'D30') {
+                const cutoff = new Date();
+                cutoff.setDate(cutoff.getDate() - 30);
+                const cutoffStr = cutoff.toISOString().slice(0, 10);
+                sortedKeys = sortedKeys.filter(k => k >= cutoffStr);
             }
 
-            return { candlestick: candlestickSeries, ma7: ma7Series, ma30: ma30Series };
+            return sortedKeys.map(key => {
+                const weights = groups[key];
+                const open = weights[0];
+                const close = weights[weights.length - 1];
+                const high = Math.max(...weights);
+                const low = Math.min(...weights);
+
+                let timestamp = new Date(key).getTime();
+                return {
+                    x: timestamp,
+                    y: [open, high, low, close]
+                };
+            });
         }
 
-        function getRecent30CandlestickData(timeframe) {
-            const fullData = getAllTimeframeCandlestickData(timeframe);
-            
-            if (timeframe === 'D30') {
-                const sliceCount = 30;
-                const slicedCandlestick = fullData.candlestick.slice(-sliceCount);
-                let slicedMa7 = [];
-                let slicedMa30 = [];
-                
-                if (slicedCandlestick.length > 0) {
-                    const minTimestamp = slicedCandlestick[0].x;
-                    slicedMa7 = fullData.ma7.filter(d => d.x >= minTimestamp);
-                    slicedMa30 = fullData.ma30.filter(d => d.x >= minTimestamp);
-                }
-                return { candlestick: slicedCandlestick, ma7: slicedMa7, ma30: slicedMa30 };
-            }
+        function formatBoardDateStr(timestamp, tf) {
+            const d = new Date(timestamp);
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const date = String(d.getDate()).padStart(2, '0');
 
-            return fullData;
+            if (tf.startsWith('D')) return `${y}/${m}/${date}`;
+            if (tf === 'W') return `${y}/${m}/${date}週`;
+            if (tf === 'M') return `${y}/${m}`;
+            if (tf === 'Y') return `${y}年`;
+            return "";
         }
 
         function initChart() {
-            const defaultTimeframe = document.getElementById('range-selector').value;
-            const dataObj = getRecent30CandlestickData(defaultTimeframe);
-            updatePeriodExtremeValues(dataObj.candlestick);
-
-            let minX = undefined;
-            let maxX = undefined;
-            if (defaultTimeframe === 'D30' && dataObj.candlestick.length > 0) {
-                const latestX = dataObj.candlestick[dataObj.candlestick.length - 1].x;
-                minX = latestX - (30 * 24 * 60 * 60 * 1000); 
-                maxX = latestX + (0.5 * 24 * 60 * 60 * 1000); 
-            }
+            const tf = document.getElementById('range-selector').value;
+            const candles = getFilteredCandles(tf);
 
             const options = {
-                series: [
-                    { name: 'ローソク足', type: 'candlestick', data: dataObj.candlestick },
-                    { name: '7日移動平均', type: 'line', data: dataObj.ma7 },
-                    { name: '30日移動平均', type: 'line', data: dataObj.ma30 }
-                ],
+                series: [{
+                    name: '体重変化 (四本値)',
+                    data: candles
+                }],
                 chart: {
                     type: 'candlestick',
-                    height: 320,
-                    id: 'weight_chart',
-                    background: 'transparent',
+                    height: 260,
+                    id: 'healthcare-candlestick',
                     toolbar: { show: false },
-                    zoom: { enabled: false },      
-                    scrolling: { enabled: false }, 
-                    events: {
-                        mouseMove: function(event, chartContext, config) { updateBoardLabels(config); },
-                        dataPointMouseEnter: function(event, chartContext, config) { updateBoardLabels(config); },
-                        dataPointSelection: function(event, chartContext, config) { updateBoardLabels(config); },
-                        mouseLeave: function() { resetBoardToLatest(); }
-                    }
+                    animations: { enabled: false },
+                    background: 'transparent'
+                },
+                annotations: {
+                    yaxis: [{
+                        y: profile.targetWeight,
+                        borderColor: '#2962ff',
+                        strokeDashArray: 4,
+                        label: {
+                            align: 'left',
+                            borderColor: '#2962ff',
+                            style: {
+                                color: '#fff',
+                                background: '#2962ff',
+                                fontFamily: 'JetBrains Mono'
+                            },
+                            text: `Target: ${profile.targetWeight}kg`
+                        }
+                    }]
                 },
                 theme: { mode: 'dark' },
-                stroke: { 
-                    width: [1, 3, 3], 
-                    curve: 'smooth' 
+                grid: {
+                    borderColor: '#242a36',
+                    xaxis: { lines: { show: false } },
+                    yaxis: { lines: { show: true } }
                 },
-                colors: ['#2962ff', '#ff9f43', '#08d158'], 
                 plotOptions: {
                     candlestick: {
-                        colors: { 
-                            upward: '#f23645', 
-                            downward: '#007aff' 
+                        colors: {
+                            upward: '#f23645',
+                            downward: '#007aff'
                         },
-                        wick: { useFilledColors: true }
+                        wick: { useFillColor: true }
                     }
                 },
                 xaxis: {
                     type: 'datetime',
-                    min: minX,
-                    max: maxX,
                     labels: {
                         style: { colors: '#848e9c', fontFamily: 'JetBrains Mono' },
-                        datetimeFormatter: { year: 'yyyy年', month: 'yyyy/MM', day: 'MM/dd' }
+                        datetimeUTC: false
                     },
-                    axisBorder: { color: '#2a2e39' },
-                    axisTicks: { color: '#2a2e39' }
+                    axisBorder: { show: false },
+                    axisTicks: { show: false }
                 },
                 yaxis: {
                     labels: {
-                        minWidth: 32,
-                        maxWidth: 32,
-                        offsetX: -6,
                         style: { colors: '#848e9c', fontFamily: 'JetBrains Mono' },
-                        formatter: function (val) { return val ? val.toFixed(1) : ""; }
+                        formatter: (val) => val.toFixed(1)
                     }
                 },
-                tooltip: { enabled: false },
-                grid: { 
-                    borderColor: '#2a2e39',
-                    padding: { left: 0, right: 8 }
-                },
-                markers: { size: 0 }, 
-                dataLabels: { enabled: false },
-                annotations: { yaxis: [] }
+                tooltip: {
+                    enabled: true,
+                    theme: 'dark',
+                    custom: function({ seriesIndex, dataPointIndex, w }) {
+                        const ohlc = w.globals.seriesCandleO[seriesIndex][dataPointIndex];
+                        const h = w.globals.seriesCandleH[seriesIndex][dataPointIndex];
+                        const l = w.globals.seriesCandleL[seriesIndex][dataPointIndex];
+                        const c = w.globals.seriesCandleC[seriesIndex][dataPointIndex];
+                        const timestamp = w.globals.seriesX[seriesIndex][dataPointIndex];
+                        const dStr = formatBoardDateStr(timestamp, tf);
+
+                        document.getElementById('board-date').innerText = dStr;
+                        document.getElementById('board-open').innerText = ohlc.toFixed(1);
+                        document.getElementById('board-high').innerText = h.toFixed(1);
+                        document.getElementById('board-low').innerText = l.toFixed(1);
+                        document.getElementById('board-close').innerText = c.toFixed(1);
+
+                        return `
+                            <div style="padding: 8px; font-size:0.75rem; font-family:'JetBrains Mono'; line-height:1.4; background: rgba(19, 23, 34, 0.85); backdrop-filter: blur(4px); border:1px solid #3a3f50; border-radius: 4px;">
+                                <div style="font-weight:bold; color:#fff; margin-bottom:4px;">${dStr}</div>
+                                <div>始値: ${ohlc.toFixed(1)}</div>
+                                <div>最高: ${h.toFixed(1)}</div>
+                                <div>最低: ${l.toFixed(1)}</div>
+                                <div>終値: ${c.toFixed(1)}</div>
+                            </div>
+                        `;
+                    }
+                }
             };
 
-            chart = new ApexCharts(document.querySelector("#main-chart"), options);
-            chart.render().then(() => {
-                updateChartAnnotations();
-                resetBoardToLatest();
-            });
-        }
+            chart = new ApexCharts(document.getElementById('main-chart'), options);
+            chart.render();
 
-        function updateChartAnnotations() {
-            if (!chart) return;
-            
-            const body = document.body;
-            const isGoldTheme = body.classList.contains('theme-gold') || body.classList.contains('theme-rainbow');
-            const centerLineColor = isGoldTheme ? '#c5a059' : '#2962ff';
-            const rangeBgColor = isGoldTheme ? '#c5a059' : '#2962ff';
-
-            chart.updateOptions({
-                annotations: {
-                    yaxis: [
-                        {
-                            y: computedRanges.center,
-                            borderColor: centerLineColor,
-                            strokeDashArray: 0,
-                            borderWidth: 2,
-                            label: {
-                                borderColor: 'transparent',
-                                style: { color: 'transparent', background: 'transparent' },
-                                text: ''
-                            }
-                        },
-                        {
-                            y: computedRanges.goodMin,
-                            y2: computedRanges.goodMax,
-                            borderColor: '#08d158',
-                            borderWidth: 1,
-                            fillColor: '#08d158',
-                            opacity: 0.15, 
-                            label: {
-                                borderColor: 'transparent',
-                                style: { color: 'transparent', background: 'transparent' },
-                                text: ''
-                            }
-                        },
-                        {
-                            y: computedRanges.normalMin,
-                            y2: computedRanges.normalMax,
-                            borderColor: rangeBgColor,
-                            borderWidth: 1,
-                            fillColor: rangeBgColor,
-                            opacity: 0.08, 
-                            label: {
-                                borderColor: 'transparent',
-                                style: { color: 'transparent', background: 'transparent' },
-                                text: ''
-                            }
-                        }
-                    ]
-                }
-            });
+            updateBoardStats(candles, tf);
         }
 
         function updateChart() {
             if (!chart) return;
-
-            const timeframe = document.getElementById('range-selector').value;
-            const dataObj = getRecent30CandlestickData(timeframe);
-
-            updatePeriodExtremeValues(dataObj.candlestick);
-
-            const isDaily = (timeframe === 'D30' || timeframe === 'DALL');
-            const finalMa7 = isDaily ? dataObj.ma7 : [];
-            const finalMa30 = isDaily ? dataObj.ma30 : [];
-
-            let minX = undefined;
-            let maxX = undefined;
-            if (timeframe === 'D30' && dataObj.candlestick.length > 0) {
-                const latestX = dataObj.candlestick[dataObj.candlestick.length - 1].x;
-                minX = latestX - (30 * 24 * 60 * 60 * 1000);
-                maxX = latestX + (0.5 * 24 * 60 * 60 * 1000);
-            }
+            const tf = document.getElementById('range-selector').value;
+            const candles = getFilteredCandles(tf);
 
             chart.updateOptions({
-                xaxis: {
-                    min: minX,
-                    max: maxX
-                },
-                series: [
-                    { name: (timeframe.startsWith('D') ? '日足' : timeframe === 'W' ? '週足' : timeframe === 'M' ? '月足' : '年足'), type: 'candlestick', data: dataObj.candlestick },
-                    { name: '7日移動平均', type: 'line', data: finalMa7 },
-                    { name: '30日移動平均', type: 'line', data: finalMa30 }
-                ]
+                annotations: {
+                    yaxis: [{
+                        y: profile.targetWeight,
+                        borderColor: '#2962ff',
+                        strokeDashArray: 4,
+                        label: {
+                            align: 'left',
+                            borderColor: '#2962ff',
+                            style: {
+                                color: '#fff',
+                                background: '#2962ff',
+                                fontFamily: 'JetBrains Mono'
+                            },
+                            text: `Target: ${profile.targetWeight}kg`
+                        }
+                    }]
+                }
             });
 
-            updateChartAnnotations();
-            updateBMIDisplay();
+            chart.updateSeries([{
+                data: candles
+            }]);
 
-            setTimeout(() => { resetBoardToLatest(); }, 100);
+            updateBoardStats(candles, tf);
         }
 
-        function updatePeriodExtremeValues(candlestickData) {
-            if (!candlestickData || candlestickData.length === 0) {
+        function updateBoardStats(candles, tf) {
+            const allWeights = logs.map(l => l.weight);
+            if (allWeights.length > 0) {
+                document.getElementById('board-period-high').innerText = `${Math.max(...allWeights).toFixed(1)} kg`;
+                document.getElementById('board-period-low').innerText = `${Math.min(...allWeights).toFixed(1)} kg`;
+            } else {
                 document.getElementById('board-period-high').innerText = '--';
                 document.getElementById('board-period-low').innerText = '--';
-                return;
             }
-            const highs = candlestickData.map(d => d.y[1]);
-            const lows = candlestickData.map(d => d.y[2]);
-            document.getElementById('board-period-high').innerText = Math.max(...highs).toFixed(1);
-            document.getElementById('board-period-low').innerText = Math.min(...lows).toFixed(1);
-        }
 
-        function formatBoardDateStr(timestamp, tf) {
-            const dateObj = new Date(timestamp);
-            const y = dateObj.getFullYear();
-            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
-            const d = String(dateObj.getDate()).padStart(2, '0');
-
-            if (tf.startsWith('D')) {
-                return `${y}/${m}/${d}`;
-            } else if (tf === 'W') {
-                const sundayObj = new Date(timestamp);
-                sundayObj.setDate(sundayObj.getDate() + 6);
-                const sm = String(sundayObj.getMonth() + 1).padStart(2, '0');
-                const sd = String(sundayObj.getDate()).padStart(2, '0');
-                return `${y}/${m}/${d} 〜 ${sundayObj.getFullYear()}/${sm}/${sd}`;
-            } else if (tf === 'M') {
-                return `${y}年 ${m}月足`;
-            } else if (tf === 'Y') {
-                return `${y}年足`;
-            }
-            return `${y}/${m}/${d}`;
-        }
-
-        function updateBoardLabels(config) {
-            const dataPointIndex = config.dataPointIndex;
-            if (dataPointIndex === undefined || dataPointIndex < 0) return;
-
-            const w = config.w;
-            if (!w || !w.config || !w.config.series || !w.config.series[0] || !w.config.series[0].data) return;
-            
-            const candleData = w.config.series[0].data[dataPointIndex];
-            if (!candleData || !candleData.y) return;
-
-            const tf = document.getElementById('range-selector').value;
-            document.getElementById('board-date').innerText = formatBoardDateStr(candleData.x, tf);
-            document.getElementById('board-open').innerText = candleData.y[0].toFixed(1);
-            document.getElementById('board-high').innerText = candleData.y[1].toFixed(1);
-            document.getElementById('board-low').innerText = candleData.y[2].toFixed(1);
-            document.getElementById('board-close').innerText = candleData.y[3].toFixed(1);
-        }
-
-        function resetBoardToLatest() {
-            const tf = document.getElementById('range-selector').value;
-            const dataObj = getRecent30CandlestickData(tf);
-            const candles = dataObj.candlestick;
-
-            if (!candles || candles.length === 0) {
+            if (candles.length === 0) {
                 document.getElementById('board-date').innerText = '--';
                 document.getElementById('board-open').innerText = '--';
                 document.getElementById('board-high').innerText = '--';
@@ -1960,6 +1481,271 @@
             } else if (score === 100) {
                 body.classList.add('theme-rainbow');
             }
+        }
+
+        function generateReport() {
+            const badge = document.getElementById('status-badge-box');
+            const scoreEl = document.getElementById('score-display');
+            const breakdownContainer = document.getElementById('report-breakdown');
+            const reportBox = document.getElementById('report-box');
+
+            const validLogs = logs.filter(l => l.weight !== null && l.weight !== undefined && !isNaN(l.weight));
+
+            if (validLogs.length === 0) {
+                badge.innerText = "検証不可";
+                badge.className = "status-badge-box badge-box-loading";
+                scoreEl.innerText = "--";
+                reportBox.innerText = "分析データを生成するには、ログデータ入力が必要です。";
+                breakdownContainer.innerHTML = "";
+                updateThemeByScore(0);
+                return;
+            }
+
+            const latestLog = validLogs[validLogs.length - 1];
+            const hMeter = profile.height / 100;
+            const hSquare = hMeter * hMeter;
+            const currentBmi = latestLog.weight / hSquare;
+
+            // ⚡ 48時間ボラティリティ（急激な変動）検知
+            let isVolatilityAlert = false;
+            if (latestLog.date) {
+                const latestTime = new Date(latestLog.date).getTime();
+                const fortyEightHoursAgo = latestTime - (48 * 60 * 60 * 1000);
+                
+                for (let i = 0; i < validLogs.length - 1; i++) {
+                    const compLog = validLogs[i];
+                    if (compLog.date) {
+                        const compTime = new Date(compLog.date).getTime();
+                        if (compTime >= fortyEightHoursAgo && compTime <= latestTime) {
+                            const rate = Math.abs(latestLog.weight - compLog.weight) / compLog.weight * 100;
+                            if (rate >= 3.0) {
+                                isVolatilityAlert = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ① データ密度（ログ・アクティビティ）計算: 最大50点
+            let densityPoints = 0;
+            let totalRecordsIn7Days = 0;
+            if (latestLog.date) {
+                const latestTime = new Date(latestLog.date).getTime();
+                const sevenDaysAgo = latestTime - (7 * 24 * 60 * 60 * 1000);
+                
+                const logsIn7Days = validLogs.filter(l => {
+                    if (!l.date) return false;
+                    const t = new Date(l.date).getTime();
+                    return t >= sevenDaysAgo && t <= latestTime;
+                });
+                totalRecordsIn7Days = logsIn7Days.length;
+
+                const dateCounts = {};
+                logsIn7Days.forEach(l => {
+                    const dayKey = l.date.slice(0, 10);
+                    dateCounts[dayKey] = (dateCounts[dayKey] || 0) + 1;
+                });
+
+                Object.values(dateCounts).forEach(cnt => {
+                    if (cnt >= 1) densityPoints += 3;
+                    if (cnt >= 2) densityPoints += 3;
+                });
+
+                if (totalRecordsIn7Days >= 21) {
+                    densityPoints += 8;
+                }
+                if (densityPoints > 50) densityPoints = 50;
+            }
+
+            // ② コンディション（トレンド維持）計算: 最大50点
+            const ma7BmiList = [];
+            const ma30BmiList = [];
+
+            for (let i = 0; i < validLogs.length; i++) {
+                const start7 = Math.max(0, i - 6);
+                const sub7 = validLogs.slice(start7, i + 1);
+                const sum7 = sub7.reduce((acc, l) => acc + l.weight, 0);
+                const ma7Weight = sum7 / sub7.length;
+                ma7BmiList.push(ma7Weight / hSquare);
+
+                const start30 = Math.max(0, i - 29);
+                const sub30 = validLogs.slice(start30, i + 1);
+                const sum30 = sub30.reduce((acc, l) => acc + l.weight, 0);
+                const ma30Weight = sum30 / sub30.length;
+                ma30BmiList.push(ma30Weight / hSquare);
+            }
+
+            let conditionPoints = 10;
+            let isLongTermBonus = false;
+
+            if (validLogs.length >= 7) {
+                const recentMa7Bmis = ma7BmiList.slice(-7);
+                const isCoreZone7 = recentMa7Bmis.every(bmi => bmi >= 21.0 && bmi <= 23.0);
+                const isNormalZone7 = recentMa7Bmis.every(bmi => bmi >= 18.5 && bmi <= 25.0);
+
+                if (isCoreZone7) {
+                    conditionPoints = 40;
+                } else if (isNormalZone7) {
+                    conditionPoints = 30;
+                }
+
+                const recentMa30Bmis = ma30BmiList.slice(-7);
+                const isCoreZone30 = recentMa30Bmis.every(bmi => bmi >= 21.0 && bmi <= 23.0);
+                if (isCoreZone30) {
+                    isLongTermBonus = true;
+                    conditionPoints += 10;
+                }
+            }
+            if (conditionPoints > 50) conditionPoints = 50;
+
+            const totalScore = densityPoints + conditionPoints;
+            scoreEl.innerText = totalScore;
+            updateThemeByScore(totalScore);
+
+            breakdownContainer.innerHTML = `
+                <div class="breakdown-item">
+                    <div class="breakdown-meta">
+                        <span class="breakdown-label">① データ密度（ログ・アクティビティ）</span>
+                        <span class="breakdown-points">${densityPoints} / 50 点</span>
+                    </div>
+                    <div class="breakdown-bar-bg"><div class="breakdown-bar-fill" style="width:${(densityPoints / 50) * 100}%;"></div></div>
+                    <span class="breakdown-hint">直近7日間の総記録回数: ${totalRecordsIn7Days}回</span>
+                </div>
+                <div class="breakdown-item">
+                    <div class="breakdown-meta">
+                        <span class="breakdown-label">② コンディション（トレンド維持）</span>
+                        <span class="breakdown-points">${conditionPoints} / 50 点</span>
+                    </div>
+                    <div class="breakdown-bar-bg"><div class="breakdown-bar-fill" style="width:${(conditionPoints / 50) * 100}%;"></div></div>
+                    <span class="breakdown-hint">直近7件のMA7状況に基づく評価（長期ボーナス: ${isLongTermBonus ? '適応済' : '未適応'}）</span>
+                </div>
+            `;
+
+            // 【最優先割り込み仕様】ボラティリティ異常検知時のオーバーライド
+            if (isVolatilityAlert) {
+                badge.innerText = "⚠️ ボラティリティ高";
+                badge.className = "status-badge-box badge-box-volatility";
+                reportBox.innerText = "水分増減等による一過性の帳簿上のノイズ・スパイクであるため、静観し定時打刻を継続すべき";
+            } else {
+                if (totalScore >= 85) {
+                    badge.innerText = "PRIME HEALTH";
+                    badge.className = "status-badge-box badge-box-prime";
+                } else if (totalScore >= 60) {
+                    badge.innerText = "FAIR CONTROL";
+                    badge.className = "status-badge-box badge-box-fair";
+                } else {
+                    badge.innerText = "UNDER REVIEW";
+                    badge.className = "status-badge-box badge-box-review";
+                }
+
+                // 通常の分析テキスト（必要に応じて初期状態を設定）
+                if (currentBmi >= 21.0 && currentBmi <= 23.0) {
+                    reportBox.innerText = `現在のBMIは ${currentBmi.toFixed(1)} です。非常に理想的な状態（コアゾーン内）をキープできています。現在の生活リズムと打刻を安定して継続しましょう。`;
+                } else if (currentBmi >= 18.5 && currentBmi <= 25.0) {
+                    reportBox.innerText = `現在のBMIは ${currentBmi.toFixed(1)} です。一般適正範囲内に収まっています。より安定したトレンド維持を目指して、定期的な計測を続けていきましょう。`;
+                } else {
+                    reportBox.innerText = `現在のBMIは ${currentBmi.toFixed(1)} です。適正範囲から外れています。極端な食事制限などは避け、まずは規則正しい時間帯での打刻継続を最優先にしてください。`;
+                }
+            }
+        }
+
+        function exportData() {
+            if (logs.length === 0) {
+                showToast("エクスポートするデータがありません");
+                return;
+            }
+            const exportObj = {
+                version: "MyLogHealthcare-V2",
+                profile: profile,
+                logs: logs
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `mylog_healthcare_backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast("JSONデータを出力しました");
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed && Array.isArray(parsed.logs)) {
+                        logs = parsed.logs;
+                        localStorage.setItem('weight_logs', JSON.stringify(logs));
+                        
+                        if (parsed.profile) {
+                            profile = parsed.profile;
+                            localStorage.setItem('weight_profile', JSON.stringify(profile));
+                            document.getElementById('profile-height').value = profile.height;
+                            document.getElementById('profile-target-weight').value = profile.targetWeight;
+                        }
+                        
+                        showToast("データを正常に復元しました");
+                        calculateRanges();
+                        updateSummaryIndicator();
+                        renderHistory();
+                        generateReport();
+                        if (chart) {
+                            updateChart();
+                        }
+                    } else {
+                        showToast("不正なバックアップ形式ファイルです");
+                    }
+                } catch (err) {
+                    showToast("ファイルのインポートに失敗しました");
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = "";
+        }
+
+        function resetAllData() {
+            if (confirm("【警告】すべての測定履歴とプロフィール設定が削除されます。本当によろしいですか？")) {
+                localStorage.clear();
+                logs = [];
+                profile = { height: 170.0, targetWeight: 63.5, targetBmi: 22, normalMin: 18.5, normalMax: 25 };
+                document.getElementById('profile-height').value = 170.0;
+                document.getElementById('profile-target-weight').value = 63.5;
+                
+                showToast("初期化完了。リロードします");
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            }
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = "toast";
+            toast.innerText = message;
+            
+            toast.onclick = function() {
+                this.classList.remove('show');
+                setTimeout(() => this.remove(), 250);
+            };
+
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 250);
+                }
+            }, 2500);
         }
     </script>
 </body>
