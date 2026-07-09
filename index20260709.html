@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MyLog Healthcare</title>
+    
+    <link rel="icon" type="image/png" href="icon.png">
+    <link class="apple-touch-icon" href="icon.png">
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0b0e14">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        /* --- デザインシステム & 変数 --- */
+        :root {
+            --bg-body: #0b0e14;
+            --bg-card: #131722;
+            --bg-input: #1e222d;
+            --border-color: #3a3f50; 
+            --border-focus: #52586c;
+            --text-main: #c5c7d0;
+            --text-bright: #ffffff;
+            --text-muted: #848e9c;
+            --theme-blue: #2962ff;
+            --theme-blue-hover: #1e4bd6;
+            --theme-gold: #c5a059;
+            --theme-gold-hover: #b08d4b;
+            --color-positive: #f23645; 
+            --color-negative: #007aff; 
+            --font-main: 'Noto Sans JP', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --accent-color: #08d158;
+            --accent-color-hover: #06b34a;
+            --title-color: var(--text-bright);
+        }
+
+        /* --- スコア連動テーマシステム --- */
+        body.theme-green {
+            --accent-color: #08d158;
+            --accent-color-hover: #06b34a;
+        }
+        
+        body.theme-blue {
+            --accent-color: #007aff;
+            --accent-color-hover: #0062cc;
+        }
+        
+        body.theme-gold {
+            --accent-color: #c5a059;
+            --accent-color-hover: #b08d4b;
+            --title-color: #c5a059;
+        }
+        body.theme-gold .toast {
+            background: rgba(197, 160, 89, 0.95);
+        }
+        body.theme-gold .btn-toggle-view.active {
+            background: rgba(197, 160, 89, 0.2);
+            border-color: #c5a059;
+        }
+
+        body.theme-rainbow {
+            --accent-color: #ff9f43;
+            --accent-color-hover: #ff7f00;
+        }
+        body.theme-rainbow .brand-title {
+            background: linear-gradient(90deg, #ff3366, #ff9933, #33cc66, #3399ff, #9933ff, #ff3366);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rainbow-text 3s linear infinite;
+        }
+        body.theme-rainbow .score-value {
+            background: linear-gradient(90deg, #ff3366, #ff9933, #33cc66, #3399ff, #9933ff, #ff3366);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rainbow-text 3s linear infinite;
+            text-shadow: none !important;
+        }
+        body.theme-rainbow .card {
+            position: relative;
+            border: 1px solid transparent;
+            background-image: linear-gradient(var(--bg-card), var(--bg-card)), linear-gradient(135deg, #ff3366, #ff9933, #33cc66, #3399ff, #9933ff);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            box-shadow: 0 4px 20px rgba(255, 159, 67, 0.1);
+        }
+        body.theme-rainbow .breakdown-bar-fill {
+            background: linear-gradient(90deg, #ff3366, #ff9933, #33cc66, #3399ff);
+        }
+        body.theme-rainbow .toast {
+            background: linear-gradient(90deg, #ff3366, #ff9933);
+        }
+
+        @keyframes rainbow-text {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            padding: 16px;
+            max-width: 800px;
+            margin: 0 auto;
+            padding-bottom: 60px;
+        }
+
+        /* --- タイポグラフィ & 共通コンポーネント --- */
+        h2 {
+            font-size: 1.1rem;
+            color: var(--text-bright);
+            border-left: 4px solid var(--accent-color);
+            padding-left: 8px;
+            margin-bottom: 14px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        /* --- ナビゲーション --- */
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .brand-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--title-color);
+            font-family: var(--font-mono);
+            letter-spacing: -0.5px;
+            transition: color 0.3s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+        .btn-help {
+            background-color: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-help:hover {
+            border-color: var(--border-focus);
+            color: var(--text-bright);
+        }
+
+        /* --- 入力フォーム（省スペース化調整） --- */
+        .recording-card {
+            padding: 12px 14px; /* パディングを少し縮小 */
+        }
+        .form-group {
+            margin-bottom: 10px; /* 入力項目間の余白を12pxから10pxに縮小 */
+        }
+
+        input, select, textarea {
+            width: 100%;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color); 
+            color: var(--text-bright);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: var(--font-main);
+            transition: all 0.2s ease;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(41, 98, 255, 0.15);
+        }
+        input[type="datetime-local"] {
+            font-family: var(--font-mono);
+        }
+        
+        textarea {
+            resize: none;
+        }
+
+        .weight-input-container {
+            position: relative;
+        }
+        .weight-unit {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+        .btn-submit {
+            width: 100%;
+            background-color: var(--accent-color);
+            color: #fff;
+            border: none;
+            padding: 11px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 2px;
+        }
+        .btn-submit:hover {
+            background-color: var(--accent-color-hover);
+        }
+
+        /* --- サマリー表示エリア --- */
+        .latest-summary-container {
+            background: linear-gradient(135deg, var(--bg-input), #171c28);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .summary-block {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .summary-block.right-align {
+            text-align: right;
+            align-items: flex-end;
+        }
+        .summary-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .summary-values {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+        .summary-main-weight {
+            font-family: var(--font-mono);
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-bright);
+        }
+        .summary-diff {
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .diff-plus { color: #f23645; background-color: rgba(242, 54, 69, 0.1); }
+        .diff-minus { color: #007aff; background-color: rgba(0, 122, 255, 0.1); }
+        .diff-zero { color: var(--text-muted); background-color: rgba(132, 142, 156, 0.1); }
+
+        .summary-bmi-val {
+            font-family: var(--font-mono);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            transition: color 0.3s ease;
+        }
+
+        /* --- チャートコントロール --- */
+        .chart-controls {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 8px;
+        }
+        .range-select {
+            background-color: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            width: auto;
+        }
+
+        .chart-wrapper {
+            margin: 0 -4px;
+            margin-bottom: 14px;
+        }
+
+        /* --- 板情報 (四本値) --- */
+        .board-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1px;
+            background-color: var(--border-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+        .board-cell {
+            background-color: var(--bg-input);
+            padding: 9px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .board-cell.full-width {
+            grid-column: span 2;
+        }
+        .board-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .board-value {
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            color: var(--text-bright);
+            font-weight: 700;
+        }
+        .board-value.date {
+            font-size: 0.85rem;
+        }
+
+        /* --- グラフ下インジケーター --- */
+        .chart-bottom-indicators {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            padding: 10px 12px;
+            background-color: rgba(30, 34, 45, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+        @media(min-width: 540px) {
+            .chart-bottom-indicators { grid-template-columns: repeat(3, 1fr); }
+        }
+        .indicator-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+        }
+        @media(min-width: 540px) {
+            .indicator-item.full-mobile { grid-column: span 1; }
+        }
+        @media(max-width: 539px) {
+            .indicator-item.full-mobile { grid-column: span 2; }
+        }
+        .indicator-label {
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .indicator-value {
+            font-weight: 700;
+            color: var(--text-bright);
+        }
+        .ind-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+            display: inline-block;
+        }
+        .ind-high { background-color: #ff6b76; }
+        .ind-center { background-color: var(--accent-color); transition: background-color 0.3s ease; }
+        .ind-low { background-color: #007aff; }
+
+        /* --- Reportウィンドウ演出パーツ --- */
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 12px;
+        }
+        
+        .status-badge-box {
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 8px 12px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            letter-spacing: 0.5px;
+        }
+        .badge-box-prime {
+            background-color: rgba(197, 160, 89, 0.12);
+            border: 1px solid rgba(197, 160, 89, 0.5);
+            color: #ebd094;
+        }
+        .badge-box-fair {
+            background-color: rgba(0, 122, 255, 0.08);
+            border: 1px solid rgba(0, 122, 255, 0.4);
+            color: var(--color-negative);
+        }
+        .badge-box-review {
+            background-color: rgba(242, 54, 69, 0.08);
+            border: 1px solid rgba(242, 54, 69, 0.4);
+            color: var(--color-positive);
+        }
+        .badge-box-volatility {
+            background-color: rgba(255, 111, 0, 0.12);
+            border: 1px solid rgba(255, 111, 0, 0.5);
+            color: #ff9100;
+        }
+        .badge-box-loading {
+            background-color: rgba(132, 142, 156, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+        }
+
+        .score-container {
+            background: linear-gradient(135deg, #1e222d, #141823);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .score-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            font-family: var(--font-mono);
+            letter-spacing: 0.5px;
+        }
+        .score-num-wrap {
+            font-family: var(--font-mono);
+            display: flex;
+            align-items: baseline;
+        }
+        .score-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffb703;
+            text-shadow: 0 0 10px rgba(255, 183, 3, 0.2);
+        }
+        .score-max {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-left: 2px;
+        }
+
+        .report-text {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-main);
+        }
+
+        /* --- Reportウィンドウ内訳 --- */
+        .score-breakdown {
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px dashed var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .breakdown-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .breakdown-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 2px;
+        }
+        .breakdown-label {
+            color: var(--text-main);
+            font-weight: 500;
+        }
+        .breakdown-points {
+            font-family: var(--font-mono);
+            color: var(--text-bright);
+            font-weight: 700;
+        }
+        .breakdown-bar-bg {
+            width: 100%;
+            height: 6px;
+            background-color: var(--bg-input);
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .breakdown-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color), #ebd094);
+            width: 0%;
+            transition: width 0.4s ease;
+            border-radius: 3px;
+        }
+        .breakdown-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            padding-left: 2px;
+        }
+
+        /* --- 履歴リスト --- */
+        .history-list {
+            margin: 0 -16px;
+            padding: 0 16px;
+            max-height: none;
+            overflow-y: visible;
+        }
+        
+        .history-list.scroll-enabled {
+            max-height: 420px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            display: flex;
+            flex-direction: column;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            background-color: transparent;
+            transition: background-color 0.15s;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .history-item:last-child { border-bottom: none; }
+        .history-item:active { background-color: var(--bg-input); }
+        
+        .btn-toggle-view {
+            background-color: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-toggle-view:hover {
+            border-color: var(--border-focus);
+            color: var(--text-bright);
+        }
+        .btn-toggle-view.active {
+            border-color: var(--accent-color);
+            color: var(--text-bright);
+            background-color: rgba(41, 98, 255, 0.1);
+        }
+
+        .history-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        .history-date {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+        .history-date:hover { color: var(--color-positive); }
+        .history-weight {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            color: var(--text-bright);
+        }
+        .history-memo {
+            font-size: 0.85rem;
+            color: var(--text-main);
+            white-space: pre-wrap;
+            padding-left: 0;
+            line-height: 1.5;
+        }
+        .hint-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 12px;
+        }
+
+        /* --- プロフィール ＆ 適正範囲 --- */
+        .profile-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .bmi-display-box {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .bmi-value {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            transition: color 0.3s ease;
+        }
+        .range-box {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .range-title {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            font-weight: bold;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 6px;
+        }
+        .range-label {
+            font-size: 0.85rem;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            display: block;
+        }
+        .range-val {
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            color: var(--text-bright);
+            font-weight: 700;
+            display: block;
+            padding-left: 4px;
+        }
+        .range-block { margin-bottom: 14px; }
+        .range-block:last-child { margin-bottom: 0; }
+
+        .btn-profile-save {
+            background-color: var(--bg-input);
+            color: var(--text-bright);
+            border: 1px solid var(--accent-color);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 4px;
+        }
+        .btn-profile-save:hover { background-color: var(--accent-color); }
+
+        /* --- バックアップUI --- */
+        .backup-flex {
+            display: flex;
+            gap: 12px;
+            margin-top: 4px;
+        }
+        .btn-backup {
+            flex: 1;
+            background-color: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .btn-backup:hover {
+            border-color: var(--border-focus);
+            color: var(--text-bright);
+        }
+        #file-input {
+            display: none;
+        }
+
+        .system-danger-zone {
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px dashed var(--border-color);
+            text-align: center;
+        }
+        .btn-danger-reset {
+            background-color: rgba(242, 54, 69, 0.1);
+            color: #f23645;
+            border: 1px solid rgba(242, 54, 69, 0.4);
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-danger-reset:hover {
+            background-color: #f23645;
+            color: #fff;
+            border-color: #f23645;
+        }
+
+        /* --- トースト通知 --- */
+        #toast-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .toast {
+            background-color: rgba(41, 98, 255, 0.95);
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            letter-spacing: 0.5px;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: auto;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .toast.show { opacity: 1; transform: scale(1); }
+    </style>
+</head>
+<body>
+
+    <div class="nav-container">
+        <div class="brand-title" onclick="window.location.reload();">MyLog Healthcare</div>
+        <a href="howto.html" class="btn-help">📖 HOW TO</a>
+    </div>
+
+    <div class="card recording-card">
+        <h2>Log Input</h2>
+        <form id="log-form" onsubmit="saveLog(event)">
+            <div class="form-group">
+                <input type="datetime-local" id="input-date" required>
+            </div>
+            <div class="form-group">
+                <div class="weight-input-container">
+                    <input type="number" id="input-weight" step="0.1" placeholder="Weight 例: 65.3 or 653">
+                    <span class="weight-unit">kg</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <textarea id="input-memo" rows="1" placeholder="Memo（食事、運動、メモなど）"></textarea>
+            </div>
+            <button type="submit" class="btn-submit">Save Log</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Dashboard</h2>
+        
+        <div class="latest-summary-container">
+            <div class="summary-block">
+                <div class="summary-title">Weight</div>
+                <div class="summary-values">
+                    <span id="summary-weight" class="summary-main-weight">--</span>
+                    <span id="summary-diff" class="summary-diff diff-zero">--</span>
+                </div>
+            </div>
+            <div class="summary-block right-align">
+                <div class="summary-title">BMI</div>
+                <div id="summary-bmi" class="summary-bmi-val">--</div>
+            </div>
+        </div>
+        
+        <div class="chart-controls">
+            <select id="range-selector" class="range-select" onchange="updateChart()">
+                <option value="D30" selected>日足 (直近30日)</option>
+                <option value="DALL">日足 (全期間)</option>
+                <option value="W">週足 (Weekly)</option>
+                <option value="M">月足 (Monthly)</option>
+                <option value="Y">年足 (Yearly)</option>
+            </select>
+        </div>
+
+        <div class="chart-wrapper">
+            <div id="main-chart"></div>
+        </div>
+
+        <div class="board-grid">
+            <div class="board-cell full-width">
+                <span class="board-label">表示中の日付/期間</span>
+                <span id="board-date" class="board-value date">--</span>
+            </div>
+            <div class="board-cell">
+                <span class="board-label">始値 (最初)</span>
+                <span id="board-open" class="board-value">--</span>
+            </div>
+            <div class="board-cell">
+                <span class="board-label">終値 (最後)</span>
+                <span id="board-close" class="board-value">--</span>
+            </div>
+            <div class="board-cell">
+                <span class="board-label">最安値</span>
+                <span id="board-low" class="board-value">--</span>
+            </div>
+            <div class="board-cell">
+                <span class="board-label">最高値</span>
+                <span id="board-high" class="board-value">--</span>
+            </div>
+            <div class="board-cell">
+                <span class="board-label">期間内最高</span>
+                <span id="board-period-high" class="board-value">--</span>
+            </div>
+            <div class="board-cell">
+                <span class="board-label">期間内最安</span>
+                <span id="board-period-low" class="board-value">--</span>
+            </div>
+        </div>
+
+        <div class="chart-bottom-indicators">
+            <div class="indicator-item">
+                <span class="indicator-label"><span class="ind-dot ind-high"></span>適正上限 (BMI 25)</span>
+                <span id="board-target-high" class="indicator-value">--</span>
+            </div>
+            <div class="indicator-item">
+                <span class="indicator-label"><span class="ind-dot ind-center"></span>理想中心 (BMI 22)</span>
+                <span id="board-target-center" class="indicator-value">--</span>
+            </div>
+            <div class="indicator-item full-mobile">
+                <span class="indicator-label"><span class="ind-dot ind-low"></span>適正下限 (BMI 18.5)</span>
+                <span id="board-target-low" class="indicator-value">--</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Report</h2>
+        
+        <div class="report-header">
+            <div id="status-badge-box" class="status-badge-box badge-box-loading">
+                Analyzing...
+            </div>
+            <div class="score-container">
+                <span class="score-label">SCORE</span>
+                <div class="score-num-wrap">
+                    <span id="score-display" class="score-value">--</span>
+                    <span class="score-max">/100</span>
+                </div>
+            </div>
+        </div>
+        
+        <div id="report-box" class="report-text">
+            データを入力すると、客観的なテクニカル分析がここに表示されます。
+        </div>
+
+        <div id="report-breakdown" class="score-breakdown" style="display: none;"></div>
+    </div>
+
+    <div class="card">
+        <h2>
+            Log History
+            <button id="btn-toggle-history" class="btn-toggle-view" onclick="toggleHistoryView()">表示切替</button>
+        </h2>
+        <div id="history-container" class="history-list"></div>
+        
+        <div class="hint-text">※ 日時部分を長押しで削除できます</div>
+    </div>
+
+    <div class="card">
+        <h2>Profile</h2>
+        <div class="profile-layout">
+            <div class="form-group">
+                <label for="profile-height">身長 (cm)</label>
+                <input type="number" id="profile-height" step="0.1" value="170.0">
+                <button type="button" class="btn-profile-save" onclick="saveProfile()">設定を保存</button>
+            </div>
+            
+            <div class="bmi-display-box">
+                <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">現在の算出BMI</span>
+                <span id="current-bmi-value" class="bmi-value">--</span>
+            </div>
+
+            <div class="range-box">
+                <div class="range-title">算出された適正範囲 (BMI基準)</div>
+                
+                <div class="range-block">
+                    <span class="range-label">理想の中心値 (BMI 22):</span>
+                    <span id="range-bmi-220" class="range-val">-- kg</span>
+                </div>
+                
+                <div class="range-block">
+                    <span class="range-label">優良範囲 (BMI 21 - 23):</span>
+                    <span id="range-bmi-good" class="range-val">-- kg</span>
+                </div>
+                
+                <div class="range-block">
+                    <span class="range-label">一般適正範囲 (BMI 18.5 - 25):</span>
+                    <span id="range-bmi-normal" class="range-val">-- kg</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Data Backup</h2>
+        <div class="backup-flex">
+            <button class="btn-backup" onclick="exportDataJSON()">📤 JSONエクスポート</button>
+            <button class="btn-backup" onclick="document.getElementById('file-input').click()">📥 JSONインポート</button>
+            <input type="file" id="file-input" accept=".json" onchange="importDataJSON(event)">
+        </div>
+    </div>
+
+    <div class="system-danger-zone">
+        <button class="btn-danger-reset" onclick="resetAllData()">🗑️ すべてのデータをリセット</button>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('ServiceWorker 登録成功', reg.scope))
+                    .catch(err => console.log('ServiceWorker 登録失敗', err));
+            });
+        }
+
+        let logs = [];
+        let chart = null;
+        let profile = { height: 170.0 };
+        let isHistoryScrollEnabled = false;
+
+        let computedRanges = {
+            center: 22,
+            goodMin: 21,
+            goodMax: 23,
+            normalMin: 18.5,
+            normalMax: 25
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initDateTime();
+            loadLocalStorage();
+            calculateRanges();
+            updateSummaryIndicator();
+            renderHistory();
+            initChart();
+            generateReport();
+        });
+
+        function initDateTime() {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('input-date').value = now.toISOString().slice(0, 16);
+        }
+
+        function loadLocalStorage() {
+            const storedLogs = localStorage.getItem('weight_logs');
+            if (storedLogs) {
+                logs = JSON.parse(storedLogs);
+            } else {
+                const today = new Date();
+                logs = [];
+                for(let i = 45; i >= 0; i--) {
+                    const d = new Date();
+                    d.setDate(today.getDate() - i);
+                    const baseWeight = 66 + Math.sin(i * 0.2) * 1.5 + (Math.random() - 0.5) * 0.6;
+                    logs.push({
+                        id: Date.now() - i * 86400000 - 30000,
+                        date: new Date(d.setHours(7, 0, 0)).toISOString().slice(0, 16),
+                        weight: parseFloat(baseWeight.toFixed(1)),
+                        memo: "朝の計測。"
+                    });
+                    logs.push({
+                        id: Date.now() - i * 86400000 - 10000,
+                        date: new Date(d.setHours(20, 0, 0)).toISOString().slice(0, 16),
+                        weight: parseFloat((baseWeight + 0.5).toFixed(1)),
+                        memo: "夜、食事後。"
+                    });
+                }
+                localStorage.setItem('weight_logs', JSON.stringify(logs));
+            }
+
+            const storedProfile = localStorage.getItem('weight_profile');
+            if (storedProfile) {
+                profile = JSON.parse(storedProfile);
+                document.getElementById('profile-height').value = profile.height;
+            }
+        }
+
+        function saveProfile() {
+            const heightInput = document.getElementById('profile-height').value;
+            profile.height = parseFloat(heightInput) || 170.0;
+            localStorage.setItem('weight_profile', JSON.stringify(profile));
+            
+            showToast("身長を保存しました");
+            calculateRanges();
+            generateReport();
+            if (chart) {
+                updateChart(); 
+            }
+        }
+
+        function calculateRanges() {
+            const hMeter = profile.height / 100;
+            const hSquare = hMeter * hMeter;
+
+            const r185 = (hSquare * 18.5).toFixed(1);
+            const r210 = (hSquare * 21.0).toFixed(1);
+            const r220 = (hSquare * 22.0).toFixed(1);
+            const r230 = (hSquare * 23.0).toFixed(1);
+            const r250 = (hSquare * 25.0).toFixed(1);
+
+            document.getElementById('range-bmi-220').innerText = `${r220} kg`;
+            document.getElementById('range-bmi-good').innerText = `${r210} - ${r230} kg`;
+            document.getElementById('range-bmi-normal').innerText = `${r185} - ${r250} kg`;
+
+            document.getElementById('board-target-high').innerText = `${r250}kg`;
+            document.getElementById('board-target-center').innerText = `${r220}kg`;
+            document.getElementById('board-target-low').innerText = `${r185}kg`;
+
+            computedRanges.center = hSquare * 22.0;
+            computedRanges.goodMin = hSquare * 21.0;
+            computedRanges.goodMax = hSquare * 23.0;
+            computedRanges.normalMin = hSquare * 18.5;
+            computedRanges.normalMax = hSquare * 25.0;
+
+            updateBMIDisplay();
+        }
+
+        function updateBMIDisplay() {
+            const bmiValueEl = document.getElementById('current-bmi-value');
+            const summaryBmiEl = document.getElementById('summary-bmi');
+            const validWeightLogs = logs.filter(l => l.weight !== null && l.weight !== undefined && !isNaN(l.weight));
+            
+            if (validWeightLogs.length === 0) {
+                bmiValueEl.innerText = "--";
+                summaryBmiEl.innerText = "--";
+                return;
+            }
+
+            const latestWeight = validWeightLogs[validWeightLogs.length - 1].weight;
+            const hMeter = profile.height / 100;
+            const currentBMI = latestWeight / (hMeter * hMeter);
+            
+            const bmiString = currentBMI.toFixed(1);
+            bmiValueEl.innerText = bmiString;
+            summaryBmiEl.innerText = bmiString;
+        }
+
+        function updateSummaryIndicator() {
+            const weightEl = document.getElementById('summary-weight');
+            const diffEl = document.getElementById('summary-diff');
+            const validWeightLogs = logs.filter(l => l.weight !== null && l.weight !== undefined && !isNaN(l.weight));
+
+            if (validWeightLogs.length === 0) {
+                weightEl.innerText = "--";
+                diffEl.innerText = "--";
+                diffEl.className = "summary-diff diff-zero";
+                return;
+            }
+
+            const latestLog = validWeightLogs[validWeightLogs.length - 1];
+            weightEl.innerText = latestLog.weight.toFixed(1);
+
+            if (validWeightLogs.length >= 2) {
+                const prevLog = validWeightLogs[validWeightLogs.length - 2];
+                const diff = latestLog.weight - prevLog.weight;
+                const formattedDiff = diff > 0 ? `+${diff.toFixed(1)}` : diff.toFixed(1);
+
+                diffEl.innerText = formattedDiff;
+
+                if (diff > 0) {
+                    diffEl.className = "summary-diff diff-plus";
+                } else if (diff < 0) {
+                    diffEl.className = "summary-diff diff-minus";
+                } else {
+                    diffEl.className = "summary-diff diff-zero";
+                }
+            } else {
+                diffEl.innerText = "First";
+                diffEl.className = "summary-diff diff-zero";
+            }
+
+            updateBMIDisplay();
+        }
+
+        function saveLog(e) {
+            e.preventDefault();
+            const dateVal = document.getElementById('input-date').value;
+            const weightInputRaw = document.getElementById('input-weight').value;
+            const memoVal = document.getElementById('input-memo').value;
+
+            if (!dateVal) return;
+
+            let weightVal = null;
+            if (weightInputRaw !== '') {
+                weightVal = parseFloat(weightInputRaw);
+                if (weightVal >= 100) {
+                    const converted = parseFloat((weightVal / 10).toFixed(1));
+                    showToast(`自動補正: ${weightVal} → ${converted}`);
+                    weightVal = converted;
+                }
+            }
+
+            if (weightVal === null && memoVal.trim() === '') {
+                showToast("データが空です");
+                return;
+            }
+
+            const newLog = {
+                id: Date.now(),
+                date: dateVal,
+                weight: weightVal, 
+                memo: memoVal
+            };
+
+            logs.push(newLog);
+            logs.sort((a, b) => new Date(a.date) - new Date(b.date));
+            localStorage.setItem('weight_logs', JSON.stringify(logs));
+
+            showToast("ログを保存しました");
+            document.getElementById('input-weight').value = '';
+            document.getElementById('input-memo').value = '';
+            initDateTime();
+
+            updateSummaryIndicator();
+            renderHistory();
+            updateChart();
+            generateReport();
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerText = message;
+            
+            toast.addEventListener('click', () => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 250);
+            });
+
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 250);
+                }
+            }, 3000);
+        }
+
+        function toggleHistoryView() {
+            isHistoryScrollEnabled = !isHistoryScrollEnabled;
+            
+            const container = document.getElementById('history-container');
+            const toggleBtn = document.getElementById('btn-toggle-history');
+            
+            if (isHistoryScrollEnabled) {
+                container.classList.add('scroll-enabled');
+                toggleBtn.classList.add('active');
+            } else {
+                container.classList.remove('scroll-enabled');
+                toggleBtn.classList.remove('active');
+            }
+            
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('history-container');
+            const toggleBtn = document.getElementById('btn-toggle-history');
+            container.innerHTML = '';
+
+            if (logs.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.9rem;">データがありません</div>';
+                if (toggleBtn) toggleBtn.style.display = 'none';
+                return;
+            }
+
+            if (logs.length > 5) {
+                if (toggleBtn) toggleBtn.style.display = 'inline-block';
+            } else {
+                if (toggleBtn) toggleBtn.style.display = 'none';
+            }
+
+            let reversedLogs = [...logs].reverse();
+
+            if (!isHistoryScrollEnabled && reversedLogs.length > 5) {
+                reversedLogs = reversedLogs.slice(0, 5);
+            }
+
+            reversedLogs.forEach(log => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+
+                const formattedDate = log.date.replace('T', ' ');
+
+                const meta = document.createElement('div');
+                meta.className = 'history-meta';
+
+                const dateEl = document.createElement('span');
+                dateEl.className = 'history-date';
+                dateEl.innerHTML = `📅 ${formattedDate}`;
+                
+                setupLongPress(dateEl, log.id);
+
+                const weightEl = document.createElement('span');
+                weightEl.className = 'history-weight';
+                weightEl.innerText = (log.weight !== null && log.weight !== undefined) ? log.weight.toFixed(1) : '';
+
+                meta.appendChild(dateEl);
+                meta.appendChild(weightEl);
+                item.appendChild(meta);
+
+                if (log.memo) {
+                    const memoEl = document.createElement('div');
+                    memoEl.className = 'history-memo';
+                    memoEl.innerText = log.memo;
+                    item.appendChild(memoEl);
+                }
+
+                container.appendChild(item);
+            });
+        }
+
+        function setupLongPress(element, id) {
+            let pressTimer;
+            const startPress = (e) => { pressTimer = setTimeout(() => { deleteLogConfirm(id); }, 800); };
+            const cancelPress = () => { clearTimeout(pressTimer); };
+
+            element.addEventListener('mousedown', startPress);
+            element.addEventListener('mouseup', cancelPress);
+            element.addEventListener('mouseleave', cancelPress);
+            element.addEventListener('touchstart', startPress, { passive: true });
+            element.addEventListener('touchend', cancelPress, { passive: true });
+            element.addEventListener('touchcancel', cancelPress, { passive: true });
+        }
+
+        function deleteLogConfirm(id) {
+            const logItem = logs.find(l => l.id === id);
+            if (!logItem) return;
+
+            const displayWeight = logItem.weight ? `${logItem.weight}` : "メモのみ";
+            if (confirm(`【確認】\n${logItem.date.replace('T', ' ')} のログ(${displayWeight}) を削除しますか？`)) {
+                logs = logs.filter(l => l.id !== id);
+                localStorage.setItem('weight_logs', JSON.stringify(logs));
+                showToast("データが削除されました");
+                
+                updateSummaryIndicator();
+                renderHistory();
+                updateChart();
+                generateReport();
+            }
+        }
+
+        function resetAllData() {
+            if (confirm("【警告】\nすべてのサンプルデータおよび記録ログを完全に消去しますか？この操作は戻せません。")) {
+                if (confirm("本当に本当によろしいですか？（すべての履歴が空になります）")) {
+                    logs = [];
+                    localStorage.setItem('weight_logs', JSON.stringify(logs));
+                    showToast("すべてのデータをクリアしました");
+                    
+                    isHistoryScrollEnabled = false;
+                    const container = document.getElementById('history-container');
+                    container.classList.remove('scroll-enabled');
+                    const toggleBtn = document.getElementById('btn-toggle-history');
+                    if (toggleBtn) toggleBtn.classList.remove('active');
+                    
+                    updateSummaryIndicator();
+                    renderHistory();
+                    
+                    if (chart) {
+                        chart.destroy();
+                        chart = null;
+                    }
+                    initChart();
+                    generateReport();
+                }
+            }
+        }
+
+        function exportDataJSON() {
+            if (logs.length === 0) {
+                showToast("エクスポートするデータがありません");
+                return;
+            }
+            
+            const dataStr = JSON.stringify(logs, null, 2);
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
+            const now = new Date();
+            const dateStr = now.toISOString().slice(0,10).replace(/-/g, '');
+            
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.href = url;
+            downloadAnchor.download = `mylog_backup_${dateStr}.json`;
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            document.body.removeChild(downloadAnchor);
+            URL.revokeObjectURL(url);
+            
+            showToast("JSONファイルをエクスポートしました");
+        }
+
+        function importDataJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsedData = JSON.parse(e.target.result);
+                    if (!Array.isArray(parsedData)) {
+                        throw new Error("データが配列形式ではありません。");
+                    }
+                    if (parsedData.length > 0 && (!parsedData[0].hasOwnProperty('date') || !parsedData[0].hasOwnProperty('weight'))) {
+                        throw new Error("ログデータの形式が正しくありません。");
+                    }
+
+                    if (confirm(`【バックアップ復元】\nファイルから ${parsedData.length} 件のログを読み込みました。\n現在のブラウザのデータは上書きされますが、よろしいですか？`)) {
+                        logs = parsedData;
+                        logs.sort((a, b) => new Date(a.date) - new Date(b.date));
+                        localStorage.setItem('weight_logs', JSON.stringify(logs));
+                        
+                        showToast("バックアップデータを復元しました");
+                        
+                        isHistoryScrollEnabled = false;
+                        document.getElementById('history-container').classList.remove('scroll-enabled');
+                        const toggleBtn = document.getElementById('btn-toggle-history');
+                        if (toggleBtn) toggleBtn.classList.remove('active');
+                        
+                        updateSummaryIndicator();
+                        renderHistory();
+                        
+                        if (chart) {
+                            chart.destroy();
+                            chart = null;
+                        }
+                        initChart();
+                        generateReport();
+                    }
+                } catch (error) {
+                    alert(`【エラー】インポートに失敗しました。\n原因: ${error.message}`);
+                } finally {
+                    document.getElementById('file-input').value = "";
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function generateReport() {
+            const badgeBox = document.getElementById('status-badge-box');
+            const scoreDisplay = document.getElementById('score-display');
+            const reportBox = document.getElementById('report-box');
+            const breakdownBox = document.getElementById('report-breakdown');
+            
+            const validWeightLogs = logs.filter(l => l.weight !== null && l.weight !== undefined);
+
+            if (validWeightLogs.length === 0) {
+                badgeBox.className = "status-badge-box badge-box-review";
+                badgeBox.innerText = "⚠️ データ不足";
+                scoreDisplay.innerText = "0";
+                reportBox.innerText = "データが未登録です。ログを記録するとテクニカル分析が開始されます。";
+                breakdownBox.style.display = "none";
+                
+                document.body.className = ''; 
+                return;
+            }
+
+            const latest = validWeightLogs[validWeightLogs.length - 1];
+            const currentWeight = latest.weight;
+
+            let score_activity = 0;   
+            let score_condition = 0;  
+
+            const today = new Date();
+            const hMeter = profile.height / 100;
+            const hSquare = hMeter * hMeter;
+            const currentBMI = currentWeight / hSquare;
+
+            const logCountPerDay = {};
+            for (let i = 1; i <= 7; i++) {
+                const d = new Date();
+                d.setDate(today.getDate() - i);
+                const dateStr = d.toISOString().split('T')[0];
+                logCountPerDay[dateStr] = 0;
+            }
+
+            logs.forEach(l => {
+                const logDateStr = l.date.split('T')[0];
+                if (logCountPerDay.hasOwnProperty(logDateStr)) {
+                    logCountPerDay[logDateStr]++;
+                }
+            });
+
+            Object.keys(logCountPerDay).forEach(dateStr => {
+                const count = logCountPerDay[dateStr];
+                if (count === 1) score_activity += 4; 
+                if (count >= 2) score_activity += 8; 
+            });
+
+            if (score_activity > 50) score_activity = 50; 
+
+            const dailyDataObj = getAllTimeframeCandlestickData('DALL');
+            const ma7List = dailyDataObj.ma7;
+            const ma30List = dailyDataObj.ma30;
+
+            let ma7PerfectGood = true;   
+            let ma7PerfectNormal = true; 
+            let ma30PerfectGood = true;  
+            
+            let ma7CheckedDays = 0;
+            let ma30CheckedDays = 0;
+
+            for (let i = 0; i < 7; i++) {
+                const targetIdx = ma7List.length - 1 - i;
+                if (targetIdx >= 0) {
+                    ma7CheckedDays++;
+                    const ma7Val = ma7List[targetIdx].y;
+                    const bmi = ma7Val / hSquare;
+                    if (bmi < 21.0 || bmi > 23.0) ma7PerfectGood = false;
+                    if (bmi < 18.5 || bmi > 25.0) ma7PerfectNormal = false;
+                } else {
+                    ma7PerfectGood = false;
+                    ma7PerfectNormal = false;
+                }
+
+                const targetIdx30 = ma30List.length - 1 - i;
+                if (targetIdx30 >= 0) {
+                    ma30CheckedDays++;
+                    const ma30Val = ma30List[targetIdx30].y;
+                    const bmi30 = ma30Val / hSquare;
+                    if (bmi30 < 21.0 || bmi30 > 23.0) ma30PerfectGood = false;
+                } else {
+                    ma30PerfectGood = false;
+                }
+            }
+
+            if (ma7CheckedDays >= 7 && ma7PerfectGood) {
+                score_condition = 40;     
+            } else if (ma7CheckedDays >= 7 && ma7PerfectNormal) {
+                score_condition = 30;     
+            } else {
+                score_condition = 10;     
+            }
+
+            let hasMa30Bonus = false;
+            if (ma30CheckedDays >= 7 && ma30PerfectGood) {
+                score_condition += 10;
+                hasMa30Bonus = true;
+            }
+
+            const totalScore = score_activity + score_condition;
+            scoreDisplay.innerText = totalScore;
+
+            updateThemeByScore(totalScore);
+
+            if (chart) {
+                updateChartAnnotations();
+            }
+
+            let volatilityHigh = false;
+            let maxVolDiffPct = 0; 
+            const latestTime = new Date(latest.date).getTime();
+            const fortyEightHours = 48 * 60 * 60 * 1000;
+
+            const pastLogsIn48h = validWeightLogs.filter(l => {
+                const logTime = new Date(l.date).getTime();
+                return l.id !== latest.id && (latestTime - logTime) >= 0 && (latestTime - logTime) <= fortyEightHours;
+            });
+
+            if (pastLogsIn48h.length > 0) {
+                const basePastLog = pastLogsIn48h[pastLogsIn48h.length - 1];
+                const diffPct = ((currentWeight - basePastLog.weight) / basePastLog.weight) * 100;
+                if (Math.abs(diffPct) >= 2.0) {
+                    volatilityHigh = true;
+                    maxVolDiffPct = diffPct;
+                }
+            }
+
+            let orbitText = "保ち合い";
+            if (validWeightLogs.length >= 5) {
+                const recent5 = validWeightLogs.slice(-5);
+                const diff5 = recent5[4].weight - recent5[0].weight;
+                if (diff5 < -0.4) orbitText = "下落基調";
+                if (diff5 > 0.4) orbitText = "上昇基調";
+            }
+
+            let positionText = "適正範囲内";
+            let statusClass = 'badge-box-fair';
+            let commentText = "";
+
+            if (currentBMI < 18.5) {
+                positionText = "低体重";
+                statusClass = 'badge-box-review';
+                commentText = `国内成人の約1割が属する低体重域に位置。チャートは${orbitText}を示しており、理想中心線（BMI22）を下回る水準での推移が続いています。`;
+            } else if (currentBMI >= 18.5 && currentBMI < 21.0) {
+                positionText = "適正(下限接近)";
+                statusClass = 'badge-box-fair';
+                commentText = `成人人口の約65%を占める主要レンジ内ですが、下限寄りにプロット。現在は${orbitText}を形成し、中心線への収束力を測る局面です。`;
+            } else if (currentBMI >= 21.0 && currentBMI <= 23.0) {
+                positionText = "理想中心(優良)";
+                statusClass = 'badge-box-prime';
+                commentText = `主要レンジ内で最も均衡が取れたコアゾーン（BMI22付近）に定着。ローソク足は${orbitText}を描き、極めて安定した相場環境を維持しています。`;
+            } else if (currentBMI > 23.0 && currentBMI <= 25.0) {
+                positionText = "適正(上限接近)";
+                statusClass = 'badge-box-fair';
+                commentText = `主要レンジ内ですが上限寄りにプロット。チャートは${orbitText}を形成しており、中心線（BMI22）への回帰・収束を待つ状態です。`;
+            } else {
+                positionText = "要調整";
+                statusClass = 'badge-box-review';
+                commentText = `国内成人の約25%が属する過剰積載域にプロット。現在は${orbitText}を示しており、上位足における抵抗線のブレイク状況を注視する局面です。`;
+            }
+
+            if (volatilityHigh) {
+                statusClass = 'badge-box-volatility';
+                positionText = "⚠️ ボラティリティ高";
+                
+                const formattedPct = maxVolDiffPct > 0 ? `+${maxVolDiffPct.toFixed(1)}` : `${maxVolDiffPct.toFixed(1)}`;
+                if (maxVolDiffPct < 0) {
+                    commentText = `48時間以内の急激な下方乖離（${formattedPct}%）を検知。構造的な企業価値（体組成）の毀損ではなく、一時的な資産の流動化（水分減少）に伴う帳簿上のノイズの可能性が濃厚です。指標の信頼性が一時的に低下しているため、突発的な値動きに惑わされず、定時打刻によるデータ蓄積を継続すべきフェーズです。`;
+                } else {
+                    commentText = `48時間以内の想定レンジを上抜ける急騰（${formattedPct}%）を観測。本質的なアセットの増価ではなく、一時的な内部留保（水分貯留）の膨張による見かけ上のスパイクと判断されます。数日以内に適正レーティングへ収束する蓋然性が高ため、一過性のオーバーヒートを静観し、監査体制を維持してください。`;
+                }
+            }
+
+            badgeBox.className = `status-badge-box ${statusClass}`;
+            badgeBox.innerText = positionText;
+            reportBox.innerText = commentText;
+
+            const activityPct = (score_activity / 50) * 100;
+            const conditionPct = (score_condition / 50) * 100;
+
+            let activityHint = `昨日以前の7日間の打刻実績（1日1回+4点 / 2回以上+8点）。ほぼ毎日朝晩の入力で満点（50点）に到達し、継続しやすい仕組みに設計されています。`;
+
+            let conditionHint = `直近7日間の移動平均（MA7）が適正〜優良ゾーンにプロットされているかを判定。`;
+            if (hasMa30Bonus) {
+                conditionHint = `💎 【長期維持ボーナス獲得】 MA30も優良範囲をキープしています。`;
+            } else if (score_condition >= 40) {
+                conditionHint = `MA7は優良。過去7日間のMA30もすべて優良範囲に入ると長期維持ボーナス（+10点）が付与されます。`;
+            }
+
+            breakdownBox.innerHTML = `
+                <div class="breakdown-item">
+                    <div class="breakdown-meta">
+                        <span class="breakdown-label">①データ密度（ログ・アクティビティ）</span>
+                        <span class="breakdown-points">${score_activity} / 50 点</span>
+                    </div>
+                    <div class="breakdown-bar-bg">
+                        <div class="breakdown-bar-fill" style="width: ${activityPct}%;"></div>
+                    </div>
+                    <div class="breakdown-hint">${activityHint}</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="breakdown-meta">
+                        <span class="breakdown-label">② コンディション（移動平均・トレンド維持）</span>
+                        <span class="breakdown-points">${score_condition} / 50 点</span>
+                    </div>
+                    <div class="breakdown-bar-bg">
+                        <div class="breakdown-bar-fill" style="width: ${conditionPct}%;"></div>
+                    </div>
+                    <div class="breakdown-hint">${conditionHint}</div>
+                </div>
+            `;
+            breakdownBox.style.display = "flex";
+        }
+
+        function getAllTimeframeCandlestickData(timeframe) {
+            const validWeightLogs = logs.filter(l => l.weight !== null && l.weight !== undefined);
+            const groups = {};
+
+            function getMondayBasedWeekStr(dateObj) {
+                const d = new Date(dateObj);
+                const day = d.getDay();
+                const diff = d.getDate() - day + (day === 0 ? -6 : 1); 
+                const monday = new Date(d.setDate(diff));
+                return monday.toISOString().split('T')[0];
+            }
+
+            validWeightLogs.forEach(log => {
+                const logDate = new Date(log.date);
+                let key = "";
+
+                if (timeframe === 'D30' || timeframe === 'DALL') {
+                    key = log.date.split('T')[0];
+                } else if (timeframe === 'W') {
+                    key = getMondayBasedWeekStr(logDate);
+                } else if (timeframe === 'M') {
+                    key = `${logDate.getFullYear()}-${String(logDate.getMonth() + 1).padStart(2, '0')}`;
+                } else if (timeframe === 'Y') {
+                    key = `${logDate.getFullYear()}`;
+                }
+                
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(log);
+            });
+
+            const sortedKeys = Object.keys(groups).sort();
+            const candlestickSeries = [];
+            const rawCloseData = [];
+
+            sortedKeys.forEach(keyStr => {
+                const periodLogs = groups[keyStr];
+                periodLogs.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                const open = periodLogs[0].weight;
+                const close = periodLogs[periodLogs.length - 1].weight;
+                const high = Math.max(...periodLogs.map(l => l.weight));
+                const low = Math.min(...periodLogs.map(l => l.weight));
+
+                let timestamp = 0;
+                if (timeframe === 'D30' || timeframe === 'DALL' || timeframe === 'W') {
+                    timestamp = new Date(keyStr).getTime();
+                } else if (timeframe === 'M') {
+                    timestamp = new Date(`${keyStr}-01`).getTime();
+                } else if (timeframe === 'Y') {
+                    timestamp = new Date(`${keyStr}-01-01`).getTime();
+                }
+
+                candlestickSeries.push({ x: timestamp, y: [open, high, low, close] });
+                rawCloseData.push({ x: timestamp, close: close });
+            });
+
+            const ma7Series = [];
+            const ma30Series = [];
+            if (timeframe === 'D30' || timeframe === 'DALL') {
+                for (let i = 0; i < rawCloseData.length; i++) {
+                    if (i >= 6) {
+                        let sum = 0;
+                        for (let j = 0; j < 7; j++) sum += rawCloseData[i - j].close;
+                        ma7Series.push({ x: rawCloseData[i].x, y: parseFloat((sum / 7).toFixed(2)) });
+                    }
+                    if (i >= 29) {
+                        let sum = 0;
+                        for (let j = 0; j < 30; j++) sum += rawCloseData[i - j].close;
+                        ma30Series.push({ x: rawCloseData[i].x, y: parseFloat((sum / 30).toFixed(2)) });
+                    }
+                }
+            }
+
+            return { candlestick: candlestickSeries, ma7: ma7Series, ma30: ma30Series };
+        }
+
+        function getRecent30CandlestickData(timeframe) {
+            const fullData = getAllTimeframeCandlestickData(timeframe);
+            
+            if (timeframe === 'D30') {
+                const sliceCount = 30;
+                const slicedCandlestick = fullData.candlestick.slice(-sliceCount);
+                let slicedMa7 = [];
+                let slicedMa30 = [];
+                
+                if (slicedCandlestick.length > 0) {
+                    const minTimestamp = slicedCandlestick[0].x;
+                    slicedMa7 = fullData.ma7.filter(d => d.x >= minTimestamp);
+                    slicedMa30 = fullData.ma30.filter(d => d.x >= minTimestamp);
+                }
+                return { candlestick: slicedCandlestick, ma7: slicedMa7, ma30: slicedMa30 };
+            }
+
+            return fullData;
+        }
+
+        function initChart() {
+            const defaultTimeframe = document.getElementById('range-selector').value;
+            const dataObj = getRecent30CandlestickData(defaultTimeframe);
+            updatePeriodExtremeValues(dataObj.candlestick);
+
+            let minX = undefined;
+            let maxX = undefined;
+            if (defaultTimeframe === 'D30' && dataObj.candlestick.length > 0) {
+                const latestX = dataObj.candlestick[dataObj.candlestick.length - 1].x;
+                minX = latestX - (30 * 24 * 60 * 60 * 1000); 
+                maxX = latestX + (0.5 * 24 * 60 * 60 * 1000); 
+            }
+
+            const options = {
+                series: [
+                    { name: 'ローソク足', type: 'candlestick', data: dataObj.candlestick },
+                    { name: '7日移動平均', type: 'line', data: dataObj.ma7 },
+                    { name: '30日移動平均', type: 'line', data: dataObj.ma30 }
+                ],
+                chart: {
+                    type: 'candlestick',
+                    height: 320,
+                    id: 'weight_chart',
+                    background: 'transparent',
+                    toolbar: { show: false },
+                    zoom: { enabled: false },      
+                    scrolling: { enabled: false }, 
+                    events: {
+                        mouseMove: function(event, chartContext, config) { updateBoardLabels(config); },
+                        dataPointMouseEnter: function(event, chartContext, config) { updateBoardLabels(config); },
+                        dataPointSelection: function(event, chartContext, config) { updateBoardLabels(config); },
+                        mouseLeave: function() { resetBoardToLatest(); }
+                    }
+                },
+                theme: { mode: 'dark' },
+                stroke: { 
+                    width: [1, 3, 3], 
+                    curve: 'smooth' 
+                },
+                colors: ['#2962ff', '#ff9f43', '#08d158'], 
+                plotOptions: {
+                    candlestick: {
+                        colors: { 
+                            upward: '#f23645', 
+                            downward: '#007aff' 
+                        },
+                        wick: { useFilledColors: true }
+                    }
+                },
+                xaxis: {
+                    type: 'datetime',
+                    min: minX,
+                    max: maxX,
+                    labels: {
+                        style: { colors: '#848e9c', fontFamily: 'JetBrains Mono' },
+                        datetimeFormatter: { year: 'yyyy年', month: 'yyyy/MM', day: 'MM/dd' }
+                    },
+                    axisBorder: { color: '#2a2e39' },
+                    axisTicks: { color: '#2a2e39' }
+                },
+                yaxis: {
+                    labels: {
+                        minWidth: 32,
+                        maxWidth: 32,
+                        offsetX: -6,
+                        style: { colors: '#848e9c', fontFamily: 'JetBrains Mono' },
+                        formatter: function (val) { return val ? val.toFixed(1) : ""; }
+                    }
+                },
+                tooltip: { enabled: false },
+                grid: { 
+                    borderColor: '#2a2e39',
+                    padding: { left: 0, right: 8 }
+                },
+                markers: { size: 0 }, 
+                dataLabels: { enabled: false },
+                annotations: { yaxis: [] }
+            };
+
+            chart = new ApexCharts(document.querySelector("#main-chart"), options);
+            chart.render().then(() => {
+                updateChartAnnotations();
+                resetBoardToLatest();
+            });
+        }
+
+        function updateChartAnnotations() {
+            if (!chart) return;
+            
+            const body = document.body;
+            const isGoldTheme = body.classList.contains('theme-gold') || body.classList.contains('theme-rainbow');
+            const centerLineColor = isGoldTheme ? '#c5a059' : '#2962ff';
+            const rangeBgColor = isGoldTheme ? '#c5a059' : '#2962ff';
+
+            chart.updateOptions({
+                annotations: {
+                    yaxis: [
+                        {
+                            y: computedRanges.center,
+                            borderColor: centerLineColor,
+                            strokeDashArray: 0,
+                            borderWidth: 2,
+                            label: {
+                                borderColor: 'transparent',
+                                style: { color: 'transparent', background: 'transparent' },
+                                text: ''
+                            }
+                        },
+                        {
+                            y: computedRanges.goodMin,
+                            y2: computedRanges.goodMax,
+                            borderColor: '#08d158',
+                            borderWidth: 1,
+                            fillColor: '#08d158',
+                            opacity: 0.15, 
+                            label: {
+                                borderColor: 'transparent',
+                                style: { color: 'transparent', background: 'transparent' },
+                                text: ''
+                            }
+                        },
+                        {
+                            y: computedRanges.normalMin,
+                            y2: computedRanges.normalMax,
+                            borderColor: rangeBgColor,
+                            borderWidth: 1,
+                            fillColor: rangeBgColor,
+                            opacity: 0.08, 
+                            label: {
+                                borderColor: 'transparent',
+                                style: { color: 'transparent', background: 'transparent' },
+                                text: ''
+                            }
+                        }
+                    ]
+                }
+            });
+        }
+
+        function updateChart() {
+            if (!chart) return;
+
+            const timeframe = document.getElementById('range-selector').value;
+            const dataObj = getRecent30CandlestickData(timeframe);
+
+            updatePeriodExtremeValues(dataObj.candlestick);
+
+            const isDaily = (timeframe === 'D30' || timeframe === 'DALL');
+            const finalMa7 = isDaily ? dataObj.ma7 : [];
+            const finalMa30 = isDaily ? dataObj.ma30 : [];
+
+            let minX = undefined;
+            let maxX = undefined;
+            if (timeframe === 'D30' && dataObj.candlestick.length > 0) {
+                const latestX = dataObj.candlestick[dataObj.candlestick.length - 1].x;
+                minX = latestX - (30 * 24 * 60 * 60 * 1000);
+                maxX = latestX + (0.5 * 24 * 60 * 60 * 1000);
+            }
+
+            chart.updateOptions({
+                xaxis: {
+                    min: minX,
+                    max: maxX
+                },
+                series: [
+                    { name: (timeframe.startsWith('D') ? '日足' : timeframe === 'W' ? '週足' : timeframe === 'M' ? '月足' : '年足'), type: 'candlestick', data: dataObj.candlestick },
+                    { name: '7日移動平均', type: 'line', data: finalMa7 },
+                    { name: '30日移動平均', type: 'line', data: finalMa30 }
+                ]
+            });
+
+            updateChartAnnotations();
+            updateBMIDisplay();
+
+            setTimeout(() => { resetBoardToLatest(); }, 100);
+        }
+
+        function updatePeriodExtremeValues(candlestickData) {
+            if (!candlestickData || candlestickData.length === 0) {
+                document.getElementById('board-period-high').innerText = '--';
+                document.getElementById('board-period-low').innerText = '--';
+                return;
+            }
+            const highs = candlestickData.map(d => d.y[1]);
+            const lows = candlestickData.map(d => d.y[2]);
+            document.getElementById('board-period-high').innerText = Math.max(...highs).toFixed(1);
+            document.getElementById('board-period-low').innerText = Math.min(...lows).toFixed(1);
+        }
+
+        function formatBoardDateStr(timestamp, tf) {
+            const dateObj = new Date(timestamp);
+            const y = dateObj.getFullYear();
+            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const d = String(dateObj.getDate()).padStart(2, '0');
+
+            if (tf.startsWith('D')) {
+                return `${y}/${m}/${d}`;
+            } else if (tf === 'W') {
+                const sundayObj = new Date(timestamp);
+                sundayObj.setDate(sundayObj.getDate() + 6);
+                const sm = String(sundayObj.getMonth() + 1).padStart(2, '0');
+                const sd = String(sundayObj.getDate()).padStart(2, '0');
+                return `${y}/${m}/${d} 〜 ${sundayObj.getFullYear()}/${sm}/${sd}`;
+            } else if (tf === 'M') {
+                return `${y}年 ${m}月足`;
+            } else if (tf === 'Y') {
+                return `${y}年足`;
+            }
+            return `${y}/${m}/${d}`;
+        }
+
+        function updateBoardLabels(config) {
+            const dataPointIndex = config.dataPointIndex;
+            if (dataPointIndex === undefined || dataPointIndex < 0) return;
+
+            const w = config.w;
+            if (!w || !w.config || !w.config.series || !w.config.series[0] || !w.config.series[0].data) return;
+            
+            const candleData = w.config.series[0].data[dataPointIndex];
+            if (!candleData || !candleData.y) return;
+
+            const tf = document.getElementById('range-selector').value;
+            document.getElementById('board-date').innerText = formatBoardDateStr(candleData.x, tf);
+            document.getElementById('board-open').innerText = candleData.y[0].toFixed(1);
+            document.getElementById('board-high').innerText = candleData.y[1].toFixed(1);
+            document.getElementById('board-low').innerText = candleData.y[2].toFixed(1);
+            document.getElementById('board-close').innerText = candleData.y[3].toFixed(1);
+        }
+
+        function resetBoardToLatest() {
+            const tf = document.getElementById('range-selector').value;
+            const dataObj = getRecent30CandlestickData(tf);
+            const candles = dataObj.candlestick;
+
+            if (!candles || candles.length === 0) {
+                document.getElementById('board-date').innerText = '--';
+                document.getElementById('board-open').innerText = '--';
+                document.getElementById('board-high').innerText = '--';
+                document.getElementById('board-low').innerText = '--';
+                document.getElementById('board-close').innerText = '--';
+                return;
+            }
+
+            const latestCandle = candles[candles.length - 1];
+            const dateStr = formatBoardDateStr(latestCandle.x, tf);
+
+            document.getElementById('board-date').innerText = `${dateStr} (最新)`;
+            document.getElementById('board-open').innerText = latestCandle.y[0].toFixed(1);
+            document.getElementById('board-high').innerText = latestCandle.y[1].toFixed(1);
+            document.getElementById('board-low').innerText = latestCandle.y[2].toFixed(1);
+            document.getElementById('board-close').innerText = latestCandle.y[3].toFixed(1);
+        }
+
+        function updateThemeByScore(score) {
+            const body = document.body;
+            body.classList.remove('theme-green', 'theme-blue', 'theme-gold', 'theme-rainbow');
+
+            if (score >= 0 && score <= 59) {
+                body.classList.add('theme-green');
+            } else if (score >= 60 && score <= 79) {
+                body.classList.add('theme-blue');
+            } else if (score >= 80 && score <= 99) {
+                body.classList.add('theme-gold');
+            } else if (score === 100) {
+                body.classList.add('theme-rainbow');
+            }
+        }
+    </script>
+</body>
+</html>
