@@ -179,12 +179,12 @@
             color: var(--text-bright);
         }
 
-        /* --- 入力フォーム（省スペース化調整） --- */
+        /* --- 入力フォーム --- */
         .recording-card {
-            padding: 12px 14px; /* パディングを少し縮小 */
+            padding: 12px 14px;
         }
         .form-group {
-            margin-bottom: 10px; /* 入力項目間の余白を12pxから10pxに縮小 */
+            margin-bottom: 10px;
         }
 
         input, select, textarea {
@@ -1736,6 +1736,7 @@
                 colors: ['#2962ff', '#ff9f43', '#08d158'], 
                 plotOptions: {
                     candlestick: {
+                        columnWidth: '65%',
                         colors: { 
                             upward: '#f23645', 
                             downward: '#007aff' 
@@ -1847,13 +1848,27 @@
 
             let minX = undefined;
             let maxX = undefined;
+            let columnWidthVal = '65%';
+
             if (timeframe === 'D30' && dataObj.candlestick.length > 0) {
                 const latestX = dataObj.candlestick[dataObj.candlestick.length - 1].x;
                 minX = latestX - (30 * 24 * 60 * 60 * 1000);
                 maxX = latestX + (0.5 * 24 * 60 * 60 * 1000);
+            } else if (timeframe === 'W' && dataObj.candlestick.length > 0) {
+                const firstX = dataObj.candlestick[0].x;
+                const latestX = dataObj.candlestick[dataObj.candlestick.length - 1].x;
+                const margin = 3.5 * 24 * 60 * 60 * 1000;
+                minX = firstX - margin;
+                maxX = latestX + margin;
+                columnWidthVal = '85%';
             }
 
             chart.updateOptions({
+                plotOptions: {
+                    candlestick: {
+                        columnWidth: columnWidthVal
+                    }
+                },
                 xaxis: {
                     min: minX,
                     max: maxX
