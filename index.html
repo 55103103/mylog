@@ -939,6 +939,22 @@
         </div>
     </div>
 
+    <!-- 追加: 設定ウィンドウ -->
+    <div class="card">
+        <h2>Settings</h2>
+        <div class="form-group">
+            <label for="default-timeframe-select" style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500; display: block; margin-bottom: 6px;">チャートの初期表示時間足</label>
+            <select id="default-timeframe-select">
+                <option value="D30">日足 (直近30日)</option>
+                <option value="DALL">日足 (全期間)</option>
+                <option value="W">週足 (Weekly)</option>
+                <option value="M">月足 (Monthly)</option>
+                <option value="Y">年足 (Yearly)</option>
+            </select>
+        </div>
+        <button type="button" class="btn-profile-save" onclick="saveDefaultTimeframe()">初期表示設定を保存</button>
+    </div>
+
     <div class="system-danger-zone">
         <button class="btn-danger-reset" onclick="resetAllData()">🗑️ すべてのデータをリセット</button>
     </div>
@@ -1020,6 +1036,22 @@
             if (storedProfile) {
                 profile = JSON.parse(storedProfile);
                 document.getElementById('profile-height').value = profile.height;
+            }
+
+            // 初期表示時間足の読み込み
+            const defaultTimeframe = localStorage.getItem('default_timeframe') || 'D30';
+            document.getElementById('range-selector').value = defaultTimeframe;
+            document.getElementById('default-timeframe-select').value = defaultTimeframe;
+        }
+
+        function saveDefaultTimeframe() {
+            const selectedVal = document.getElementById('default-timeframe-select').value;
+            localStorage.setItem('default_timeframe', selectedVal);
+            document.getElementById('range-selector').value = selectedVal;
+            
+            showToast("初期表示時間足を保存しました");
+            if (chart) {
+                updateChart();
             }
         }
 
@@ -1749,6 +1781,8 @@
                 maxX = latestX + (0.5 * 24 * 60 * 60 * 1000); 
             }
 
+            const isCategory = (defaultTimeframe === 'W' || defaultTimeframe === 'M' || defaultTimeframe === 'Y');
+
             const options = {
                 series: [
                     { name: 'ローソク足', type: 'candlestick', data: dataObj.candlestick },
@@ -1787,9 +1821,9 @@
                     }
                 },
                 xaxis: {
-                    type: 'datetime',
-                    min: minX,
-                    max: maxX,
+                    type: isCategory ? 'category' : 'datetime',
+                    min: isCategory ? undefined : minX,
+                    max: isCategory ? undefined : maxX,
                     labels: {
                         style: { colors: '#848e9c', fontFamily: 'JetBrains Mono' },
                         datetimeFormatter: { year: 'yyyy年', month: 'yyyy/MM', day: 'MM/dd' }
