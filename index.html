@@ -967,6 +967,10 @@
             normalMax: 25
         };
 
+        function sortLogs(logsArray) {
+            return logsArray.sort((a, b) => new Date(a.date) - new Date(b.date));
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             initDateTime();
             loadLocalStorage();
@@ -987,6 +991,7 @@
             const storedLogs = localStorage.getItem('weight_logs');
             if (storedLogs) {
                 logs = JSON.parse(storedLogs);
+                sortLogs(logs);
             } else {
                 const today = new Date();
                 logs = [];
@@ -1007,6 +1012,7 @@
                         memo: "夜、食事後。"
                     });
                 }
+                sortLogs(logs);
                 localStorage.setItem('weight_logs', JSON.stringify(logs));
             }
 
@@ -1145,7 +1151,7 @@
             };
 
             logs.push(newLog);
-            logs.sort((a, b) => new Date(a.date) - new Date(b.date));
+            sortLogs(logs);
             localStorage.setItem('weight_logs', JSON.stringify(logs));
 
             showToast("ログを保存しました");
@@ -1238,7 +1244,7 @@
 
                 const weightEl = document.createElement('span');
                 weightEl.className = 'history-weight';
-                weightEl.innerText = (log.weight !== null && log.weight !== undefined) ? log.weight.toFixed(1) : '';
+                weightEl.innerText = (log.weight !== null && log.weight !== undefined) ? Number(log.weight).toFixed(1) : '';
 
                 meta.appendChild(dateEl);
                 meta.appendChild(weightEl);
@@ -1275,6 +1281,7 @@
             const displayWeight = logItem.weight ? `${logItem.weight}` : "メモのみ";
             if (confirm(`【確認】\n${logItem.date.replace('T', ' ')} のログ(${displayWeight}) を削除しますか？`)) {
                 logs = logs.filter(l => l.id !== id);
+                sortLogs(logs);
                 localStorage.setItem('weight_logs', JSON.stringify(logs));
                 showToast("データが削除されました");
                 
@@ -1346,16 +1353,44 @@
                     if (!Array.isArray(parsedData)) {
                         throw new Error("データが配列形式ではありません。");
                     }
-                    if (parsedData.length > 0 && (!parsedData[0].hasOwnProperty('date') || !parsedData[0].hasOwnProperty('weight'))) {
-                        throw new Error("ログデータの形式が正しくありません。");
+
+                    const sanitizedData = parsedData.map((item, index) => {
+                        let rawDate = item.date || item.datetime || item.timestamp || item.created_at;
+                        if (!rawDate) return null;
+
+                        let parsedDateStr;
+                        try {
+                            parsedDateStr = new Date(rawDate).toISOString().slice(0, 16);
+                        } catch(err) {
+                            return null;
+                        }
+                        if (parsedDateStr === "Invalid Date") return null;
+
+                        let rawWeight = item.weight !== undefined ? item.weight : item.value;
+                        let numWeight = null;
+                        if (rawWeight !== null && rawWeight !== undefined && rawWeight !== '') {
+                            numWeight = parseFloat(rawWeight);
+                            if (isNaN(numWeight)) numWeight = null;
+                            else if (numWeight >= 100) numWeight = parseFloat((numWeight / 10).toFixed(1));
+                        }
+
+                        return {
+                            id: item.id || (Date.now() + index),
+                            date: parsedDateStr,
+                            weight: numWeight,
+                            memo: item.memo || item.note || ""
+                        };
+                    }).filter(item => item !== null);
+
+                    if (sanitizedData.length === 0) {
+                        throw new Error("有効なログデータが見つかりませんでした。");
                     }
 
-                    if (confirm(`【バックアップ復元】\nファイルから ${parsedData.length} 件のログを読み込みました。\n現在のブラウザのデータは上書きされますが、よろしいですか？`)) {
-                        logs = parsedData;
-                        logs.sort((a, b) => new Date(a.date) - new Date(b.date));
+                    if (confirm(`【バックアップ復元】\nファイルから ${sanitizedData.length} 件のログを読み込みました。\n自動的に日時ソートおよびデータ整形を行って取り込みます。よろしいですか？`)) {
+                        logs = sortLogs(sanitizedData);
                         localStorage.setItem('weight_logs', JSON.stringify(logs));
                         
-                        showToast("バックアップデータを復元しました");
+                        showToast("データ整形・復元が完了しました");
                         
                         isHistoryScrollEnabled = false;
                         document.getElementById('history-container').classList.remove('scroll-enabled');
@@ -1387,7 +1422,7 @@
             const reportBox = document.getElementById('report-box');
             const breakdownBox = document.getElementById('report-breakdown');
             
-            const validWeightLogs = logs.filter(l => l.weight !== null && l.weight !== undefined);
+            const validWeightLogs = logs.filter(l => l.weight !== null && l.weight !== undefined && !isNaN(l.weight));
 
             if (validWeightLogs.length === 0) {
                 badgeBox.className = "status-badge-box badge-box-review";
@@ -1401,7 +1436,7 @@
             }
 
             const latest = validWeightLogs[validWeightLogs.length - 1];
-            const currentWeight = latest.weight;
+            const currentWeight = Number(latest.weight);
 
             let score_activity = 0;   
             let score_condition = 0;  
@@ -1598,8 +1633,9 @@
             breakdownBox.style.display = "flex";
         }
 
+        /* --- 集計データ生成（カテゴリ型対応修正版） --- */
         function getAllTimeframeCandlestickData(timeframe) {
-            const validWeightLogs = logs.filter(l => l.weight !== null && l.weight !== undefined);
+            const validLogs = sortLogs([...logs]).filter(l => l.weight !== null && l.weight !== undefined && !isNaN(l.weight));
             const groups = {};
 
             function getMondayBasedWeekStr(dateObj) {
@@ -1607,10 +1643,13 @@
                 const day = d.getDay();
                 const diff = d.getDate() - day + (day === 0 ? -6 : 1); 
                 const monday = new Date(d.setDate(diff));
-                return monday.toISOString().split('T')[0];
+                const y = monday.getFullYear();
+                const m = String(monday.getMonth() + 1).padStart(2, '0');
+                const md = String(monday.getDate()).padStart(2, '0');
+                return `${y}/${m}/${md}`;
             }
 
-            validWeightLogs.forEach(log => {
+            validLogs.forEach(log => {
                 const logDate = new Date(log.date);
                 let key = "";
 
@@ -1619,7 +1658,7 @@
                 } else if (timeframe === 'W') {
                     key = getMondayBasedWeekStr(logDate);
                 } else if (timeframe === 'M') {
-                    key = `${logDate.getFullYear()}-${String(logDate.getMonth() + 1).padStart(2, '0')}`;
+                    key = `${logDate.getFullYear()}/${String(logDate.getMonth() + 1).padStart(2, '0')}`;
                 } else if (timeframe === 'Y') {
                     key = `${logDate.getFullYear()}`;
                 }
@@ -1632,26 +1671,29 @@
             const candlestickSeries = [];
             const rawCloseData = [];
 
+            const isCategory = (timeframe === 'W' || timeframe === 'M' || timeframe === 'Y');
+
             sortedKeys.forEach(keyStr => {
                 const periodLogs = groups[keyStr];
                 periodLogs.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-                const open = periodLogs[0].weight;
-                const close = periodLogs[periodLogs.length - 1].weight;
-                const high = Math.max(...periodLogs.map(l => l.weight));
-                const low = Math.min(...periodLogs.map(l => l.weight));
+                const open = Number(periodLogs[0].weight);
+                const close = Number(periodLogs[periodLogs.length - 1].weight);
+                const weights = periodLogs.map(l => Number(l.weight));
+                const high = Math.max(...weights);
+                const low = Math.min(...weights);
 
-                let timestamp = 0;
-                if (timeframe === 'D30' || timeframe === 'DALL' || timeframe === 'W') {
-                    timestamp = new Date(keyStr).getTime();
-                } else if (timeframe === 'M') {
-                    timestamp = new Date(`${keyStr}-01`).getTime();
-                } else if (timeframe === 'Y') {
-                    timestamp = new Date(`${keyStr}-01-01`).getTime();
+                let xVal = 0;
+                if (isCategory) {
+                    // カテゴリ形式（文字列）で渡す
+                    xVal = keyStr;
+                } else {
+                    // 日時数値（タイムスタンプ）で渡す
+                    xVal = new Date(keyStr).getTime();
                 }
 
-                candlestickSeries.push({ x: timestamp, y: [open, high, low, close] });
-                rawCloseData.push({ x: timestamp, close: close });
+                candlestickSeries.push({ x: xVal, y: [open, high, low, close] });
+                rawCloseData.push({ x: xVal, close: close });
             });
 
             const ma7Series = [];
@@ -1834,6 +1876,7 @@
             });
         }
 
+        // チャート更新処理
         function updateChart() {
             if (!chart) return;
 
@@ -1854,14 +1897,9 @@
                 const latestX = dataObj.candlestick[dataObj.candlestick.length - 1].x;
                 minX = latestX - (30 * 24 * 60 * 60 * 1000);
                 maxX = latestX + (0.5 * 24 * 60 * 60 * 1000);
-            } else if (timeframe === 'W' && dataObj.candlestick.length > 0) {
-                const firstX = dataObj.candlestick[0].x;
-                const latestX = dataObj.candlestick[dataObj.candlestick.length - 1].x;
-                const margin = 3.5 * 24 * 60 * 60 * 1000;
-                minX = firstX - margin;
-                maxX = latestX + margin;
-                columnWidthVal = '85%';
             }
+
+            const isCategory = (timeframe === 'W' || timeframe === 'M' || timeframe === 'Y');
 
             chart.updateOptions({
                 plotOptions: {
@@ -1870,8 +1908,9 @@
                     }
                 },
                 xaxis: {
-                    min: minX,
-                    max: maxX
+                    type: isCategory ? 'category' : 'datetime',
+                    min: isCategory ? undefined : minX,
+                    max: isCategory ? undefined : maxX
                 },
                 series: [
                     { name: (timeframe.startsWith('D') ? '日足' : timeframe === 'W' ? '週足' : timeframe === 'M' ? '月足' : '年足'), type: 'candlestick', data: dataObj.candlestick },
@@ -1898,25 +1937,18 @@
             document.getElementById('board-period-low').innerText = Math.min(...lows).toFixed(1);
         }
 
-        function formatBoardDateStr(timestamp, tf) {
-            const dateObj = new Date(timestamp);
+        function formatBoardDateStr(xVal, tf) {
+            if (typeof xVal === 'string') {
+                if (tf === 'W') return `${xVal} 〜 (1週間)`;
+                if (tf === 'M') return `${xVal} 月足`;
+                if (tf === 'Y') return `${xVal} 年足`;
+                return xVal;
+            }
+            const dateObj = new Date(xVal);
             const y = dateObj.getFullYear();
             const m = String(dateObj.getMonth() + 1).padStart(2, '0');
             const d = String(dateObj.getDate()).padStart(2, '0');
 
-            if (tf.startsWith('D')) {
-                return `${y}/${m}/${d}`;
-            } else if (tf === 'W') {
-                const sundayObj = new Date(timestamp);
-                sundayObj.setDate(sundayObj.getDate() + 6);
-                const sm = String(sundayObj.getMonth() + 1).padStart(2, '0');
-                const sd = String(sundayObj.getDate()).padStart(2, '0');
-                return `${y}/${m}/${d} 〜 ${sundayObj.getFullYear()}/${sm}/${sd}`;
-            } else if (tf === 'M') {
-                return `${y}年 ${m}月足`;
-            } else if (tf === 'Y') {
-                return `${y}年足`;
-            }
             return `${y}/${m}/${d}`;
         }
 
